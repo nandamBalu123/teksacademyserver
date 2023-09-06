@@ -1,0 +1,54 @@
+# Node.js / npm
+node_modules/
+npm-debug.log 
+yarn-error.log 
+*.env
+
+# Dependency directories
+/dist/
+/build/
+/out/
+
+# Editor and IDE files
+.vscode/
+.idea/
+*.sublime-*
+
+# Log files
+logs/
+*.log
+
+# Temporary files
+.DS_Store
+Thumbs.db
+
+# Build output
+/build/
+/out/
+
+# Configuration files
+config.js
+
+# Compiled binary addons (if used)
+build/Release/
+
+# Local development server files
+.express/
+
+# Dependency lock files
+yarn.lock
+package-lock.json
+
+# IDE specific files
+*.iml
+*.ipr
+*.iws
+
+# Jest coverage directory
+/coverage/
+
+# TypeScript configuration file
+tsconfig.json
+
+# macOS specific files
+.DS_Store
