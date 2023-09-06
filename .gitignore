@@ -1,19 +1,20 @@
 # Ignore node_modules directory
 node_modules/
 
-# Ignore log files
-*.log
+# Ignore npm logs
+npm-debug.log
+yarn-error.log
 
-# Ignore npm's debug log
-npm-debug.log*
-
-# Ignore yarn error logs
-yarn-error.log*
+# Ignore build and distribution directories (customize as needed)
+dist/
+build/
 
 # Ignore environment-specific configuration files (e.g., .env)
-.env
+# .env
 
 # Ignore user-specific files and directories
 .DS_Store
-.vscode/
-*.sublime-*
+Thumbs.db
+
+# Ignore npm-generated files
+package-lock.json
