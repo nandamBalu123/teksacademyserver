@@ -32,6 +32,9 @@ app.use('/', inventorySystem);
 const {loginandregister} = require('./src/admindashboard/LoginAndRegister/LoginAndRegister');
 app.use('/', loginandregister);
 
+const {usersCreation} = require('./src/admindashboard/users/createusers')
+app.use('/', usersCreation)
+
 // ssl certificates
 // const { sslcert } = require('./src/sslcertificates/sllcertificatecode');
 
@@ -772,11 +775,11 @@ const httpsServer = https.createServer(
 );  
 
 // Start the HTTPS server on port 3000
-const httpsPort = 3030;
-httpsServer.listen(httpsPort, () => {
-  console.log(`HTTPS server running on port ${httpsPort}`);
-});
+// const httpsPort = 3030;
+// httpsServer.listen(httpsPort, () => {
+//   console.log(`HTTPS server running on port ${httpsPort}`);
+// });
 
-// app.listen(3030, () => {
-//   console.log('server is running on 3030')
-// })
+app.listen(3030, () => {
+  console.log('server is running on 3030')
+})
