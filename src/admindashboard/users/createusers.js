@@ -258,6 +258,19 @@ app.post('/student_form', (req, res) => {
             res.status(201).json(result);
         }
     })
+
+    app.get("/viewstudentdata/:id",(req,res)=>{
+  
+        const {id} = req.params;
+      
+        connection.query("SELECT * FROM student_details WHERE id = ? ",id,(err,result)=>{
+            if(err){
+                res.status(422).json("error");
+            }else{
+                res.status(201).json(result);
+            }
+        })
+      });
     // const studentId = req.params.studentId;
   
     // // SQL query to retrieve a student's details by their ID
