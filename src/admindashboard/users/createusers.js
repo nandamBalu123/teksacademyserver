@@ -7,7 +7,6 @@ const axios = require('axios');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser')
-
 app.use(cookieParser());
 
 
@@ -17,7 +16,7 @@ app.get('/logout', (req, res) => {
 })
 
 
-app.post('/createUser', (req, res) => {
+app.post('/createuser', (req, res) => { 
     var passwordd = req.body.email.split('@')[0];
     var passworddwithnum = passwordd;
     console.log(passworddwithnum);
@@ -50,24 +49,27 @@ app.post('/createUser', (req, res) => {
 });
 
 
-
-
-
-
+app.get('/userdata', (req, res) => {
+    const sql = "SELECT * FROM user";
+    connection.query(sql, (err, result) => {
+        if(err) return res.json({Error: "Get employee error in sql"});
+        return res.json({Status: "Success", Result: result})
+    })
+})
 
 // Secret key for JWT (store this securely and use environment variables)
 const jwtSecretKey = 'your_secret_key';
 app.post('/adminlogin', (req, res) => {
     const { email, password } = req.body;
     const sql = "SELECT * FROM user WHERE email = ?";
-    
+
     console.log('Email from Request:', email);
     console.log('Password from Request:', password);
-  
+
     // Ensure both variables are valid strings
     const trimmedEmail = String(email).trim();
     const trimmedPassword = String(password).trim();
-    
+
     connection.query(sql, [trimmedEmail], (err, result) => {
         if (err) {
             console.error('Error running database query:', err);
@@ -94,7 +96,7 @@ app.post('/adminlogin', (req, res) => {
             // Passwords match, user is authenticated
             // Generate JWT token
             const token = jwt.sign({ profile: "admin" }, jwtSecretKey, { expiresIn: '1d' });
-
+            res.cookie('token', token);
             console.log('User logged in successfully. Token generated:', token);
 
             // Fetch admin-specific data from the database here
@@ -108,12 +110,15 @@ app.post('/adminlogin', (req, res) => {
                     console.error('Error fetching admin data:', adminErr);
                     return res.status(500).json({ Status: "Error", Error: "Error fetching admin data" });
                 }
-
                 // Assuming admin data is successfully fetched, you can include it in the response
                 const adminData = adminResult[0];
 
+                // res.cookie('token', token, { httpOnly: false });
                 res.cookie('token', token);
-                return res.status(200).json({ Status: "Success", AdminData: adminData });
+                return res.status(200).json({ Status: "Success", adminData: adminData, token: token });
+
+                // res.cookie('token', token);
+                // return res.status(200).json({ Status: "Success", AdminData: adminData });
             });
         });
     });
@@ -122,31 +127,44 @@ app.post('/adminlogin', (req, res) => {
 
 const verifyUser = (req, res, next) => {
     const token = req.cookies.token;
-    if(!token) {
-        return res.json({Error: "You are no Authenticated"});
+    if (!token) {
+        return res.json({ Error: "You are no Authenticated" });
     } else {
         jwt.verify(token, "jwt-secret-key", (err, decoded) => {
-            if(err) return res.json({Error: "Token wrong"});
+            if (err) return res.json({ Error: "Token wrong" });
             req.role = decoded.role;
             req.id = decoded.id;
             next();
-        } )
+        })
     }
 }
-app.get('/dashboard',verifyUser, (req, res) => {
-    return res.json({Status: "Success", role: req.role, id: req.id})
+app.get('/dashboard', verifyUser, (req, res) => {
+    return res.json({ Status: "Success", role: req.role, id: req.id })
+})
+
+app.delete('/userdata/delete/:id', (req, res) => {
+    const { id } = req.params;
+
+    connection.query("DELETE FROM user WHERE id = ? ", id, (err, result) => {
+        if (err) {
+            res.status(422).json("error");
+        } else {
+            res.status(201).json(result);
+        }
+    })
+
 })
 
 
 app.post('/employeelogin', (req, res) => {
-    const sql = "SELECT * FROM employee Where email = ?";
-    con.query(sql, [req.body.email], (err, result) => {
+    const sql = "SELECT * FROM user Where email = ?";
+    connection.query(sql, [req.body.email], (err, result) => {
         if(err) return res.json({Status: "Error", Error: "Error in runnig query"});
         if(result.length > 0) {
             bcrypt.compare(req.body.password.toString(), result[0].password, (err, response)=> {
                 if(err) return res.json({Error: "password error"});
                 if(response) {
-                    const token = jwt.sign({role: "employee", id: result[0].id}, "jwt-secret-key", {expiresIn: '1d'});
+                    const token = jwt.sign({profile: "admin", id: result[0].id}, "jwt-secret-key", {expiresIn: '1d'});
                     res.cookie('token', token);
                     return res.json({Status: "Success", id: result[0].id})
                 } else {
@@ -156,99 +174,115 @@ app.post('/employeelogin', (req, res) => {
             })
             
         } else {
+            console.log("wrong email")
             return res.json({Status: "Error", Error: "Wrong Email or Password"});
+            
         }
     })
 })
 
 
-
-
-
-
-
-
-
-
-// app.post('/adminlogin', (req, res) => {
-//     const { email, password } = req.body;
-//     const sql = "SELECT * FROM user WHERE email = ?";
+app.post('/userroles', (req, res) => {
+    const sql = "INSERT INTO roles_permissions (role,description) VALUES (?, ?)";
+    const values = [req.body.role, req.body.description];
     
-//     console.log('Email from Request:', email);
-//     console.log('Password from Request:', password);
+    if (!values.every(value => value !== undefined)) {
+      return res.status(422).json("Please fill in all the data");
+    }
   
-//     // Ensure both variables are valid strings
-//     const trimmedEmail = String(email).trim();
-//     const trimmedPassword = String(password).trim();
+  //  selectResult
     
-//     connection.query(sql, [trimmedEmail], (err, result) => {
-//         if (err) {
-//             console.error('Error running database query:', err);
-//             return res.status(500).json({ Status: "Error", Error: "Error in running query" });
-//         }else{
-//             res.status(200)
-//         }
-
-//         if (result.length > 0) {
-//             const hashedPasswordFromDatabase = result[0].password;
-            
-//             console.log('Hashed Password from Database:', hashedPasswordFromDatabase);
-
-//             // Compare the user-provided password with the hashed password from the database
-//             bcrypt.compare(trimmedPassword, hashedPasswordFromDatabase, (bcryptErr, bcryptResult) => {
-//                 console.log('bcryptErr:', bcryptErr);
-//                 console.log('bcryptResult:', bcryptResult);
-
-//                 if (bcryptErr || !bcryptResult) {
-//                     console.log('Wrong Email or Password');
-//                     return res.status(401).json({ Status: "Error", Error: "Wrong Email or Password" });
-//                 }
-
-//                 // Passwords match, user is authenticated
-//                 // Generate JWT token
-//                 const token = jwt.sign({ profile: "admin" }, jwtSecretKey, { expiresIn: '1d' });
-
-//                 console.log('User logged in successfully. Token generated:', token);
-
-//                 res.cookie('token', token);
-//                 return res.json({ Status: "Success" });
-//             });
-//         } else {
-//             console.log('User not found');
-//             return res.status(401).json({ Status: "Error", Error: "User not found" });
-//         }
-//     });
-// });
-   
+      connection.query(sql, values, (insertErr, insertResult) => {
+        if (insertErr) {
+          console.log("Error in INSERT query: ", insertErr);
+          return res.status(500).json("Internal Server Error");
+        }
+  
+        return res.status(201).json(req.body);
+      });
+    
+})
 
 
-// app.post('/adminlogin', (req, res) => {
-//     const sql = "SELECT * FROM user WHERE mail = ? AND password = ?";
-//     console.log('Received POST request for admin login:', req.body);
+app.get('/getuserroles', (req, res) => {
+    const sql = "SELECT * FROM roles_permissions";
+    connection.query(sql, (err, result) => {
+        if(err) return res.json({Error: "Get userroles error in sql"});
+        return res.json({Status: "Success", Result: result})
+    })
+})
 
-//     connection.query(sql, [req.body.email, req.body.password], (err, result) => {
-//         if (err) {
-//             console.error('Error running database query:', err);
-//             return res.json({ Status: "Error", Error: "Error in running query" });
-//         }
+app.post('/student_form', (req, res) => {
+    // SQL query with placeholders
+    const sql = `
+      INSERT INTO student_details (
+        name, email, mobilenumber, parentsname, birthdate, gender, maritalstatus,
+        college, country, state, area, native, zipcode, whatsappno, educationtype, marks,
+        academicyear, profilepic, enquirydate, enquirytakenby, coursepackage, courses, 
+        leadsource, branch, modeoftraining, admissionstatus, registrationnumber, 
+        admissiondate, validitystartdate, validityenddate, feedetails
+      ) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+  
+    // Convert the feedetails array to JSON
+    const feedetailsJSON = JSON.stringify(req.body.feedetails);
+  
+    const values = [
+      req.body.name, req.body.email, req.body.mobileNumber, req.body.parentsname, req.body.birthdate,
+      req.body.gender, req.body.maritalStatus, req.body.college, req.body.country, req.body.state,
+      req.body.area, req.body.native, req.body.zipcode, req.body.whatsAppNo, req.body.educationType,
+      req.body.marks, req.body.academicyear, req.body.profilepic, req.body.enquiryDate,
+      req.body.enquiryTakenBy, req.body.coursePackage, req.body.courses, req.body.leadSource,
+      req.body.branch, req.body.modeOfTraining, req.body.admissionStatus, req.body.registrationNumber,
+      req.body.admissionDate, req.body.validityStartDate, req.body.validityEndDate, feedetailsJSON,
+    ];
+  
+    // Execute the SQL query
+    connection.query(sql, values, (insertErr, insertResult) => {
+      if (insertErr) {
+        console.error('Error in INSERT query:', insertErr);
+        return res.status(500).json('Internal Server Error');
+      }
+  
+      // Insertion successful, you can return a success response
+      return res.status(201).json('Student details inserted successfully');
+    });
+  });
 
-//         console.log('Query result:', result);
-
-//         if (result.length > 0) {
-//             const id = result[0].id;
-//             const token = jwt.sign({ profile: "admin" }, "jwt-secret-key", { expiresIn: '1d' });
-//             res.cookie('token', token);
-
-//             console.log('User logged in successfully. Token generated:', token);
-
-//             return res.json({ Status: "Success" });
-//         } else {
-//             console.log('Wrong Email or Password');
-//             return res.json({ Status: "Error", Error: "Wrong Email or Password" });
-//         }
-//     });
-// });
-
+  app.get('/getstudent_data', (req, res) => {
+    connection.query("SELECT * FROM student_details",(err,result)=>{
+        if(err){
+            res.status(422).json("nodata available");
+        }else{
+            res.status(201).json(result);
+        }
+    })
+    // const studentId = req.params.studentId;
+  
+    // // SQL query to retrieve a student's details by their ID
+    // const sql = `
+    //   SELECT * FROM student_details WHERE id = ?
+    // `;
+  
+    // // Execute the SQL query with the studentId parameter
+    // connection.query(sql, [studentId], (err, result) => {
+    //   if (err) {
+    //     console.error('Error in SELECT query:', err);
+    //     return res.status(500).json('Internal Server Error');
+    //   }
+  
+    //   // Check if a student with the provided ID was found
+    //   if (result.length === 0) {
+    //     return res.status(404).json('Student not found');
+    //   }
+  
+    //   // Return the student's details as JSON
+    //   const student = result[0]; // Assuming only one student is found
+    //   return res.status(200).json(student);
+    // });
+  });
+  
 module.exports = {
     usersCreation: app
 }
