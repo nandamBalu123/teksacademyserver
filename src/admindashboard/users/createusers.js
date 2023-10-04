@@ -212,6 +212,22 @@ app.get('/getuserroles', (req, res) => {
     })
 })
 
+app.get("/viewuser/:id",(req,res)=>{
+  
+    const {id} = req.params;
+  
+    connection.query("SELECT * FROM user WHERE id = ? ",id,(err,result)=>{
+        if(err){
+            res.status(422).json("error");
+        }else{
+            res.status(201).json(result);
+        }
+    })
+  });
+
+
+
+
 app.post('/student_form', (req, res) => {
     // SQL query with placeholders
     const sql = `
