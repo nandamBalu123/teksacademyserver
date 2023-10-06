@@ -11,8 +11,10 @@ app.use(cookieParser());
 
 
 app.get('/logout', (req, res) => {
+    
     res.clearCookie('token');
     return res.json({Status: "Success"});
+    
 })
 
 
@@ -47,6 +49,7 @@ app.post('/createuser', (req, res) => {
         });
     });
 });
+
 
 
 app.get('/userdata', (req, res) => {
@@ -93,8 +96,6 @@ app.post('/adminlogin', (req, res) => {
                 return res.status(401).json({ Status: "Error", Error: "Wrong Email or Password" });
             }
 
-            // Passwords match, user is authenticated
-            // Generate JWT token
             const token = jwt.sign({ profile: "admin" }, jwtSecretKey, { expiresIn: '1d' });
             res.cookie('token', token);
             console.log('User logged in successfully. Token generated:', token);
@@ -125,6 +126,20 @@ app.post('/adminlogin', (req, res) => {
 });
 
 
+// app.post('/userlogin', (req, res) => {
+//     const sql = "SELECT * FROM user WHERE email = ? AND password = ?";
+//     connection.query(sql, [req.body.email, req.body.password], (err, data) => {
+//         if(err) return res.json({Message: 'server side error'})
+//         if(data.length > 0){
+//             const name = data[0].name;
+//             const token = jwt.sign({name}, 'jsonwebtoken-secret-key', {expiresIn: '1d'});
+//             res.cookie('token', token);
+//         }else{
+//             return res.json({Message: 'no records found'})
+//         }
+//     })
+// })
+
 const verifyUser = (req, res, next) => {
     const token = req.cookies.token;
     if (!token) {
@@ -142,18 +157,6 @@ app.get('/dashboard', verifyUser, (req, res) => {
     return res.json({ Status: "Success", role: req.role, id: req.id })
 })
 
-app.delete('/userdata/delete/:id', (req, res) => {
-    const { id } = req.params;
-
-    connection.query("DELETE FROM user WHERE id = ? ", id, (err, result) => {
-        if (err) {
-            res.status(422).json("error");
-        } else {
-            res.status(201).json(result);
-        }
-    })
-
-})
 
 
 app.post('/employeelogin', (req, res) => {
@@ -225,7 +228,77 @@ app.get("/viewuser/:id",(req,res)=>{
     })
   });
 
+  app.delete("/deleteuser/:id", (req, res) => {
+    const { id } = req.params;
+  
+    connection.query("DELETE FROM user WHERE id = ?", id, (err, result) => {
+      if (err) {
+        console.error("Error deleting user:", err);
+        res.status(500).json({ error: "Internal Server Error" });
+      } else {
+        if (result.affectedRows === 0) {
+          // User with the given ID was not found
+          res.status(404).json({ error: "User not found" });
+        } else {
+          // User deleted successfully
+          res.status(200).json({ message: "User deleted successfully" });
+        }
+      }
+    });
+  });
+  
 
+
+  app.patch('/updateuser/:id', (req, res) => {
+    const { id } = req.params;
+    const data = req.body;
+    console.log(data)
+    // Validate that 'id' is a valid integer
+    if (!Number.isInteger(parseInt(id))) {
+      return res.status(422).json({ message: 'Invalid ID' });
+    }
+  
+    // Construct the SQL query
+    const updateQuery = `
+      UPDATE user 
+      SET 
+        fullname = ?, 
+        email = ?, 
+        phonenumber = ?, 
+        designation = ?, 
+        department = ?, 
+        reportto = ?, 
+        profile = ?, 
+        branch = ?
+      WHERE id = ?;
+    `;
+  
+    const values = [
+      data.fullname, 
+      data.email, 
+      data.phonenumber, 
+      data.designation, 
+      data.department, 
+      data.reportto, 
+      data.profile, 
+      data.branch,
+      id
+    ];
+  
+    // Execute the query
+    connection.query(updateQuery, values, (err, result) => {
+      if (err) {
+        console.error('Error updating user:', err);
+        res.status(500).json({ message: 'Error updating user' });
+      } else {
+        res.status(200).json({ message: 'User updated successfully' });
+      }
+    });
+  });
+  
+  
+
+// student management
 
 
 app.post('/student_form', (req, res) => {
@@ -236,9 +309,10 @@ app.post('/student_form', (req, res) => {
         college, country, state, area, native, zipcode, whatsappno, educationtype, marks,
         academicyear, profilepic, enquirydate, enquirytakenby, coursepackage, courses, 
         leadsource, branch, modeoftraining, admissionstatus, registrationnumber, 
-        admissiondate, validitystartdate, validityenddate, feedetails
+        admissiondate, validitystartdate, validityenddate, feedetails, grosstotal,
+        totaldiscount, totaltax, grandtotal, admissionremarks, assets
       ) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
   
     // Convert the feedetails array to JSON
@@ -251,7 +325,8 @@ app.post('/student_form', (req, res) => {
       req.body.marks, req.body.academicyear, req.body.profilepic, req.body.enquiryDate,
       req.body.enquiryTakenBy, req.body.coursePackage, req.body.courses, req.body.leadSource,
       req.body.branch, req.body.modeOfTraining, req.body.admissionStatus, req.body.registrationNumber,
-      req.body.admissionDate, req.body.validityStartDate, req.body.validityEndDate, feedetailsJSON,
+      req.body.admissionDate, req.body.validityStartDate, req.body.validityEndDate, feedetailsJSON, req.body.grosstotal,
+      req.body.totaldiscount, req.body.totaltax, req.body.grandtotal, req.body.admissionremarks, req.body.assets
     ];
   
     // Execute the SQL query
