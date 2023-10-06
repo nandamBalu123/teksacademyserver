@@ -316,7 +316,18 @@ app.post('/student_form', (req, res) => {
     `;
   
     // Convert the feedetails array to JSON
-    const feedetailsJSON = JSON.stringify(req.body.feedetails);
+
+    const feedetails = req.body.feedetails;
+
+    const replacer = (key, value) => {
+        if(typeof key === 'string' && key.startsWith('"') && key.endsWith('"')){
+            return key.slice(1, -1)
+        }
+        return value;
+    }
+
+    
+    const feedetailsJSON = JSON.stringify(feedetails, replacer);
   
     const values = [
       req.body.name, req.body.email, req.body.mobileNumber, req.body.parentsname, req.body.birthdate,
