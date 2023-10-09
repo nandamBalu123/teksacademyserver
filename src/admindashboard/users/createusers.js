@@ -7,6 +7,8 @@ const axios = require('axios');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser')
+const bodyParser = require('body-parser')
+app.use(bodyParser.json())
 app.use(cookieParser());
 
 
@@ -17,38 +19,92 @@ app.get('/logout', (req, res) => {
     
 })
 
-
 app.post('/createuser', (req, res) => { 
-    var passwordd = req.body.email.split('@')[0];
-    var passworddwithnum = passwordd;
-    console.log(passworddwithnum);
-    const sql = "INSERT INTO user (`fullname`, `email`, `password`, `phonenumber`, `designation`, `department`, `reportto`, `profile`, `branch`) VALUES (?)";
-    bcrypt.hash(passwordd, 10, (err, hash) => {
-        if (err) {
-            console.error('Error in hashing password:', err);
-            return res.json({ Error: 'Error in hashing password' });
-        }
-        const values = [
-            req.body.fullname,
-            req.body.email,
-            hash,
-            req.body.phonenum,
-            req.body.designation,
-            req.body.department,
-            req.body.reportto,
-            req.body.profile,
-            req.body.branch,
-        ];
-        connection.query(sql, [values], (err, result) => {
-            if (err) {
-                console.error('Error in database query:', err);
-                return res.json({ Status: "Error" });
-            }
-            console.log('User created successfully.');
-            return res.json({ Status: "Success" });
-        });
-    });
+  const email = req.body.email;
+  const passwordd = email.split('@')[0];
+  const passworddwithnum = passwordd;
+  console.log(passworddwithnum);
+
+  // Check if the email already exists in the database
+  const checkEmailQuery = "SELECT COUNT(*) AS count FROM user WHERE email = ?";
+  connection.query(checkEmailQuery, [email], (err, emailResult) => {
+      if (err) {
+          console.error('Error checking email in the database:', err);
+          return res.json({ Status: "Error" });
+      }
+      
+      // Check if the email count is greater than 0, indicating that the email already exists
+      if (emailResult[0].count > 0) {
+          console.log('Email already exists.');
+          // return res.json({ Status: "Email already exists" });
+          return res.json({ Status: 'exists'})
+          
+      }
+
+      // If the email is not found, proceed with user creation
+      bcrypt.hash(passwordd, 10, (hashErr, hash) => {
+          if (hashErr) {
+              console.error('Error in hashing password:', hashErr);
+              return res.json({ Error: 'Error in hashing password' });
+          }
+
+          const insertUserQuery = "INSERT INTO user (`fullname`, `email`, `password`, `phonenumber`, `designation`, `department`, `reportto`, `profile`, `branch`) VALUES (?)";
+          const values = [
+              req.body.fullname,
+              email,
+              hash,
+              req.body.phonenum,
+              req.body.designation,
+              req.body.department,
+              req.body.reportto,
+              req.body.profile,
+              req.body.branch,
+          ];
+
+          connection.query(insertUserQuery, [values], (insertErr, result) => {
+              if (insertErr) {
+                  console.error('Error in database query:', insertErr);
+                  return res.json({ Status: "Error" });
+              }
+              console.log('User created successfully.');
+              return res.json({ Status: "Success" });
+          });
+      });
+  });
 });
+
+
+// app.post('/createuser', (req, res) => { 
+//     var passwordd = req.body.email.split('@')[0];
+//     var passworddwithnum = passwordd;
+//     console.log(passworddwithnum);
+//     const sql = "INSERT INTO user (`fullname`, `email`, `password`, `phonenumber`, `designation`, `department`, `reportto`, `profile`, `branch`) VALUES (?)";
+//     bcrypt.hash(passwordd, 10, (err, hash) => {
+//         if (err) {
+//             console.error('Error in hashing password:', err);
+//             return res.json({ Error: 'Error in hashing password' });
+//         }
+//         const values = [
+//             req.body.fullname,
+//             req.body.email,
+//             hash,
+//             req.body.phonenum,
+//             req.body.designation,
+//             req.body.department,
+//             req.body.reportto,
+//             req.body.profile,
+//             req.body.branch,
+//         ];
+//         connection.query(sql, [values], (err, result) => {
+//             if (err) {
+//                 console.error('Error in database query:', err);
+//                 return res.json({ Status: "Error" });
+//             }
+//             console.log('User created successfully.');
+//             return res.json({ Status: "Success" });
+//         });
+//     });
+// });
 
 
 
@@ -228,73 +284,56 @@ app.get("/viewuser/:id",(req,res)=>{
     })
   });
 
-  app.delete("/deleteuser/:id", (req, res) => {
-    const { id } = req.params;
-  
-    connection.query("DELETE FROM user WHERE id = ?", id, (err, result) => {
-      if (err) {
-        console.error("Error deleting user:", err);
-        res.status(500).json({ error: "Internal Server Error" });
-      } else {
-        if (result.affectedRows === 0) {
-          // User with the given ID was not found
-          res.status(404).json({ error: "User not found" });
-        } else {
-          // User deleted successfully
-          res.status(200).json({ message: "User deleted successfully" });
-        }
-      }
-    });
-  });
-  
 
-
-  app.patch('/updateuser/:id', (req, res) => {
-    const { id } = req.params;
-    const data = req.body;
-    console.log(data)
-    // Validate that 'id' is a valid integer
-    if (!Number.isInteger(parseInt(id))) {
-      return res.status(422).json({ message: 'Invalid ID' });
+  
+  // Delete a user by ID
+app.delete('/deleteuser/:id', (req, res) => {
+  const { id } = req.params;
+  const sql = 'DELETE FROM user WHERE id = ?';
+console.log(sql);
+  connection.query(sql, [id], (err, result) => {
+    if (err) {
+      console.error('Error deleting user:', err);
+      res.status(500).send('Internal Server Error'); // You can customize the error response as needed
+    } else {
+      console.log('User deleted successfully');
+      res.send('User deleted successfully');
     }
+  });
+});
+
   
-    // Construct the SQL query
-    const updateQuery = `
-      UPDATE user 
-      SET 
-        fullname = ?, 
-        email = ?, 
-        phonenumber = ?, 
-        designation = ?, 
-        department = ?, 
-        reportto = ?, 
-        profile = ?, 
-        branch = ?
-      WHERE id = ?;
-    `;
+    // connection.query("DELETE FROM user WHERE id = ?", id, (err, result) => {
+    //   if (err) {
+    //     console.error("Error deleting user:", err);
+    //     res.status(500).json({ error: "Internal Server Error" });
+    //   } else {
+    //     if (result.affectedRows === 0) {
+    //       // User with the given ID was not found
+    //       res.status(404).json({ error: "User not found" });
+    //     } else {
+    //       // User deleted successfully
+    //       res.status(200).json({ message: "User deleted successfully" });
+    //     }
+    //   }
+    // });
+
   
-    const values = [
-      data.fullname, 
-      data.email, 
-      data.phonenumber, 
-      data.designation, 
-      data.department, 
-      data.reportto, 
-      data.profile, 
-      data.branch,
-      id
-    ];
+  app.put('/updateuser/:id', (req, res) => {
+    const sql = "UPDATE user SET fullname = ?, email = ?, phonenumber = ?, designation = ?, department = ?, reportto = ?, profile = ?, branch = ? WHERE id = ?;";
+    const id = req.params.id;
+    const { fullname, email, phonenumber, designation, department, reportto, profile, branch } = req.body; // Destructure the request body
   
-    // Execute the query
-    connection.query(updateQuery, values, (err, result) => {
+    connection.query(sql, [fullname, email, phonenumber, designation, department, reportto, profile, branch, id], (err, result) => {
       if (err) {
         console.error('Error updating user:', err);
-        res.status(500).json({ message: 'Error updating user' });
-      } else {
-        res.status(200).json({ message: 'User updated successfully' });
+        return res.status(500).json({ error: "Internal Server Error" }); // Return an error response
       }
+      return res.status(200).json({ updated: true }); // Return a success response
     });
   });
+
+
   
   
 
@@ -310,24 +349,21 @@ app.post('/student_form', (req, res) => {
         academicyear, profilepic, enquirydate, enquirytakenby, coursepackage, courses, 
         leadsource, branch, modeoftraining, admissionstatus, registrationnumber, 
         admissiondate, validitystartdate, validityenddate, feedetails, grosstotal,
-        totaldiscount, totaltax, grandtotal, admissionremarks, assets
+        totaldiscount, totaltax, grandtotal, admissionremarks, assets, totalinstallments,
+        dueamount, addfee, initialamount, duedatetype, installments, materialfee, coursefee,
+        admissionfee
       ) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
   
     // Convert the feedetails array to JSON
 
     const feedetails = req.body.feedetails;
-
-    const replacer = (key, value) => {
-        if(typeof key === 'string' && key.startsWith('"') && key.endsWith('"')){
-            return key.slice(1, -1)
-        }
-        return value;
-    }
-
+    const installments = req.body.initialamount;
     
-    const feedetailsJSON = JSON.stringify(feedetails, replacer);
+    const feedetailsJSON = JSON.stringify(feedetails);
+    const installmentsJSON = JSON.stringify(installments)
+    
   
     const values = [
       req.body.name, req.body.email, req.body.mobileNumber, req.body.parentsname, req.body.birthdate,
@@ -337,7 +373,9 @@ app.post('/student_form', (req, res) => {
       req.body.enquiryTakenBy, req.body.coursePackage, req.body.courses, req.body.leadSource,
       req.body.branch, req.body.modeOfTraining, req.body.admissionStatus, req.body.registrationNumber,
       req.body.admissionDate, req.body.validityStartDate, req.body.validityEndDate, feedetailsJSON, req.body.grosstotal,
-      req.body.totaldiscount, req.body.totaltax, req.body.grandtotal, req.body.admissionremarks, req.body.assets
+      req.body.totaldiscount, req.body.totaltax, req.body.grandtotal, req.body.admissionremarks, req.body.assets,
+      req.body.totalinstallments, req.body.dueamount, req.body.addfee, installmentsJSON,req.body.duedatetype,
+      req.body.duedatetype, req.body.installments, req.body.materialfee, req.body.coursefee, req.body.admissionfee
     ];
   
     // Execute the SQL query
@@ -352,6 +390,8 @@ app.post('/student_form', (req, res) => {
     });
   });
 
+  
+  
   app.get('/getstudent_data', (req, res) => {
     connection.query("SELECT * FROM student_details",(err,result)=>{
         if(err){
@@ -373,31 +413,42 @@ app.post('/student_form', (req, res) => {
             }
         })
       });
-    // const studentId = req.params.studentId;
-  
-    // // SQL query to retrieve a student's details by their ID
-    // const sql = `
-    //   SELECT * FROM student_details WHERE id = ?
-    // `;
-  
-    // // Execute the SQL query with the studentId parameter
-    // connection.query(sql, [studentId], (err, result) => {
-    //   if (err) {
-    //     console.error('Error in SELECT query:', err);
-    //     return res.status(500).json('Internal Server Error');
-    //   }
-  
-    //   // Check if a student with the provided ID was found
-    //   if (result.length === 0) {
-    //     return res.status(404).json('Student not found');
-    //   }
-  
-    //   // Return the student's details as JSON
-    //   const student = result[0]; // Assuming only one student is found
-    //   return res.status(200).json(student);
-    // });
+    
   });
   
+
+  app.put('/updatestudentdata/:id', (req, res) => {
+    const sql = `UPDATE student_details SET name=?, email=?, mobilenumber=?, parentsname=?,
+    birthdate=?, gender=?, maritalstatus=?, college=?, country=?, state=?, area=?, native=?, 
+    zipcode=?, whatsappno=?, educationtype=?, marks=?, academicyear=?, profilepic=?, 
+    enquirydate=?, enquirytakenby=?, coursepackage=?, courses=?, leadsource=?, branch=?, 
+    modeoftraining=?, admissionstatus=?, registrationnumber=?, admissiondate=?, validitystartdate=?,
+     validityenddate=?, feedetails=?, grosstotal=?, totaldiscount=?, totaltax=?, grandtotal=?, 
+     admissionremarks=?, assets=? WHERE id=?`;
+    const id = req.params.id;
+    const { name, email, mobilenumber, parentsname, birthdate, gender, maritalstatus, college,
+       country, state, area, native, zipcode, whatsappno, educationtype, marks, academicyear, 
+       profilepic, enquirydate, enquirytakenby, coursepackage, courses, leadsource, branch, 
+       modeoftraining, admissionstatus, registrationnumber, admissiondate, validitystartdate, 
+       validityenddate, feedetails, grosstotal, totaldiscount, totaltax, grandtotal, admissionremarks, 
+       assets} = req.body; // Destructure the request body
+  
+    connection.query(sql, [name, email, mobilenumber, parentsname, birthdate, gender, maritalstatus,
+       college, country, state, area, native, zipcode, whatsappno, educationtype, marks, academicyear,
+        profilepic, enquirydate, enquirytakenby, coursepackage, courses, leadsource, branch, 
+        modeoftraining, admissionstatus, registrationnumber, admissiondate, validitystartdate,
+         validityenddate, feedetails, grosstotal, totaldiscount, totaltax, grandtotal, 
+         admissionremarks, assets, id], (err, result) => {
+      if (err) {
+        console.error('Error updating student data:', err);
+        return res.status(500).json({ error: "Internal Server Error" }); // Return an error response
+      }
+      return res.status(200).json({ updated: true }); // Return a success response
+    });
+  });
+  
+  
+
 module.exports = {
     usersCreation: app
 }
