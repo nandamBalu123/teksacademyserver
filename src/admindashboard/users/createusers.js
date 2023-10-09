@@ -375,9 +375,10 @@ app.post('/student_form', (req, res) => {
       req.body.admissionDate, req.body.validityStartDate, req.body.validityEndDate, feedetailsJSON, req.body.grosstotal,
       req.body.totaldiscount, req.body.totaltax, req.body.grandtotal, req.body.admissionremarks, req.body.assets,
       req.body.totalinstallments, req.body.dueamount, req.body.addfee, installmentsJSON,req.body.duedatetype,
-      req.body.duedatetype, req.body.installments, req.body.materialfee, req.body.coursefee, req.body.admissionfee
+      req.body.installments, req.body.materialfee, req.body.coursefee, req.body.admissionfee
     ];
   
+
     // Execute the SQL query
     connection.query(sql, values, (insertErr, insertResult) => {
       if (insertErr) {
