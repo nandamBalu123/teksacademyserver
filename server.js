@@ -15,7 +15,7 @@ const connection = require('./src/db/connection');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
-app.use(cors());
+app.use(cors()); 
 app.use(express.json());
 app.use(bodyParser.json());
 
