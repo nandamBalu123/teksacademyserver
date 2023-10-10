@@ -123,7 +123,7 @@ app.post('/form-data', (req, res) => {
         },
       ],
       customFieldValues: {
-        cfEnquiredCourse: wcourse,
+        requirementName: wcourse,
       },
       source: 1056043,
     };
@@ -208,7 +208,7 @@ app.post('/form-data', (req, res) => {
         },
       ],
       customFieldValues: {
-        cfEnquiredCourse: sccourse,
+        requirementName: sccourse,
       },
       source: 1056041,
     };
@@ -293,7 +293,7 @@ app.post('/form-data', (req, res) => {
         },
       ],
       customFieldValues: {
-        cfEnquiredCourse: slpcourse,
+        requirementName: slpcourse,
       },
       source: 1056041,
     };
@@ -379,7 +379,7 @@ app.post('/form-data', (req, res) => {
         },
       ],
       customFieldValues: {
-        cfEnquiredCourse: course,
+        requirementName: course,
         city: city,
       },
       source: 1056041,
@@ -467,7 +467,7 @@ app.post('/form-data', (req, res) => {
         },
       ],
       customFieldValues: {
-        cfEnquiredCourse: efcourse,
+        requirementName: efcourse,
         city: efcity,
       },
       source: 1056041,
@@ -554,7 +554,7 @@ app.post('/form-data', (req, res) => {
         },
       ],
       customFieldValues: {
-        cfEnquiredCourse: slpefcourse,
+        requirementName: slpefcourse,
         city: slpefcity,
       },
       source: 1056041,

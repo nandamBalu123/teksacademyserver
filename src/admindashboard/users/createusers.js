@@ -351,9 +351,9 @@ app.post('/student_form', (req, res) => {
         admissiondate, validitystartdate, validityenddate, feedetails, grosstotal,
         totaldiscount, totaltax, grandtotal, admissionremarks, assets, totalinstallments,
         dueamount, addfee, initialamount, duedatetype, installments, materialfee, coursefee,
-        admissionfee
+        admissionfee, feedetailsbilling, totalfeewithouttax
       ) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
   
     // Convert the feedetails array to JSON
@@ -375,7 +375,7 @@ app.post('/student_form', (req, res) => {
       req.body.admissionDate, req.body.validityStartDate, req.body.validityEndDate, feedetailsJSON, req.body.grosstotal,
       req.body.totaldiscount, req.body.totaltax, req.body.grandtotal, req.body.admissionremarks, req.body.assets,
       req.body.totalinstallments, req.body.dueamount, req.body.addfee, installmentsJSON,req.body.duedatetype,
-      req.body.installments, req.body.materialfee, req.body.coursefee, req.body.admissionfee
+      req.body.installments, req.body.materialfee, req.body.coursefee, req.body.admissionfee, req.body.feedetailsbilling, req.body.totalfeewithouttax
     ];
   
 
