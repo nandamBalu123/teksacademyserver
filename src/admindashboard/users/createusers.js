@@ -396,22 +396,19 @@ const values = [
 });
 
 app.put('/addfee/:id', (req, res) => {
-  const sql = "UPDATE student_details SET dueamount = ?, initialamount = ?, totalinstallments = ? WHERE id = ?;";
+  const sql = "UPDATE student_details SET dueamount = ?, addfee = ?, initialamount = ?, totalinstallments = ? WHERE id = ?;";
   const id = req.params.id;
 
+  
   const dueamount = req.body.dueamount;
   const initialamount = req.body.initialamount;
   const totalinstallments = req.body.totalinstallments;
-  const totalinstallmentsJSON = JSON.stringify(totalinstallments)
-
+  const totalinstallmentsJSON = JSON.stringify(totalinstallments);
+  const addfee = req.body.addfee;
   
-  // const { req.body.dueamount, initialamount, totalinstallmentsJSON } = // Destructure the request body
-
-
-  console.log("dueamount", dueamount);
   // console.log("initialamount", initialamount);
   // console.log("totalinstallments", totalinstallmentsJSON);
-  connection.query(sql, [dueamount, initialamount, totalinstallmentsJSON, id], (err, result) => {
+  connection.query(sql, [dueamount, initialamount, totalinstallmentsJSON, addfee, id], (err, result) => {
     if (err) {
       console.error('Error updating user:', err);
       return res.status(500).json({ error: "Internal Server Error" }); // Return an error response
