@@ -408,7 +408,7 @@ app.put('/addfee/:id', (req, res) => {
   
   // console.log("initialamount", initialamount);
   // console.log("totalinstallments", totalinstallmentsJSON);
-  connection.query(sql, [dueamount, initialamount, totalinstallmentsJSON, addfee, id], (err, result) => {
+  connection.query(sql, [dueamount, addfee, initialamount, totalinstallmentsJSON, id], (err, result) => {
     if (err) {
       console.error('Error updating user:', err);
       return res.status(500).json({ error: "Internal Server Error" }); // Return an error response
