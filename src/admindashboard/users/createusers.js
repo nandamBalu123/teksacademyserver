@@ -340,58 +340,63 @@ console.log(sql);
 // student management
 
 
+
 app.post('/student_form', (req, res) => {
-    // SQL query with placeholders
-    const sql = `
-      INSERT INTO student_details (
-        name, email, mobilenumber, parentsname, birthdate, gender, maritalstatus,
-        college, country, state, area, native, zipcode, whatsappno, educationtype, marks,
-        academicyear, profilepic, enquirydate, enquirytakenby, coursepackage, courses, 
-        leadsource, branch, modeoftraining, admissionstatus, registrationnumber, 
-        admissiondate, validitystartdate, validityenddate, feedetails, grosstotal,
-        totaldiscount, totaltax, grandtotal, finaltotal, admissionremarks, assets, totalinstallments,
-        dueamount, addfee, initialamount, duedatetype, installments, materialfee, coursefee,
-        admissionfee, feedetailsbilling, totalfeewithouttax
-      ) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `;
-  
-    // Convert the feedetails array to JSON
+  // SQL query with placeholders
+  // const insertUserQuery = "INSERT INTO user (`fullname`, `email`, `password`, `phonenumber`, `designation`, `department`, `reportto`, `profile`, `branch`) VALUES (?)";
+  // const sql = "INSERT INTO student_details (`name`, `email`, `mobilenumber`, `parentsname`, `birthdate`, `gender`, `maritalstatus`, `college`, `country`, `state`, `area`, `native`, `zipcode`, `whatsappno`, `educationtype`, `marks`, `academicyear`, `profilepic`, `enquirydate`, `enquirytakenby`, `coursepackage`, `courses`, `leadsource`, `branch`, `modeoftraining`, `admissionstatus`, `registrationnumber`, `admissiondate`, `validitystartdate`, `validityenddate`, `feedetails`, `grosstotal`, `totaldiscount`, `totaltax`, `grandtotal`, `finaltotal`, `admissionremarks`, `assets`, `totalinstallments`, `dueamount`, `addfee`, `initialamount`, `duedatetype`, `installments`, `materialfee`, `feedetailsbilling`, `totalfeewithouttax`) VALUES (?)";
+  const sql = `
+    INSERT INTO student_details (
+      name, email, mobilenumber, parentsname, birthdate, gender, maritalstatus,
+      college, country, state, area, native, zipcode, whatsappno, educationtype, marks,
+      academicyear, profilepic, enquirydate, enquirytakenby, coursepackage, courses, 
+      leadsource, branch, modeoftraining, admissionstatus, registrationnumber, 
+      admissiondate, validitystartdate, validityenddate, feedetails, grosstotal,
+      totaldiscount, totaltax, grandtotal, finaltotal, admissionremarks, assets, totalinstallments,
+      dueamount, addfee, initialamount, duedatetype, installments, materialfee,
+      feedetailsbilling, totalfeewithouttax
+    ) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `;
 
-    const feedetails = req.body.feedetails;
-    const installments = req.body.initialamount;
-    
-    const feedetailsJSON = JSON.stringify(feedetails);
-    const installmentsJSON = JSON.stringify(installments)
-    
-  
-    const values = [
-      req.body.name, req.body.email, req.body.mobileNumber, req.body.parentsname, req.body.birthdate,
-      req.body.gender, req.body.maritalStatus, req.body.college, req.body.country, req.body.state,
-      req.body.area, req.body.native, req.body.zipcode, req.body.whatsAppNo, req.body.educationType,
-      req.body.marks, req.body.academicyear, req.body.profilepic, req.body.enquiryDate,
-      req.body.enquiryTakenBy, req.body.coursePackage, req.body.courses, req.body.leadSource,
-      req.body.branch, req.body.modeOfTraining, req.body.admissionStatus, req.body.registrationNumber,
-      req.body.admissionDate, req.body.validityStartDate, req.body.validityEndDate, feedetailsJSON, req.body.grosstotal,
-      req.body.totaldiscount, req.body.totaltax, req.body.grandtotal, req.body.finaltotal, req.body.admissionremarks, req.body.assets,
-      req.body.totalinstallments, req.body.dueamount, req.body.addfee, installmentsJSON,req.body.duedatetype,
-      req.body.installments, req.body.materialfee, req.body.coursefee, req.body.admissionfee, req.body.feedetailsbilling, req.body.totalfeewithouttax
-    ];
-  
 
-    // Execute the SQL query
-    connection.query(sql, values, (insertErr, insertResult) => {
-      if (insertErr) {
-        console.error('Error in INSERT query:', insertErr);
-        return res.status(500).json('Internal Server Error');
-      }
-  
-      // Insertion successful, you can return a success response
-      return res.status(201).json('Student details inserted successfully');
-    });
+  // // Convert the feedetails array to JSON
+const feedetails = req.body.feedetails;
+const installments = req.body.installments; // Assuming installments should be a separate array
+const feedetailsbilling = req.body.feedetailsbilling;
+
+const feedetailsJSON = JSON.stringify(feedetails);
+const installmentsJSON = JSON.stringify(installments);
+const feedetailsbillingJSON = JSON.stringify(feedetailsbilling)
+
+const values = [
+    req.body.name, req.body.email, req.body.mobilenumber, req.body.parentsname, req.body.birthdate,
+    req.body.gender, req.body.maritalstatus, req.body.college, req.body.country, req.body.state,
+    req.body.area, req.body.native, req.body.zipcode, req.body.whatsappno, req.body.educationtype,
+    req.body.marks, req.body.academicyear, req.body.profilepic, req.body.enquirydate,
+    req.body.enquirytakenby, req.body.coursepackage, req.body.courses, req.body.leadsource,
+    req.body.branch, req.body.modeoftraining, req.body.admissionstatus, req.body.registrationnumber,
+    req.body.admissiondate, req.body.validitystartdate, req.body.validityenddate, feedetailsJSON, 
+    req.body.grosstotal, req.body.totaldiscount, req.body.totaltax, req.body.grandtotal, req.body.finaltotal, 
+    req.body.admissionremarks, req.body.assets, req.body.totalinstallments, req.body.dueamount, 
+    req.body.addfee, installmentsJSON, req.body.initialamount, req.body.duedatetype, req.body.materialfee, feedetailsbillingJSON, req.body.totalfeewithouttax
+];
+
+
+  // Execute the SQL query
+  connection.query(sql, values, (insertErr, insertResult) => {
+    if (insertErr) {
+      console.error('Error in INSERT query:', insertErr);
+      return res.status(500).json('Internal Server Error');
+    }
+
+    // Insertion successful, you can return a success response
+    return res.status(201).json('Student details inserted successfully');
   });
+});
 
-  
+
+
   
   app.get('/getstudent_data', (req, res) => {
     connection.query("SELECT * FROM student_details",(err,result)=>{
