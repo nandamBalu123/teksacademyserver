@@ -367,7 +367,7 @@ const feedetailsbilling = req.body.feedetailsbilling;
 
 const feedetailsJSON = JSON.stringify(feedetails);
 const installmentsJSON = JSON.stringify(installments);
-const feedetailsbillingJSON = JSON.stringify(feedetailsbilling)
+const feedetailsbillingJSON = JSON.stringify(feedetailsbilling);
 
 const values = [
     req.body.name, req.body.email, req.body.mobilenumber, req.body.parentsname, req.body.birthdate,
@@ -395,6 +395,22 @@ const values = [
   });
 });
 
+app.put('/addfee/:id', (req, res) => {
+  const sql = "UPDATE student_details SET dueamount = ?, initialamount = ?, totalinstallments = ? WHERE id = ?;";
+  const id = req.params.id;
+  const { dueamount, initialamount, totalinstallments } = req.body; // Destructure the request body
+
+  console.log("dueamount", dueamount);
+  console.log("initialamount", initialamount);
+  console.log("totalinstallments", totalinstallments);
+  connection.query(sql, [dueamount, initialamount, totalinstallments, id], (err, result) => {
+    if (err) {
+      console.error('Error updating user:', err);
+      return res.status(500).json({ error: "Internal Server Error" }); // Return an error response
+    }
+    return res.status(200).json({ updated: true }); // Return a success response
+  });
+});
 
 
   
