@@ -421,8 +421,6 @@ app.put('/feeinstallments/:id', (req, res) => {
   const sql = "UPDATE student_details SET installments = ?, totalinstallments = ?, dueamount = ? WHERE id = ?;";
   const id = req.params.id;
 
-  
-  
   const installments = req.body.installments;
   const totalinstallments = req.body.totalinstallments;
   const dueamount = req.body.dueamount;
