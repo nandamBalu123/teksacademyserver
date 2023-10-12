@@ -395,6 +395,29 @@ const values = [
   });
 });
 
+app.get('/getstudent_data', (req, res) => {
+  connection.query("SELECT * FROM student_details",(err,result)=>{
+      if(err){
+          res.status(422).json("nodata available");
+      }else{
+          res.status(201).json(result);
+      }
+  })
+});
+  app.get("/viewstudentdata/:id",(req,res)=>{
+
+      const {id} = req.params;
+    
+      connection.query("SELECT * FROM student_details WHERE id = ? ",id,(err,result)=>{
+          if(err){
+              res.status(422).json("error");
+          }else{
+              res.status(201).json(result);
+          }
+      })
+    });
+  
+
 app.put('/addfee/:id', (req, res) => {
   const sql = "UPDATE student_details SET dueamount = ?, addfee = ?, initialamount = ?, totalinstallments = ? WHERE id = ?;";
   const id = req.params.id;
@@ -425,12 +448,8 @@ app.put('/feeinstallments/:id', (req, res) => {
   const installmentsJSON = JSON.stringify(installments);
   const totalinstallments = req.body.totalinstallments;
   const dueamount = req.body.dueamount;
-  const totalinstallmentsJSON = JSON.stringify(totalinstallments);
   
-  
-  // console.log("initialamount", initialamount);
-  // console.log("totalinstallments", totalinstallmentsJSON);
-  connection.query(sql, [installmentsJSON, totalinstallmentsJSON, dueamount, id], (err, result) => {
+  connection.query(sql, [installmentsJSON, totalinstallments, dueamount, id], (err, result) => {
     if (err) {
       console.error('Error updating user:', err);
       return res.status(500).json({ error: "Internal Server Error" }); // Return an error response
@@ -439,28 +458,7 @@ app.put('/feeinstallments/:id', (req, res) => {
   });
 });
 
-  app.get('/getstudent_data', (req, res) => {
-    connection.query("SELECT * FROM student_details",(err,result)=>{
-        if(err){
-            res.status(422).json("nodata available");
-        }else{
-            res.status(201).json(result);
-        }
-    })
-  });
-    app.get("/viewstudentdata/:id",(req,res)=>{
   
-        const {id} = req.params;
-      
-        connection.query("SELECT * FROM student_details WHERE id = ? ",id,(err,result)=>{
-            if(err){
-                res.status(422).json("error");
-            }else{
-                res.status(201).json(result);
-            }
-        })
-      });
-    
  
   
 
