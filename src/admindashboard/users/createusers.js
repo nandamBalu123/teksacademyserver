@@ -388,7 +388,7 @@ app.get('/getstudent_data', (req, res) => {
       // Parse the "installments" JSON strings into JavaScript objects
       const parsedResults = result.map(row => {
         const parsedInstallments = JSON.parse(row.totalinstallments);
-        return { ...row, installments: parsedInstallments };
+        return { ...row, totalinstallments: parsedInstallments };
       });
 
       res.status(201).json(parsedResults);
