@@ -74,39 +74,6 @@ app.post('/createuser', (req, res) => {
 });
 
 
-// app.post('/createuser', (req, res) => { 
-//     var passwordd = req.body.email.split('@')[0];
-//     var passworddwithnum = passwordd;
-//     console.log(passworddwithnum);
-//     const sql = "INSERT INTO user (`fullname`, `email`, `password`, `phonenumber`, `designation`, `department`, `reportto`, `profile`, `branch`) VALUES (?)";
-//     bcrypt.hash(passwordd, 10, (err, hash) => {
-//         if (err) {
-//             console.error('Error in hashing password:', err);
-//             return res.json({ Error: 'Error in hashing password' });
-//         }
-//         const values = [
-//             req.body.fullname,
-//             req.body.email,
-//             hash,
-//             req.body.phonenum,
-//             req.body.designation,
-//             req.body.department,
-//             req.body.reportto,
-//             req.body.profile,
-//             req.body.branch,
-//         ];
-//         connection.query(sql, [values], (err, result) => {
-//             if (err) {
-//                 console.error('Error in database query:', err);
-//                 return res.json({ Status: "Error" });
-//             }
-//             console.log('User created successfully.');
-//             return res.json({ Status: "Success" });
-//         });
-//     });
-// });
-
-
 
 app.get('/userdata', (req, res) => {
     const sql = "SELECT * FROM user";
@@ -367,8 +334,10 @@ const feedetailsbilling = req.body.feedetailsbilling;
 
 const feedetailsJSON = JSON.stringify(feedetails);
 const installmentsJSON = JSON.stringify(installments);
+// const installmentsJSON = [[]];
 const feedetailsbillingJSON = JSON.stringify(feedetailsbilling);
-
+console.log("installment", installmentsJSON);
+console.log("installment", feedetailsbillingJSON)
 const values = [
     req.body.name, req.body.email, req.body.mobilenumber, req.body.parentsname, req.body.birthdate,
     req.body.gender, req.body.maritalstatus, req.body.college, req.body.country, req.body.state,
@@ -379,7 +348,7 @@ const values = [
     req.body.admissiondate, req.body.validitystartdate, req.body.validityenddate, feedetailsJSON, 
     req.body.grosstotal, req.body.totaldiscount, req.body.totaltax, req.body.grandtotal, req.body.finaltotal, 
     req.body.admissionremarks, req.body.assets, req.body.totalinstallments, req.body.dueamount, 
-    req.body.addfee, installmentsJSON, req.body.initialamount, req.body.duedatetype, req.body.materialfee, feedetailsbillingJSON, req.body.totalfeewithouttax
+    req.body.addfee, req.body.initialamount, req.body.duedatetype, installmentsJSON, req.body.materialfee, feedetailsbillingJSON, req.body.totalfeewithouttax
 ];
 
 
@@ -395,15 +364,40 @@ const values = [
   });
 });
 
+
+
+// app.get('/getstudent_data', (req, res) => {
+//   const sql = "SELECT * FROM student_details";
+
+//   connection.query(sql,(err,result)=>{
+//       if(err){
+//           res.status(422).json("nodata available");
+//       }else{
+//           res.status(201).json(result);
+//       }
+//   })
+// });
+
 app.get('/getstudent_data', (req, res) => {
-  connection.query("SELECT * FROM student_details",(err,result)=>{
-      if(err){
-          res.status(422).json("nodata available");
-      }else{
-          res.status(201).json(result);
-      }
-  })
+  const sql = "SELECT * FROM student_details";
+
+  connection.query(sql, (err, result) => {
+    if (err) {
+      res.status(422).json("No data available");
+    } else {
+      // Parse the "installments" JSON strings into JavaScript objects
+      const parsedResults = result.map(row => {
+        const parsedInstallments = JSON.parse(row.installments);
+        return { ...row, installments: parsedInstallments };
+      });
+
+      res.status(201).json(parsedResults);
+    }
+  });
 });
+
+
+
 app.get("/viewstudentdata/:id",(req,res)=>{
 
     const {id} = req.params;
