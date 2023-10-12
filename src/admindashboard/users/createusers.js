@@ -446,7 +446,7 @@ app.put('/feeinstallments/:id', (req, res) => {
             res.status(201).json(result);
         }
     })
-
+  });
     app.get("/viewstudentdata/:id",(req,res)=>{
   
         const {id} = req.params;
@@ -460,7 +460,7 @@ app.put('/feeinstallments/:id', (req, res) => {
         })
       });
     
-  });
+ 
   
 
   app.put('/updatestudentdata/:id', (req, res) => {
