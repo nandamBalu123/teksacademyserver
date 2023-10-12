@@ -378,6 +378,20 @@ const values = [
 //   })
 // });
 
+
+// app.get("/viewstudentdata/:id",(req,res)=>{
+
+//   const {id} = req.params;
+
+//   connection.query("SELECT * FROM student_details WHERE id = ? ",id,(err,result)=>{
+//       if(err){
+//           res.status(422).json("error");
+//       }else{
+//           res.status(201).json(result);
+//       }
+//   })
+// });
+
 app.get('/getstudent_data', (req, res) => {
   const sql = "SELECT * FROM student_details";
 
@@ -397,19 +411,25 @@ app.get('/getstudent_data', (req, res) => {
 });
 
 
-
 app.get("/viewstudentdata/:id",(req,res)=>{
 
-    const {id} = req.params;
+  const {id} = req.params;
+
+  connection.query("SELECT * FROM student_details WHERE id = ? ",id,(err,result)=>{
+      if(err){
+          res.status(422).json("error");
+      }else {
+        // Parse the "installments" JSON strings into JavaScript objects
+        const parsedResults = result.map(row => {
+          const parsedInstallments = JSON.parse(row.totalinstallments);
+          return { ...row, totalinstallments: parsedInstallments };
+        });
   
-    connection.query("SELECT * FROM student_details WHERE id = ? ",id,(err,result)=>{
-        if(err){
-            res.status(422).json("error");
-        }else{
-            res.status(201).json(result);
-        }
-    })
-  });
+        res.status(201).json(parsedResults);
+      }
+  })
+});
+
   
 
 app.put('/addfee/:id', (req, res) => {
