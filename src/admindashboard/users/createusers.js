@@ -422,14 +422,15 @@ app.put('/feeinstallments/:id', (req, res) => {
   const id = req.params.id;
 
   const installments = req.body.installments;
+  const installmentsJSON = JSON.stringify(installments);
   const totalinstallments = req.body.totalinstallments;
   const dueamount = req.body.dueamount;
   const totalinstallmentsJSON = JSON.stringify(totalinstallments);
-  const addfee = req.body.addfee;
+  
   
   // console.log("initialamount", initialamount);
   // console.log("totalinstallments", totalinstallmentsJSON);
-  connection.query(sql, [installments, totalinstallmentsJSON, dueamount, id], (err, result) => {
+  connection.query(sql, [installmentsJSON, totalinstallmentsJSON, dueamount, id], (err, result) => {
     if (err) {
       console.error('Error updating user:', err);
       return res.status(500).json({ error: "Internal Server Error" }); // Return an error response
