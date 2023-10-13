@@ -366,54 +366,39 @@ const values = [
 
 
 
-app.get('/getstudent_data', (req, res) => {
-  const sql = "SELECT * FROM student_details";
-
-  connection.query(sql,(err,result)=>{
-      if(err){
-          res.status(422).json("nodata available");
-      }else{
-          res.status(201).json(result);
-      }
-  })
-});
-
-
-
 // app.get('/getstudent_data', (req, res) => {
 //   const sql = "SELECT * FROM student_details";
 
-//   connection.query(sql, (err, result) => {
-//     if (err) {
-//       res.status(422).json("No data available");
-//     } else {
-//       // Parse the "installments" JSON strings into JavaScript objects
-//       const parsedResults = result.map(row => {
-//         const parsedInstallments = JSON.parse(row.totalinstallments);
-//         return { ...row, totalinstallments: parsedInstallments };
-//       });
-
-//       res.status(201).json(parsedResults);
-//     }
-//   });
+//   connection.query(sql,(err,result)=>{
+//       if(err){
+//           res.status(422).json("nodata available");
+//       }else{
+//           res.status(201).json(result);
+//       }
+//   })
 // });
 
 
 
+app.get('/getstudent_data', (req, res) => {
+  const sql = "SELECT * FROM student_details";
 
+  connection.query(sql, (err, result) => {
+    if (err) {
+      res.status(422).json("No data available");
+    } else {
+      // Parse the "installments" JSON strings into JavaScript objects
+      const parsedResults = result.map(row => {
+        const parsedTotalInstallments = JSON.parse(row.totalinstallments);
+        const parsedInstallments = JSON.parse(row.installments);
+        return { ...row, totalinstallments: parsedTotalInstallments, installments: parsedInstallments };
+      });
 
-app.get("/viewstudentdata/:id",(req,res)=>{
-
-  const {id} = req.params;
-
-  connection.query("SELECT * FROM student_details WHERE id = ? ",id,(err,result)=>{
-      if(err){
-          res.status(422).json("error");
-      }else{
-          res.status(201).json(result);
-      }
-  })
+      res.status(201).json(parsedResults);
+    }
+  });
 });
+
 
 
 
@@ -425,17 +410,34 @@ app.get("/viewstudentdata/:id",(req,res)=>{
 //   connection.query("SELECT * FROM student_details WHERE id = ? ",id,(err,result)=>{
 //       if(err){
 //           res.status(422).json("error");
-//       }else {
-//         // Parse the "installments" JSON strings into JavaScript objects
-//         const parsedResults = result.map(row => {
-//           const parsedInstallments = JSON.parse(row.totalinstallments);
-//           return { ...row, totalinstallments: parsedInstallments };
-//         });
-  
-//         res.status(201).json(parsedResults);
+//       }else{
+//           res.status(201).json(result);
 //       }
 //   })
 // });
+
+
+
+
+app.get("/viewstudentdata/:id",(req,res)=>{
+
+  const {id} = req.params;
+
+  connection.query("SELECT * FROM student_details WHERE id = ? ",id,(err,result)=>{
+      if(err){
+          res.status(422).json("error");
+      }else {
+        // Parse the "installments" JSON strings into JavaScript objects
+        const parsedResults = result.map(row => {
+          const parsedTotalInstallments = JSON.parse(row.totalinstallments);
+          const parsedInstallments = JSON.parse(row.installments);
+          return { ...row, totalinstallments: parsedTotalInstallments, installments: parsedInstallments };
+        });
+  
+        res.status(201).json(parsedResults);
+      }
+  })
+});
 
 app.put('/addfee/:id', (req, res) => {
   const id = req.params.id;
