@@ -321,9 +321,9 @@ app.post('/student_form', (req, res) => {
       admissiondate, validitystartdate, validityenddate, feedetails, grosstotal,
       totaldiscount, totaltax, grandtotal, finaltotal, admissionremarks, assets, totalinstallments,
       dueamount, addfee, initialamount, duedatetype, installments, materialfee,
-      feedetailsbilling, totalfeewithouttax
+      feedetailsbilling, totalfeewithouttax, totalpaidamount
     ) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
 
@@ -334,7 +334,6 @@ const feedetailsbilling = req.body.feedetailsbilling;
 
 const feedetailsJSON = JSON.stringify(feedetails);
 const installmentsJSON = JSON.stringify(installments);
-// const installmentsJSON = [[]];
 const feedetailsbillingJSON = JSON.stringify(feedetailsbilling);
 console.log("installment", installmentsJSON);
 console.log("installment", feedetailsbillingJSON)
@@ -348,7 +347,8 @@ const values = [
     req.body.admissiondate, req.body.validitystartdate, req.body.validityenddate, feedetailsJSON, 
     req.body.grosstotal, req.body.totaldiscount, req.body.totaltax, req.body.grandtotal, req.body.finaltotal, 
     req.body.admissionremarks, req.body.assets, req.body.totalinstallments, req.body.dueamount, 
-    req.body.addfee, req.body.initialamount, req.body.duedatetype, installmentsJSON, req.body.materialfee, feedetailsbillingJSON, req.body.totalfeewithouttax
+    req.body.addfee, req.body.initialamount, req.body.duedatetype, installmentsJSON, req.body.materialfee, feedetailsbillingJSON, 
+    req.body.totalfeewithouttax, req.body.totalpaidamount
 ];
 
 
@@ -446,13 +446,14 @@ app.put('/addfee/:id', (req, res) => {
   const totalinstallments = req.body.totalinstallments;
   const addfee = req.body.addfee;
   const installments = req.body.installments;
+  const totalpaidamount = req.body.totalpaidamount
 
-  const sql = "UPDATE student_details SET totalinstallments = ?, dueamount = ?, addfee = ?, initialamount = ?, installments = ? WHERE id = ?;";
+  const sql = "UPDATE student_details SET totalinstallments = ?, dueamount = ?, addfee = ?, initialamount = ?, installments = ?, totalpaidamount = ? WHERE id = ?;";
 
   const totalinstallmentsJSON = JSON.stringify(totalinstallments);
   const installmentsJSON = JSON.stringify(installments);
 
-  connection.query(sql, [totalinstallmentsJSON, dueamount, addfee, initialamount, installmentsJSON, id], (err, result) => {
+  connection.query(sql, [totalinstallmentsJSON, dueamount, addfee, initialamount, installmentsJSON, totalpaidamount, id], (err, result) => {
     if (err) {
       console.error('Error updating user:', err);
       return res.status(500).json({ error: "Internal Server Error" }); // Return an error response
