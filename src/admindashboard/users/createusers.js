@@ -485,6 +485,25 @@ app.put('/feeinstallments/:id', (req, res) => {
   });
 });
 
+
+
+app.put('/addnewinstallments/:id', (req, res) => {
+  const sql = "UPDATE student_details SET installments = ? WHERE id = ?;";
+  const id = req.params.id;
+
+  const installments = req.body.installments;
+  const installmentsJSON = JSON.stringify(installments);
+  
+  
+  connection.query(sql, [installmentsJSON, id], (err, result) => {
+    if (err) {
+      console.error('Error updating user:', err);
+      return res.status(500).json({ error: "Internal Server Error" }); // Return an error response
+    }
+    return res.status(200).json({ updated: true }); // Return a success response
+  });
+});
+
   app.put('/updatestudentdata/:id', (req, res) => {
     const sql = `UPDATE student_details SET name=?, email=?, mobilenumber=?, parentsname=?,
     birthdate=?, gender=?, maritalstatus=?, college=?, country=?, state=?, area=?, native=?, 
