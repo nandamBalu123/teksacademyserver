@@ -53,7 +53,7 @@ app.post('/createuser', (req, res) => {
               req.body.fullname,
               email,
               hash,
-              req.body.phonenum,
+              req.body.phonenumber,
               req.body.designation,
               req.body.department,
               req.body.reportto,
@@ -75,13 +75,38 @@ app.post('/createuser', (req, res) => {
 
 
 
+// app.get('/userdata', (req, res) => {
+//     const sql = "SELECT * FROM user";
+//     connection.query(sql, (err, result) => {
+//         if(err) return res.json({Error: "Get employee error in sql"});
+//         return res.json({Status: "Success", Result: result})
+//     })
+// });
+
 app.get('/userdata', (req, res) => {
-    const sql = "SELECT * FROM user";
-    connection.query(sql, (err, result) => {
-        if(err) return res.json({Error: "Get employee error in sql"});
-        return res.json({Status: "Success", Result: result})
-    })
+  const sql = "SELECT * FROM user";
+  connection.query(sql,(err,result)=>{
+          if(err){
+              res.status(422).json("nodata available");
+          }else{
+              res.status(201).json(result);
+              console.log(result)
+          }
+      })
 })
+
+// app.get('/getstudent_data', (req, res) => {
+//   const sql = "SELECT * FROM student_details";
+
+//   connection.query(sql,(err,result)=>{
+//       if(err){
+//           res.status(422).json("nodata available");
+//       }else{
+//           res.status(201).json(result);
+//       }
+//   })
+// });
+
 
 // Secret key for JWT (store this securely and use environment variables)
 const jwtSecretKey = 'your_secret_key';
