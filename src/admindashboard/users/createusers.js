@@ -90,7 +90,7 @@ app.get('/userdata', (req, res) => {
               res.status(422).json("nodata available");
           }else{
               res.status(201).json(result);
-              console.log(result)
+              
           }
       })
 })
@@ -259,7 +259,7 @@ app.get('/getuserroles', (req, res) => {
     const sql = "SELECT * FROM roles_permissions";
     connection.query(sql, (err, result) => {
         if(err) return res.json({Error: "Get userroles error in sql"});
-        return res.json({Status: "Success", Result: result})
+        return res.json(result)
     })
 })
 
@@ -688,9 +688,131 @@ app.get('/getbranch', (req, res) => {
   const sql = "SELECT * FROM branch_settings";
   connection.query(sql, (err, result) => {
     if(err){
-      return res.json({Error: "get userroles error in sql"});
+      return res.json({Error: "get branch error in sql"});
     }else{
       res.status(201).json(result);
+    }
+  })
+})
+
+// department
+
+app.post('/adddepartment', (req, res) => {
+  const sql = "INSERT INTO department_settings (department_name) VALUES (?)";
+  const values = [req.body.department_name];
+
+  if(!values.every(value => value !== undefined)){
+    return res.status(422).json("fill the field");
+  }
+
+  connection.query(sql, values, (err, result) => {
+    if(err){
+      return res.json({Error: "get department error in sql"})
+    }else{
+      res.status(201).json(req.body)
+    }
+  })
+})
+
+app.get('/getdepartment', (req, res) =>{
+  const sql = "SELECT * FROM department_settings";
+  connection.query(sql, (err, result) => {
+    if(err){
+      return res.json({Error: "get department error in sql"})
+    }else{
+      res.status(201).json(result)
+    }
+  })
+})
+
+// leadsource
+
+app.post('/addloadsource', (req, res) => {
+  const sql = "INSERT INTO leadsource_setting (leadsource) VALUES (?)";
+  const values = [req.body.leadsource];
+
+  if(!values.every(value => value !== undefined)){
+    res.status(422).json("fill the fields")
+  };
+
+  connection.query(sql, values, (err, result) => {
+    if(err){
+      return res.json({Error: "error adding loadsource"})
+    }else{
+      res.status(201).json(req.body);
+    }
+  })
+})
+
+app.get('/getleadsource', (req, res) => {
+  const sql = "SELECT * FROM leadsource_settings";
+  
+  connection.query(sql, (err, result) => {
+    if(err){
+      return res.json({Error: "get leadsource error in sql"})
+    }else{
+      res.status(201).json(result)
+    }
+  })
+})
+
+// courses
+app.post('/addcourses', (req, res) => {
+  const sql = "INSERT INTO courses_settings (course_name) VALUES (?)";
+  const values = [req.body.course_name];
+
+  if(!values.every(value => value !== undefined)){
+    return res.status(422).json('fill the fields')
+  }
+
+  connection.query(sql, values, (err, result) => {
+    if(err){
+      return res.json({Error: "error adding course"})
+    }else{
+      return res.status(201).json(result)
+    }
+  })
+
+})
+
+app.get('/getcourses', (req, res) => {
+  const sql = "SELECT * FROM courses_settings";
+  connection.query(sql, (err, result) => {
+    if(err){
+      return res.json({Error: "get courses error in sql"})
+    }else{
+      return res.status(201).json(result)
+    }
+  })
+})
+
+
+// coursespackage
+app.post('/addcoursespackages', (req, res) => {
+  const sql = "INSERT INTO coursespackages_settings (course_name) VALUES (?)";
+  const values = [req.body.course_name];
+
+  if(!values.every(value => value !== undefined)){
+    return res.status(422).json('fill the fields')
+  }
+
+  connection.query(sql, values, (err, result) => {
+    if(err){
+      return res.json({Error: "error adding course"})
+    }else{
+      return res.status(201).json(result)
+    }
+  })
+
+})
+
+app.get('/getcoursespackages', (req, res) => {
+  const sql = "SELECT * FROM coursespackages_settings";
+  connection.query(sql, (err, result) => {
+    if(err){
+      return res.json({Error: "get courses error in sql"})
+    }else{
+      return res.status(201).json(result)
     }
   })
 })
