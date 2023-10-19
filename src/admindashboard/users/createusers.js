@@ -10,7 +10,7 @@ const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
 app.use(bodyParser.json())
 app.use(cookieParser()); 
-
+const multer = require('multer');
 
 app.get('/logout', (req, res) => {
     
@@ -22,8 +22,8 @@ app.get('/logout', (req, res) => {
 app.post('/createuser', (req, res) => { 
   const email = req.body.email;
   const passwordd = email.split('@')[0];
-  const passworddwithnum = passwordd;
-  console.log(passworddwithnum);
+  // const passworddwithnum = passwordd;
+  // console.log(passworddwithnum);
 
   // Check if the email already exists in the database
   const checkEmailQuery = "SELECT COUNT(*) AS count FROM user WHERE email = ?";
@@ -114,8 +114,8 @@ app.post('/adminlogin', (req, res) => {
     const { email, password } = req.body;
     const sql = "SELECT * FROM user WHERE email = ?";
 
-    console.log('Email from Request:', email);
-    console.log('Password from Request:', password);
+    // console.log('Email from Request:', email);
+    // console.log('Password from Request:', password);
 
     // Ensure both variables are valid strings
     const trimmedEmail = String(email).trim();
@@ -282,7 +282,7 @@ app.get("/viewuser/:id",(req,res)=>{
 app.delete('/deleteuser/:id', (req, res) => {
   const { id } = req.params;
   const sql = 'DELETE FROM user WHERE id = ?';
-console.log(sql);
+
   connection.query(sql, [id], (err, result) => {
     if (err) {
       console.error('Error deleting user:', err);
@@ -333,7 +333,80 @@ console.log(sql);
 
 
 
-app.post('/student_form', (req, res) => {
+// app.post('/student_form', (req, res) => {
+//   // SQL query with placeholders
+//   // const insertUserQuery = "INSERT INTO user (`fullname`, `email`, `password`, `phonenumber`, `designation`, `department`, `reportto`, `profile`, `branch`) VALUES (?)";
+//   // const sql = "INSERT INTO student_details (`name`, `email`, `mobilenumber`, `parentsname`, `birthdate`, `gender`, `maritalstatus`, `college`, `country`, `state`, `area`, `native`, `zipcode`, `whatsappno`, `educationtype`, `marks`, `academicyear`, `profilepic`, `enquirydate`, `enquirytakenby`, `coursepackage`, `courses`, `leadsource`, `branch`, `modeoftraining`, `admissionstatus`, `registrationnumber`, `admissiondate`, `validitystartdate`, `validityenddate`, `feedetails`, `grosstotal`, `totaldiscount`, `totaltax`, `grandtotal`, `finaltotal`, `admissionremarks`, `assets`, `totalinstallments`, `dueamount`, `addfee`, `initialamount`, `duedatetype`, `installments`, `materialfee`, `feedetailsbilling`, `totalfeewithouttax`) VALUES (?)";
+//   const sql = `
+//     INSERT INTO student_details (
+//       name, email, mobilenumber, parentsname, birthdate, gender, maritalstatus,
+//       college, country, state, area, native, zipcode, whatsappno, educationtype, marks,
+//       academicyear, profilepic, enquirydate, enquirytakenby, coursepackage, courses, 
+//       leadsource, branch, modeoftraining, admissionstatus, registrationnumber, 
+//       admissiondate, validitystartdate, validityenddate, feedetails, grosstotal,
+//       totaldiscount, totaltax, grandtotal, finaltotal, admissionremarks, assets, totalinstallments,
+//       dueamount, addfee, initialamount, duedatetype, installments, materialfee,
+//       feedetailsbilling, totalfeewithouttax, totalpaidamount
+//     ) 
+//     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+//   `;
+
+
+//   // // Convert the feedetails array to JSON
+// const feedetails = req.body.feedetails;
+// const installments = req.body.installments; // Assuming installments should be a separate array
+// const feedetailsbilling = req.body.feedetailsbilling;
+
+// const feedetailsJSON = JSON.stringify(feedetails);
+// const installmentsJSON = JSON.stringify(installments);
+// const feedetailsbillingJSON = JSON.stringify(feedetailsbilling);
+// console.log("installment", installmentsJSON);
+// console.log("installment", feedetailsbillingJSON)
+// const values = [
+//     req.body.name, req.body.email, req.body.mobilenumber, req.body.parentsname, req.body.birthdate,
+//     req.body.gender, req.body.maritalstatus, req.body.college, req.body.country, req.body.state,
+//     req.body.area, req.body.native, req.body.zipcode, req.body.whatsappno, req.body.educationtype,
+//     req.body.marks, req.body.academicyear, req.body.profilepic, req.body.enquirydate,
+//     req.body.enquirytakenby, req.body.coursepackage, req.body.courses, req.body.leadsource,
+//     req.body.branch, req.body.modeoftraining, req.body.admissionstatus, req.body.registrationnumber,
+//     req.body.admissiondate, req.body.validitystartdate, req.body.validityenddate, feedetailsJSON, 
+//     req.body.grosstotal, req.body.totaldiscount, req.body.totaltax, req.body.grandtotal, req.body.finaltotal, 
+//     req.body.admissionremarks, req.body.assets, req.body.totalinstallments, req.body.dueamount, 
+//     req.body.addfee, req.body.initialamount, req.body.duedatetype, installmentsJSON, req.body.materialfee, feedetailsbillingJSON, 
+//     req.body.totalfeewithouttax, req.body.totalpaidamount
+// ];
+
+
+//   // Execute the SQL query
+//   connection.query(sql, values, (insertErr, insertResult) => {
+//     if (insertErr) {
+//       console.error('Error in INSERT query:', insertErr);
+//       return res.status(500).json('Internal Server Error');
+//     }
+
+//     // Insertion successful, you can return a success response
+//     return res.status(201).json('Student details inserted successfully');
+//   });
+// });
+
+
+// Define the storage for uploaded files using multer.diskStorage
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    // Set the destination where uploaded files will be stored.
+    // In this example, we're using the "uploads" directory.
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    // Set the filename for the uploaded file. You can customize it as needed.
+    cb(null, file.originalname);
+  },
+});
+
+// Create the multer instance and specify the storage settings
+const upload = multer({ storage: storage });
+
+app.post('/student_form', upload.single('image'), (req, res) => {
   // SQL query with placeholders
   // const insertUserQuery = "INSERT INTO user (`fullname`, `email`, `password`, `phonenumber`, `designation`, `department`, `reportto`, `profile`, `branch`) VALUES (?)";
   // const sql = "INSERT INTO student_details (`name`, `email`, `mobilenumber`, `parentsname`, `birthdate`, `gender`, `maritalstatus`, `college`, `country`, `state`, `area`, `native`, `zipcode`, `whatsappno`, `educationtype`, `marks`, `academicyear`, `profilepic`, `enquirydate`, `enquirytakenby`, `coursepackage`, `courses`, `leadsource`, `branch`, `modeoftraining`, `admissionstatus`, `registrationnumber`, `admissiondate`, `validitystartdate`, `validityenddate`, `feedetails`, `grosstotal`, `totaldiscount`, `totaltax`, `grandtotal`, `finaltotal`, `admissionremarks`, `assets`, `totalinstallments`, `dueamount`, `addfee`, `initialamount`, `duedatetype`, `installments`, `materialfee`, `feedetailsbilling`, `totalfeewithouttax`) VALUES (?)";
@@ -360,8 +433,7 @@ const feedetailsbilling = req.body.feedetailsbilling;
 const feedetailsJSON = JSON.stringify(feedetails);
 const installmentsJSON = JSON.stringify(installments);
 const feedetailsbillingJSON = JSON.stringify(feedetailsbilling);
-console.log("installment", installmentsJSON);
-console.log("installment", feedetailsbillingJSON)
+
 const values = [
     req.body.name, req.body.email, req.body.mobilenumber, req.body.parentsname, req.body.birthdate,
     req.body.gender, req.body.maritalstatus, req.body.college, req.body.country, req.body.state,
@@ -562,7 +634,66 @@ app.put('/addnewinstallments/:id', (req, res) => {
   });
   
   
+// branch settings
 
+
+
+// app.post('/userroles', (req, res) => {
+//   const sql = "INSERT INTO roles_permissions (role,description) VALUES (?, ?)";
+//   const values = [req.body.role, req.body.description];
+  
+//   if (!values.every(value => value !== undefined)) {
+//     return res.status(422).json("Please fill in all the data");
+//   }
+
+// //  selectResult
+  
+//     connection.query(sql, values, (insertErr, insertResult) => {
+//       if (insertErr) {
+//         console.log("Error in INSERT query: ", insertErr);
+//         return res.status(500).json("Internal Server Error");
+//       }
+
+//       return res.status(201).json(req.body);
+//     });
+  
+// })
+
+
+// app.get('/getuserroles', (req, res) => {
+//   const sql = "SELECT * FROM roles_permissions";
+//   connection.query(sql, (err, result) => {
+//       if(err) return res.json({Error: "Get userroles error in sql"});
+//       return res.json({Status: "Success", Result: result})
+//   })
+// })
+
+
+app.post('/addbranch', (req, res) => {
+  const sql = "INSERT INTO branch_settings (branch_name) VALUES (?)";
+  const values = [req.body.branch_name];
+
+  if(!values.every(value => value !== undefined)){
+    return res.status(422).json("Please fill in all the data");
+  }
+  connection.query(sql, values, (err, result) => {
+    if(err){
+      console.log("err insert in addbranch: ", err);
+    }
+    return res.status(201).json(req.body);
+  })
+});
+
+app.get('/getbranch', (req, res) => {
+  const sql = "SELECT * FROM branch_settings";
+  connection.query(sql, (err, result) => {
+    if(err){
+      return res.json({Error: "get userroles error in sql"});
+    }else{
+      res.status(201).json(result);
+    }
+  })
+})
 module.exports = {
     usersCreation: app
 }
