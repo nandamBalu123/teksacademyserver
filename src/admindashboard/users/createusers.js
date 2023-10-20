@@ -153,7 +153,7 @@ app.post('/adminlogin', (req, res) => {
             // For example:
             const adminDataSql = "SELECT * FROM user WHERE id = ?";
             const adminId = result[0].id;
-
+            
             connection.query(adminDataSql, [adminId], (adminErr, adminResult) => {
                 if (adminErr) {
                     console.error('Error fetching admin data:', adminErr);
@@ -200,7 +200,7 @@ const verifyUser = (req, res, next) => {
             req.role = decoded.role;
             req.id = decoded.id;
             next();
-            console.log(req.role)
+            
         })
     }
 }
@@ -554,6 +554,37 @@ app.get('/getstudent_data', (req, res) => {
   });
 });
 
+app.get('/someadminendpoint', (req, res) => {
+  // Retrieve the JWT token from the request's cookies
+  const token = req.cookies.token;
+
+  if (!token) {
+      return res.status(401).json({ Status: "Error", Error: "Unauthorized" });
+  }
+
+  try {
+      // Verify and decode the JWT token using your secret key
+      const decoded = jwt.verify(token, jwtSecretKey);
+
+      // The user ID (adminId) will be available in the decoded payload
+      const adminId = decoded.id;
+    console.log(adminId);
+      // Now you can use the adminId as needed
+      // For example, you can fetch data specific to this admin using adminId
+      // and send it in the response
+      // const adminData = fetchDataFromDatabase(adminId); // Implement this function
+      // res.status(200).json({ Status: "Success", adminData: adminData, userId: adminId });
+  } catch (error) {
+      // Handle any errors related to token verification
+      return res.status(401).json({ Status: "Error", Error: "Invalid token" });
+  }
+});
+
+
+
+
+
+
 
 
 
@@ -871,7 +902,7 @@ app.get('/getcourses', (req, res) => {
 
 // coursespackage
 app.post('/addcoursespackages', (req, res) => {
-  const sql = "INSERT INTO coursespackages_settings (course_name) VALUES (?)";
+  const sql = "INSERT INTO coursespackages_settings (coursepackages_name) VALUES (?)";
   const values = [req.body.course_name];
 
   if(!values.every(value => value !== undefined)){
