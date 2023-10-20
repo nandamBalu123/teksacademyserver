@@ -903,7 +903,7 @@ app.get('/getcourses', (req, res) => {
 // coursespackage
 app.post('/addcoursespackages', (req, res) => {
   const sql = "INSERT INTO coursespackages_settings (coursepackages_name) VALUES (?)";
-  const values = [req.body.course_name];
+  const values = [req.body.coursepackages_name];
 
   if(!values.every(value => value !== undefined)){
     return res.status(422).json('fill the fields')
