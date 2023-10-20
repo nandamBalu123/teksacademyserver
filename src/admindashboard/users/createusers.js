@@ -901,22 +901,17 @@ app.get('/getcourses', (req, res) => {
 
 
 // coursespackage
-app.post('/addcoursespackages', (req, res) => {
-  const sql = "INSERT INTO coursespackages_settings (coursepackages_name) VALUES (?)";
+
+app.post('/addcoursep', (req, res) => {
+  const sql = "INSERT INTO coursepackages_settings (coursepackages_name) VALUES (?)";
   const values = [req.body.coursepackages_name];
-
-  if(!values.every(value => value !== undefined)){
-    return res.status(422).json('fill the fields')
-  }
-
   connection.query(sql, values, (err, result) => {
     if(err){
-      return res.json({Error: "error adding course"})
+      return res.json({Error: "get coursecp error in sql"})
     }else{
-      return res.status(201).json(result)
+      res.status(201).json(req.body)
     }
   })
-
 })
 
 app.get('/getcoursespackages', (req, res) => {
