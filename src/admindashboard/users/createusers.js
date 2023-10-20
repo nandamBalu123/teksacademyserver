@@ -810,7 +810,7 @@ app.get('/getdepartment', (req, res) =>{
 // leadsource
 
 app.post('/addleadsource', (req, res) => {
-  const sql = "INSERT INTO leadsource_setting (leadsource) VALUES (?)";
+  const sql = "INSERT INTO leadsource_settings (leadsource) VALUES (?)";
   const values = [req.body.leadsource];
 
   if(!values.every(value => value !== undefined)){
