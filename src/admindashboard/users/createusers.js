@@ -561,7 +561,8 @@ app.get('/getstudent_data', (req, res) => {
       const parsedResults = result.map(row => {
         const parsedTotalInstallments = JSON.parse(row.totalinstallments);
         const parsedInstallments = JSON.parse(row.installments);
-        return { ...row, totalinstallments: parsedTotalInstallments, installments: parsedInstallments };
+        const parsedInitialpayment = JSON.parse(row.initialpayment)
+        return { ...row, totalinstallments: parsedTotalInstallments, installments: parsedInstallments, initialpayment: parsedInitialpayment };
       });
 
       res.status(201).json(parsedResults);
@@ -603,7 +604,8 @@ app.get("/viewstudentdata/:id",(req,res)=>{
         const parsedResults = result.map(row => {
           const parsedTotalInstallments = JSON.parse(row.totalinstallments);
           const parsedInstallments = JSON.parse(row.installments);
-          return { ...row, totalinstallments: parsedTotalInstallments, installments: parsedInstallments };
+          const parsedInitialpayment = JSON.parse(row.initialpayment)
+          return { ...row, totalinstallments: parsedTotalInstallments, installments: parsedInstallments, initialpayment: parsedInitialpayment  };
         });
   
         res.status(201).json(parsedResults);
