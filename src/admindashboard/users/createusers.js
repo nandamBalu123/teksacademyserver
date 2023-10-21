@@ -7,6 +7,7 @@ const axios = require('axios');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser')
+const twilio = require("twilio");
 const bodyParser = require('body-parser')
 app.use(bodyParser.json())
 
@@ -410,6 +411,9 @@ const storage = multer.diskStorage({
 // Create the multer instance and specify the storage settings
 const upload = multer({ storage: storage });
 
+
+
+
 // app.post('/student_form', upload.single('image'), (req, res) => {
 //   // SQL query with placeholders
 //   // const insertUserQuery = "INSERT INTO user (`fullname`, `email`, `password`, `phonenumber`, `designation`, `department`, `reportto`, `profile`, `branch`) VALUES (?)";
@@ -423,9 +427,9 @@ const upload = multer({ storage: storage });
 //       admissiondate, validitystartdate, validityenddate, feedetails, grosstotal,
 //       totaldiscount, totaltax, grandtotal, finaltotal, admissionremarks, assets, totalinstallments,
 //       dueamount, addfee, initialamount, duedatetype, installments, materialfee,
-//       feedetailsbilling, totalfeewithouttax, totalpaidamount
+//       feedetailsbilling, totalfeewithouttax, totalpaidamount, user_id
 //     ) 
-//     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+//     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 //   `;
 
 
@@ -449,7 +453,7 @@ const upload = multer({ storage: storage });
 //     req.body.grosstotal, req.body.totaldiscount, req.body.totaltax, req.body.grandtotal, req.body.finaltotal, 
 //     req.body.admissionremarks, req.body.assets, req.body.totalinstallments, req.body.dueamount, 
 //     req.body.addfee, req.body.initialamount, req.body.duedatetype, installmentsJSON, req.body.materialfee, feedetailsbillingJSON, 
-//     req.body.totalfeewithouttax, req.body.totalpaidamount
+//     req.body.totalfeewithouttax, req.body.totalpaidamount, req.body.user_id
 // ];
 
 
@@ -465,6 +469,11 @@ const upload = multer({ storage: storage });
 //   });
 // });
 
+const accountSid = 'AC876367b65a66cb4887b88be073bc0e94';
+const authToken = 'ac5c67e0f4cff4f38cbf257bd86108cc';
+const twilioWhatsAppNumber = 'whatsapp:+9493991327';
+
+const client = new twilio(accountSid, authToken);
 
 app.post('/student_form', upload.single('image'), (req, res) => {
   // SQL query with placeholders
@@ -519,19 +528,25 @@ const values = [
     // Insertion successful, you can return a success response
     return res.status(201).json('Student details inserted successfully');
   });
+
+
+  client.messages
+        .create({
+            body: 'Student details have been successfully inserted.',
+            from: twilioWhatsAppNumber, // Replace with your Twilio WhatsApp number
+            to: 'whatsapp:+8096189590', // Replace with the recipient's WhatsApp number
+        })
+        .then((message) => {
+            console.log('WhatsApp message sent:', message.sid);
+            res.status(201).json('Student details inserted successfully');
+        })
+        .catch((error) => {
+            console.error('Error sending WhatsApp message:', error);
+            res.status(500).json('Error sending WhatsApp message');
+        });
 });
 
-// app.get('/getstudent_data', (req, res) => {
-//   const sql = "SELECT * FROM student_details";
 
-//   connection.query(sql,(err,result)=>{
-//       if(err){
-//           res.status(422).json("nodata available");
-//       }else{
-//           res.status(201).json(result);
-//       }
-//   })
-// });
 
 
 
@@ -553,35 +568,6 @@ app.get('/getstudent_data', (req, res) => {
     }
   });
 });
-
-app.get('/someadminendpoint', (req, res) => {
-  // Retrieve the JWT token from the request's cookies
-  const token = req.cookies.token;
-
-  if (!token) {
-      return res.status(401).json({ Status: "Error", Error: "Unauthorized" });
-  }
-
-  try {
-      // Verify and decode the JWT token using your secret key
-      const decoded = jwt.verify(token, jwtSecretKey);
-
-      // The user ID (adminId) will be available in the decoded payload
-      const adminId = decoded.id;
-    console.log(adminId);
-      // Now you can use the adminId as needed
-      // For example, you can fetch data specific to this admin using adminId
-      // and send it in the response
-      // const adminData = fetchDataFromDatabase(adminId); // Implement this function
-      // res.status(200).json({ Status: "Success", adminData: adminData, userId: adminId });
-  } catch (error) {
-      // Handle any errors related to token verification
-      return res.status(401).json({ Status: "Error", Error: "Invalid token" });
-  }
-});
-
-
-
 
 
 
@@ -625,10 +611,35 @@ app.get("/viewstudentdata/:id",(req,res)=>{
   })
 });
 
+// app.put('/addfee/:id', (req, res) => {
+//   const id = req.params.id;
+//   const dueamount = req.body.dueamount;
+//   const initialamount = req.body.initialamount;
+//   const totalinstallments = req.body.totalinstallments;
+//   const addfee = req.body.addfee;
+//   const installments = req.body.installments;
+//   const totalpaidamount = req.body.totalpaidamount
+
+//   const sql = "UPDATE student_details SET totalinstallments = ?, dueamount = ?, addfee = ?, initialamount = ?, installments = ?, totalpaidamount = ? WHERE id = ?;";
+
+//   const totalinstallmentsJSON = JSON.stringify(totalinstallments);
+//   const installmentsJSON = JSON.stringify(installments);
+
+//   connection.query(sql, [totalinstallmentsJSON, dueamount, addfee, initialamount, installmentsJSON, totalpaidamount, id], (err, result) => {
+//     if (err) {
+//       console.error('Error updating user:', err);
+//       return res.status(500).json({ error: "Internal Server Error" }); // Return an error response
+//     }
+//     return res.status(200).json({ updated: true }); // Return a success response
+//   });
+// });
+
+
 app.put('/addfee/:id', (req, res) => {
   const id = req.params.id;
   const dueamount = req.body.dueamount;
   const initialamount = req.body.initialamount;
+  const initialamountJSON = JSON.stringify(initialamount)
   const totalinstallments = req.body.totalinstallments;
   const addfee = req.body.addfee;
   const installments = req.body.installments;
@@ -639,7 +650,7 @@ app.put('/addfee/:id', (req, res) => {
   const totalinstallmentsJSON = JSON.stringify(totalinstallments);
   const installmentsJSON = JSON.stringify(installments);
 
-  connection.query(sql, [totalinstallmentsJSON, dueamount, addfee, initialamount, installmentsJSON, totalpaidamount, id], (err, result) => {
+  connection.query(sql, [totalinstallmentsJSON, dueamount, addfee, initialamountJSON, installmentsJSON, totalpaidamount, id], (err, result) => {
     if (err) {
       console.error('Error updating user:', err);
       return res.status(500).json({ error: "Internal Server Error" }); // Return an error response
@@ -647,6 +658,7 @@ app.put('/addfee/:id', (req, res) => {
     return res.status(200).json({ updated: true }); // Return a success response
   });
 });
+  
   
 
 
