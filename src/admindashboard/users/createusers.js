@@ -645,7 +645,7 @@ app.put('/addfee/:id', (req, res) => {
   const installments = req.body.installments;
   const totalpaidamount = req.body.totalpaidamount
 
-  const sql = "UPDATE student_details SET totalinstallments = ?, dueamount = ?, addfee = ?, initialamount = ?, installments = ?, totalpaidamount = ? WHERE id = ?;";
+  const sql = "UPDATE student_details SET totalinstallments = ?, dueamount = ?, addfee = ?, initialpayment = ?, installments = ?, totalpaidamount = ? WHERE id = ?;";
 
   const totalinstallmentsJSON = JSON.stringify(totalinstallments);
   const installmentsJSON = JSON.stringify(installments);
