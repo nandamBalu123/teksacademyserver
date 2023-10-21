@@ -350,7 +350,7 @@ app.post('/student_form', (req, res) => {
       leadsource, branch, modeoftraining, admissionstatus, registrationnumber, 
       admissiondate, validitystartdate, validityenddate, feedetails, grosstotal,
       totaldiscount, totaltax, grandtotal, finaltotal, admissionremarks, assets, totalinstallments,
-      dueamount, addfee, initialamount, duedatetype, installments, materialfee,
+      dueamount, addfee, initialpayment, duedatetype, installments, materialfee,
       feedetailsbilling, totalfeewithouttax, totalpaidamount
     ) 
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -377,7 +377,7 @@ const values = [
     req.body.admissiondate, req.body.validitystartdate, req.body.validityenddate, feedetailsJSON, 
     req.body.grosstotal, req.body.totaldiscount, req.body.totaltax, req.body.grandtotal, req.body.finaltotal, 
     req.body.admissionremarks, req.body.assets, req.body.totalinstallments, req.body.dueamount, 
-    req.body.addfee, req.body.initialamount, req.body.duedatetype, installmentsJSON, req.body.materialfee, feedetailsbillingJSON, 
+    req.body.addfee, req.body.initialpayment, req.body.duedatetype, installmentsJSON, req.body.materialfee, feedetailsbillingJSON, 
     req.body.totalfeewithouttax, req.body.totalpaidamount
 ];
 
