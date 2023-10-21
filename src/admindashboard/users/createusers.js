@@ -338,61 +338,61 @@ app.delete('/deleteuser/:id', (req, res) => {
 
 
 
-// app.post('/student_form', (req, res) => {
-//   // SQL query with placeholders
-//   // const insertUserQuery = "INSERT INTO user (`fullname`, `email`, `password`, `phonenumber`, `designation`, `department`, `reportto`, `profile`, `branch`) VALUES (?)";
-//   // const sql = "INSERT INTO student_details (`name`, `email`, `mobilenumber`, `parentsname`, `birthdate`, `gender`, `maritalstatus`, `college`, `country`, `state`, `area`, `native`, `zipcode`, `whatsappno`, `educationtype`, `marks`, `academicyear`, `profilepic`, `enquirydate`, `enquirytakenby`, `coursepackage`, `courses`, `leadsource`, `branch`, `modeoftraining`, `admissionstatus`, `registrationnumber`, `admissiondate`, `validitystartdate`, `validityenddate`, `feedetails`, `grosstotal`, `totaldiscount`, `totaltax`, `grandtotal`, `finaltotal`, `admissionremarks`, `assets`, `totalinstallments`, `dueamount`, `addfee`, `initialamount`, `duedatetype`, `installments`, `materialfee`, `feedetailsbilling`, `totalfeewithouttax`) VALUES (?)";
-//   const sql = `
-//     INSERT INTO student_details (
-//       name, email, mobilenumber, parentsname, birthdate, gender, maritalstatus,
-//       college, country, state, area, native, zipcode, whatsappno, educationtype, marks,
-//       academicyear, profilepic, enquirydate, enquirytakenby, coursepackage, courses, 
-//       leadsource, branch, modeoftraining, admissionstatus, registrationnumber, 
-//       admissiondate, validitystartdate, validityenddate, feedetails, grosstotal,
-//       totaldiscount, totaltax, grandtotal, finaltotal, admissionremarks, assets, totalinstallments,
-//       dueamount, addfee, initialamount, duedatetype, installments, materialfee,
-//       feedetailsbilling, totalfeewithouttax, totalpaidamount
-//     ) 
-//     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-//   `;
+app.post('/student_form', (req, res) => {
+  // SQL query with placeholders
+  // const insertUserQuery = "INSERT INTO user (`fullname`, `email`, `password`, `phonenumber`, `designation`, `department`, `reportto`, `profile`, `branch`) VALUES (?)";
+  // const sql = "INSERT INTO student_details (`name`, `email`, `mobilenumber`, `parentsname`, `birthdate`, `gender`, `maritalstatus`, `college`, `country`, `state`, `area`, `native`, `zipcode`, `whatsappno`, `educationtype`, `marks`, `academicyear`, `profilepic`, `enquirydate`, `enquirytakenby`, `coursepackage`, `courses`, `leadsource`, `branch`, `modeoftraining`, `admissionstatus`, `registrationnumber`, `admissiondate`, `validitystartdate`, `validityenddate`, `feedetails`, `grosstotal`, `totaldiscount`, `totaltax`, `grandtotal`, `finaltotal`, `admissionremarks`, `assets`, `totalinstallments`, `dueamount`, `addfee`, `initialamount`, `duedatetype`, `installments`, `materialfee`, `feedetailsbilling`, `totalfeewithouttax`) VALUES (?)";
+  const sql = `
+    INSERT INTO student_details (
+      name, email, mobilenumber, parentsname, birthdate, gender, maritalstatus,
+      college, country, state, area, native, zipcode, whatsappno, educationtype, marks,
+      academicyear, profilepic, enquirydate, enquirytakenby, coursepackage, courses, 
+      leadsource, branch, modeoftraining, admissionstatus, registrationnumber, 
+      admissiondate, validitystartdate, validityenddate, feedetails, grosstotal,
+      totaldiscount, totaltax, grandtotal, finaltotal, admissionremarks, assets, totalinstallments,
+      dueamount, addfee, initialamount, duedatetype, installments, materialfee,
+      feedetailsbilling, totalfeewithouttax, totalpaidamount
+    ) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `;
 
 
-//   // // Convert the feedetails array to JSON
-// const feedetails = req.body.feedetails;
-// const installments = req.body.installments; // Assuming installments should be a separate array
-// const feedetailsbilling = req.body.feedetailsbilling;
+  // // Convert the feedetails array to JSON
+const feedetails = req.body.feedetails;
+const installments = req.body.installments; // Assuming installments should be a separate array
+const feedetailsbilling = req.body.feedetailsbilling;
 
-// const feedetailsJSON = JSON.stringify(feedetails);
-// const installmentsJSON = JSON.stringify(installments);
-// const feedetailsbillingJSON = JSON.stringify(feedetailsbilling);
-// console.log("installment", installmentsJSON);
-// console.log("installment", feedetailsbillingJSON)
-// const values = [
-//     req.body.name, req.body.email, req.body.mobilenumber, req.body.parentsname, req.body.birthdate,
-//     req.body.gender, req.body.maritalstatus, req.body.college, req.body.country, req.body.state,
-//     req.body.area, req.body.native, req.body.zipcode, req.body.whatsappno, req.body.educationtype,
-//     req.body.marks, req.body.academicyear, req.body.profilepic, req.body.enquirydate,
-//     req.body.enquirytakenby, req.body.coursepackage, req.body.courses, req.body.leadsource,
-//     req.body.branch, req.body.modeoftraining, req.body.admissionstatus, req.body.registrationnumber,
-//     req.body.admissiondate, req.body.validitystartdate, req.body.validityenddate, feedetailsJSON, 
-//     req.body.grosstotal, req.body.totaldiscount, req.body.totaltax, req.body.grandtotal, req.body.finaltotal, 
-//     req.body.admissionremarks, req.body.assets, req.body.totalinstallments, req.body.dueamount, 
-//     req.body.addfee, req.body.initialamount, req.body.duedatetype, installmentsJSON, req.body.materialfee, feedetailsbillingJSON, 
-//     req.body.totalfeewithouttax, req.body.totalpaidamount
-// ];
+const feedetailsJSON = JSON.stringify(feedetails);
+const installmentsJSON = JSON.stringify(installments);
+const feedetailsbillingJSON = JSON.stringify(feedetailsbilling);
+console.log("installment", installmentsJSON);
+console.log("installment", feedetailsbillingJSON)
+const values = [
+    req.body.name, req.body.email, req.body.mobilenumber, req.body.parentsname, req.body.birthdate,
+    req.body.gender, req.body.maritalstatus, req.body.college, req.body.country, req.body.state,
+    req.body.area, req.body.native, req.body.zipcode, req.body.whatsappno, req.body.educationtype,
+    req.body.marks, req.body.academicyear, req.body.profilepic, req.body.enquirydate,
+    req.body.enquirytakenby, req.body.coursepackage, req.body.courses, req.body.leadsource,
+    req.body.branch, req.body.modeoftraining, req.body.admissionstatus, req.body.registrationnumber,
+    req.body.admissiondate, req.body.validitystartdate, req.body.validityenddate, feedetailsJSON, 
+    req.body.grosstotal, req.body.totaldiscount, req.body.totaltax, req.body.grandtotal, req.body.finaltotal, 
+    req.body.admissionremarks, req.body.assets, req.body.totalinstallments, req.body.dueamount, 
+    req.body.addfee, req.body.initialamount, req.body.duedatetype, installmentsJSON, req.body.materialfee, feedetailsbillingJSON, 
+    req.body.totalfeewithouttax, req.body.totalpaidamount
+];
 
 
-//   // Execute the SQL query
-//   connection.query(sql, values, (insertErr, insertResult) => {
-//     if (insertErr) {
-//       console.error('Error in INSERT query:', insertErr);
-//       return res.status(500).json('Internal Server Error');
-//     }
+  // Execute the SQL query
+  connection.query(sql, values, (insertErr, insertResult) => {
+    if (insertErr) {
+      console.error('Error in INSERT query:', insertErr);
+      return res.status(500).json('Internal Server Error');
+    }
 
-//     // Insertion successful, you can return a success response
-//     return res.status(201).json('Student details inserted successfully');
-//   });
-// });
+    // Insertion successful, you can return a success response
+    return res.status(201).json('Student details inserted successfully');
+  });
+});
 
 
 // Define the storage for uploaded files using multer.diskStorage
@@ -469,82 +469,82 @@ const upload = multer({ storage: storage });
 //   });
 // });
 
-const accountSid = 'AC876367b65a66cb4887b88be073bc0e94';
-const authToken = 'ac5c67e0f4cff4f38cbf257bd86108cc';
-const twilioWhatsAppNumber = 'whatsapp:+9493991327';
+// const accountSid = 'AC876367b65a66cb4887b88be073bc0e94';
+// const authToken = 'ac5c67e0f4cff4f38cbf257bd86108cc';
+// const twilioWhatsAppNumber = 'whatsapp:+9493991327';
 
-const client = new twilio(accountSid, authToken);
+// const client = new twilio(accountSid, authToken);
 
-app.post('/student_form', upload.single('image'), (req, res) => {
-  // SQL query with placeholders
-  // const insertUserQuery = "INSERT INTO user (`fullname`, `email`, `password`, `phonenumber`, `designation`, `department`, `reportto`, `profile`, `branch`) VALUES (?)";
-  // const sql = "INSERT INTO student_details (`name`, `email`, `mobilenumber`, `parentsname`, `birthdate`, `gender`, `maritalstatus`, `college`, `country`, `state`, `area`, `native`, `zipcode`, `whatsappno`, `educationtype`, `marks`, `academicyear`, `profilepic`, `enquirydate`, `enquirytakenby`, `coursepackage`, `courses`, `leadsource`, `branch`, `modeoftraining`, `admissionstatus`, `registrationnumber`, `admissiondate`, `validitystartdate`, `validityenddate`, `feedetails`, `grosstotal`, `totaldiscount`, `totaltax`, `grandtotal`, `finaltotal`, `admissionremarks`, `assets`, `totalinstallments`, `dueamount`, `addfee`, `initialamount`, `duedatetype`, `installments`, `materialfee`, `feedetailsbilling`, `totalfeewithouttax`) VALUES (?)";
-  const sql = `
-    INSERT INTO student_details (
-      name, email, mobilenumber, parentsname, birthdate, gender, maritalstatus,
-      college, country, state, area, native, zipcode, whatsappno, educationtype, marks,
-      academicyear, profilepic, enquirydate, enquirytakenby, coursepackage, courses, 
-      leadsource, branch, modeoftraining, admissionstatus, registrationnumber, 
-      admissiondate, validitystartdate, validityenddate, feedetails, grosstotal,
-      totaldiscount, totaltax, grandtotal, finaltotal, admissionremarks, assets, totalinstallments,
-      dueamount, addfee, initialamount, duedatetype, installments, materialfee,
-      feedetailsbilling, totalfeewithouttax, totalpaidamount, user_id
-    ) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `;
-
-
-  // // Convert the feedetails array to JSON
-const feedetails = req.body.feedetails;
-const installments = req.body.installments; // Assuming installments should be a separate array
-const feedetailsbilling = req.body.feedetailsbilling;
-
-const feedetailsJSON = JSON.stringify(feedetails);
-const installmentsJSON = JSON.stringify(installments);
-const feedetailsbillingJSON = JSON.stringify(feedetailsbilling);
-
-const values = [
-    req.body.name, req.body.email, req.body.mobilenumber, req.body.parentsname, req.body.birthdate,
-    req.body.gender, req.body.maritalstatus, req.body.college, req.body.country, req.body.state,
-    req.body.area, req.body.native, req.body.zipcode, req.body.whatsappno, req.body.educationtype,
-    req.body.marks, req.body.academicyear, req.body.profilepic, req.body.enquirydate,
-    req.body.enquirytakenby, req.body.coursepackage, req.body.courses, req.body.leadsource,
-    req.body.branch, req.body.modeoftraining, req.body.admissionstatus, req.body.registrationnumber,
-    req.body.admissiondate, req.body.validitystartdate, req.body.validityenddate, feedetailsJSON, 
-    req.body.grosstotal, req.body.totaldiscount, req.body.totaltax, req.body.grandtotal, req.body.finaltotal, 
-    req.body.admissionremarks, req.body.assets, req.body.totalinstallments, req.body.dueamount, 
-    req.body.addfee, req.body.initialamount, req.body.duedatetype, installmentsJSON, req.body.materialfee, feedetailsbillingJSON, 
-    req.body.totalfeewithouttax, req.body.totalpaidamount, req.body.user_id
-];
+// app.post('/student_form', upload.single('image'), (req, res) => {
+//   // SQL query with placeholders
+//   // const insertUserQuery = "INSERT INTO user (`fullname`, `email`, `password`, `phonenumber`, `designation`, `department`, `reportto`, `profile`, `branch`) VALUES (?)";
+//   // const sql = "INSERT INTO student_details (`name`, `email`, `mobilenumber`, `parentsname`, `birthdate`, `gender`, `maritalstatus`, `college`, `country`, `state`, `area`, `native`, `zipcode`, `whatsappno`, `educationtype`, `marks`, `academicyear`, `profilepic`, `enquirydate`, `enquirytakenby`, `coursepackage`, `courses`, `leadsource`, `branch`, `modeoftraining`, `admissionstatus`, `registrationnumber`, `admissiondate`, `validitystartdate`, `validityenddate`, `feedetails`, `grosstotal`, `totaldiscount`, `totaltax`, `grandtotal`, `finaltotal`, `admissionremarks`, `assets`, `totalinstallments`, `dueamount`, `addfee`, `initialamount`, `duedatetype`, `installments`, `materialfee`, `feedetailsbilling`, `totalfeewithouttax`) VALUES (?)";
+//   const sql = `
+//     INSERT INTO student_details (
+//       name, email, mobilenumber, parentsname, birthdate, gender, maritalstatus,
+//       college, country, state, area, native, zipcode, whatsappno, educationtype, marks,
+//       academicyear, profilepic, enquirydate, enquirytakenby, coursepackage, courses, 
+//       leadsource, branch, modeoftraining, admissionstatus, registrationnumber, 
+//       admissiondate, validitystartdate, validityenddate, feedetails, grosstotal,
+//       totaldiscount, totaltax, grandtotal, finaltotal, admissionremarks, assets, totalinstallments,
+//       dueamount, addfee, initialamount, duedatetype, installments, materialfee,
+//       feedetailsbilling, totalfeewithouttax, totalpaidamount, user_id
+//     ) 
+//     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+//   `;
 
 
-  // Execute the SQL query
-  connection.query(sql, values, (insertErr, insertResult) => {
-    if (insertErr) {
-      console.error('Error in INSERT query:', insertErr);
-      return res.status(500).json('Internal Server Error');
-    }
+//   // // Convert the feedetails array to JSON
+// const feedetails = req.body.feedetails;
+// const installments = req.body.installments; // Assuming installments should be a separate array
+// const feedetailsbilling = req.body.feedetailsbilling;
 
-    // Insertion successful, you can return a success response
-    return res.status(201).json('Student details inserted successfully');
-  });
+// const feedetailsJSON = JSON.stringify(feedetails);
+// const installmentsJSON = JSON.stringify(installments);
+// const feedetailsbillingJSON = JSON.stringify(feedetailsbilling);
+
+// const values = [
+//     req.body.name, req.body.email, req.body.mobilenumber, req.body.parentsname, req.body.birthdate,
+//     req.body.gender, req.body.maritalstatus, req.body.college, req.body.country, req.body.state,
+//     req.body.area, req.body.native, req.body.zipcode, req.body.whatsappno, req.body.educationtype,
+//     req.body.marks, req.body.academicyear, req.body.profilepic, req.body.enquirydate,
+//     req.body.enquirytakenby, req.body.coursepackage, req.body.courses, req.body.leadsource,
+//     req.body.branch, req.body.modeoftraining, req.body.admissionstatus, req.body.registrationnumber,
+//     req.body.admissiondate, req.body.validitystartdate, req.body.validityenddate, feedetailsJSON, 
+//     req.body.grosstotal, req.body.totaldiscount, req.body.totaltax, req.body.grandtotal, req.body.finaltotal, 
+//     req.body.admissionremarks, req.body.assets, req.body.totalinstallments, req.body.dueamount, 
+//     req.body.addfee, req.body.initialamount, req.body.duedatetype, installmentsJSON, req.body.materialfee, feedetailsbillingJSON, 
+//     req.body.totalfeewithouttax, req.body.totalpaidamount, req.body.user_id
+// ];
 
 
-  client.messages
-        .create({
-            body: 'Student details have been successfully inserted.',
-            from: twilioWhatsAppNumber, // Replace with your Twilio WhatsApp number
-            to: 'whatsapp:+8096189590', // Replace with the recipient's WhatsApp number
-        })
-        .then((message) => {
-            console.log('WhatsApp message sent:', message.sid);
-            res.status(201).json('Student details inserted successfully');
-        })
-        .catch((error) => {
-            console.error('Error sending WhatsApp message:', error);
-            res.status(500).json('Error sending WhatsApp message');
-        });
-});
+//   // Execute the SQL query
+//   connection.query(sql, values, (insertErr, insertResult) => {
+//     if (insertErr) {
+//       console.error('Error in INSERT query:', insertErr);
+//       return res.status(500).json('Internal Server Error');
+//     }
+
+//     // Insertion successful, you can return a success response
+//     return res.status(201).json('Student details inserted successfully');
+//   });
+
+
+//   client.messages
+//         .create({
+//             body: 'Student details have been successfully inserted.',
+//             from: twilioWhatsAppNumber, // Replace with your Twilio WhatsApp number
+//             to: 'whatsapp:+8096189590', // Replace with the recipient's WhatsApp number
+//         })
+//         .then((message) => {
+//             console.log('WhatsApp message sent:', message.sid);
+//             res.status(201).json('Student details inserted successfully');
+//         })
+//         .catch((error) => {
+//             console.error('Error sending WhatsApp message:', error);
+//             res.status(500).json('Error sending WhatsApp message');
+//         });
+// });
 
 
 
@@ -569,10 +569,6 @@ app.get('/getstudent_data', (req, res) => {
     }
   });
 });
-
-
-
-
 
 
 
