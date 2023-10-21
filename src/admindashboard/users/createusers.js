@@ -361,7 +361,8 @@ app.post('/student_form', (req, res) => {
 const feedetails = req.body.feedetails;
 const installments = req.body.installments; // Assuming installments should be a separate array
 const feedetailsbilling = req.body.feedetailsbilling;
-
+const initialpayment = req.body.initialpayment;
+const initialpaymentJSON = JSON.stringify(initialpayment); 
 const feedetailsJSON = JSON.stringify(feedetails);
 const installmentsJSON = JSON.stringify(installments);
 const feedetailsbillingJSON = JSON.stringify(feedetailsbilling);
@@ -377,7 +378,7 @@ const values = [
     req.body.admissiondate, req.body.validitystartdate, req.body.validityenddate, feedetailsJSON, 
     req.body.grosstotal, req.body.totaldiscount, req.body.totaltax, req.body.grandtotal, req.body.finaltotal, 
     req.body.admissionremarks, req.body.assets, req.body.totalinstallments, req.body.dueamount, 
-    req.body.addfee, req.body.initialpayment, req.body.duedatetype, installmentsJSON, req.body.materialfee, feedetailsbillingJSON, 
+    req.body.addfee, initialpaymentJSON, req.body.duedatetype, installmentsJSON, req.body.materialfee, feedetailsbillingJSON, 
     req.body.totalfeewithouttax, req.body.totalpaidamount
 ];
 
