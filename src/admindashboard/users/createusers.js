@@ -638,8 +638,8 @@ app.get("/viewstudentdata/:id",(req,res)=>{
 app.put('/addfee/:id', (req, res) => {
   const id = req.params.id;
   const dueamount = req.body.dueamount;
-  const initialamount = req.body.initialamount;
-  const initialamountJSON = JSON.stringify(initialamount)
+  const initialpayment = req.body.initialpayment;
+  const initialpaymentJSON = JSON.stringify(initialpayment)
   const totalinstallments = req.body.totalinstallments;
   const addfee = req.body.addfee;
   const installments = req.body.installments;
@@ -650,7 +650,7 @@ app.put('/addfee/:id', (req, res) => {
   const totalinstallmentsJSON = JSON.stringify(totalinstallments);
   const installmentsJSON = JSON.stringify(installments);
 
-  connection.query(sql, [totalinstallmentsJSON, dueamount, addfee, initialamountJSON, installmentsJSON, totalpaidamount, id], (err, result) => {
+  connection.query(sql, [totalinstallmentsJSON, dueamount, addfee, initialpaymentJSON, installmentsJSON, totalpaidamount, id], (err, result) => {
     if (err) {
       console.error('Error updating user:', err);
       return res.status(500).json({ error: "Internal Server Error" }); // Return an error response
