@@ -393,7 +393,7 @@ app.delete('/deleteuser/:id', (req, res) => {
 
 const accountSid = 'ACc025c2868762cef9e7e16688f4d0f483';
 const authToken = '2845f37d00a8ea6f5b907c86148fa166';
-// const twilioWhatsAppNumber = 'whatsapp:+9493991327';
+const twilioWhatsAppNumber = 'whatsapp:+9493991327';
 
 const client = new twilio(accountSid, authToken);
 
@@ -425,8 +425,7 @@ const initialpaymentJSON = JSON.stringify(initialpayment);
 const feedetailsJSON = JSON.stringify(feedetails);
 const installmentsJSON = JSON.stringify(installments);
 const feedetailsbillingJSON = JSON.stringify(feedetailsbilling);
-console.log("installment", installmentsJSON);
-console.log("installment", feedetailsbillingJSON)
+
 const values = [
     req.body.name, req.body.email, req.body.mobilenumber, req.body.parentsname, req.body.birthdate,
     req.body.gender, req.body.maritalstatus, req.body.college, req.body.country, req.body.state,
@@ -458,7 +457,7 @@ const values = [
   client.messages
         .create({
             body: 'Student details have been successfully inserted.',
-            from: 'whatsapp:+9493991327', // Replace with your Twilio WhatsApp number
+            from: twilioWhatsAppNumber, // Replace with your Twilio WhatsApp number
             to: 'whatsapp:+8096189590', // Replace with the recipient's WhatsApp number
         })
         .then((message) => {
