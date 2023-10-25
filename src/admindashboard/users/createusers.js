@@ -392,9 +392,6 @@ app.delete('/deleteuser/:id', (req, res) => {
 
 
 app.post('/student_form', (req, res) => {
-  // SQL query with placeholders
-  // const insertUserQuery = "INSERT INTO user (`fullname`, `email`, `password`, `phonenumber`, `designation`, `department`, `reportto`, `profile`, `branch`) VALUES (?)";
-  // const sql = "INSERT INTO student_details (`name`, `email`, `mobilenumber`, `parentsname`, `birthdate`, `gender`, `maritalstatus`, `college`, `country`, `state`, `area`, `native`, `zipcode`, `whatsappno`, `educationtype`, `marks`, `academicyear`, `profilepic`, `enquirydate`, `enquirytakenby`, `coursepackage`, `courses`, `leadsource`, `branch`, `modeoftraining`, `admissionstatus`, `registrationnumber`, `admissiondate`, `validitystartdate`, `validityenddate`, `feedetails`, `grosstotal`, `totaldiscount`, `totaltax`, `grandtotal`, `finaltotal`, `admissionremarks`, `assets`, `totalinstallments`, `dueamount`, `addfee`, `initialamount`, `duedatetype`, `installments`, `materialfee`, `feedetailsbilling`, `totalfeewithouttax`) VALUES (?)";
   const sql = `
     INSERT INTO student_details (
       name, email, mobilenumber, parentsname, birthdate, gender, maritalstatus,
@@ -406,11 +403,10 @@ app.post('/student_form', (req, res) => {
       dueamount, addfee, initialpayment, duedatetype, installments, materialfee,
       feedetailsbilling, totalfeewithouttax, totalpaidamount, user_id
     ) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
-
-  // // Convert the feedetails array to JSON
+// Convert the feedetails array to JSON
 const feedetails = req.body.feedetails;
 const installments = req.body.installments; // Assuming installments should be a separate array
 const feedetailsbilling = req.body.feedetailsbilling;
@@ -435,21 +431,15 @@ const values = [
     req.body.addfee, initialpaymentJSON, req.body.duedatetype, installmentsJSON, req.body.materialfee, feedetailsbillingJSON, 
     req.body.totalfeewithouttax, req.body.totalpaidamount, req.body.user_id
 ];
-
-
   // Execute the SQL query
   connection.query(sql, values, (insertErr, insertResult) => {
     if (insertErr) {
       console.error('Error in INSERT query:', insertErr);
       return res.status(500).json('Internal Server Error');
     }
-
     // Insertion successful, you can return a success response
     return res.status(201).json(insertResult);
   });
-
-  
-
 });
 
 
