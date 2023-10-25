@@ -391,12 +391,6 @@ app.delete('/deleteuser/:id', (req, res) => {
 
 
 
-const accountSid = 'ACc025c2868762cef9e7e16688f4d0f483';
-const authToken = '2845f37d00a8ea6f5b907c86148fa166';
-const twilioWhatsAppNumber = 'whatsapp:+9493991327';
-
-const client = new twilio(accountSid, authToken);
-
 app.post('/student_form', (req, res) => {
   // SQL query with placeholders
   // const insertUserQuery = "INSERT INTO user (`fullname`, `email`, `password`, `phonenumber`, `designation`, `department`, `reportto`, `profile`, `branch`) VALUES (?)";
@@ -410,9 +404,9 @@ app.post('/student_form', (req, res) => {
       admissiondate, validitystartdate, validityenddate, feedetails, grosstotal,
       totaldiscount, totaltax, grandtotal, finaltotal, admissionremarks, assets, totalinstallments,
       dueamount, addfee, initialpayment, duedatetype, installments, materialfee,
-      feedetailsbilling, totalfeewithouttax, totalpaidamount
+      feedetailsbilling, totalfeewithouttax, totalpaidamount, user_id
     ) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
 
@@ -425,6 +419,8 @@ const initialpaymentJSON = JSON.stringify(initialpayment);
 const feedetailsJSON = JSON.stringify(feedetails);
 const installmentsJSON = JSON.stringify(installments);
 const feedetailsbillingJSON = JSON.stringify(feedetailsbilling);
+const assets = req.body.assets;
+const assetsJSON = JSON.stringify(assets)
 
 const values = [
     req.body.name, req.body.email, req.body.mobilenumber, req.body.parentsname, req.body.birthdate,
@@ -435,9 +431,9 @@ const values = [
     req.body.branch, req.body.modeoftraining, req.body.admissionstatus, req.body.registrationnumber,
     req.body.admissiondate, req.body.validitystartdate, req.body.validityenddate, feedetailsJSON, 
     req.body.grosstotal, req.body.totaldiscount, req.body.totaltax, req.body.grandtotal, req.body.finaltotal, 
-    req.body.admissionremarks, req.body.assets, req.body.totalinstallments, req.body.dueamount, 
+    req.body.admissionremarks, assetsJSON, req.body.totalinstallments, req.body.dueamount, 
     req.body.addfee, initialpaymentJSON, req.body.duedatetype, installmentsJSON, req.body.materialfee, feedetailsbillingJSON, 
-    req.body.totalfeewithouttax, req.body.totalpaidamount
+    req.body.totalfeewithouttax, req.body.totalpaidamount, req.body.user_id
 ];
 
 
@@ -454,20 +450,6 @@ const values = [
 
   
 
-  client.messages
-        .create({
-            body: 'Student details have been successfully inserted.',
-            from: twilioWhatsAppNumber, // Replace with your Twilio WhatsApp number
-            to: 'whatsapp:+8096189590', // Replace with the recipient's WhatsApp number
-        })
-        .then((message) => {
-            console.log('WhatsApp message sent:', message.sid);
-            res.status(201).json('Student details inserted successfully');
-        })
-        .catch((error) => {
-            console.error('Error sending WhatsApp message:', error);
-            res.status(500).json('Error sending WhatsApp message');
-        });
 });
 
 
