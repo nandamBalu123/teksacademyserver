@@ -417,7 +417,7 @@ app.post("/student_form", (req, res) => {
       admissiondate, validitystartdate, validityenddate, feedetails, grosstotal,
       totaldiscount, totaltax, grandtotal, finaltotal, admissionremarks, assets, totalinstallments,
       dueamount, addfee, initialpayment, duedatetype, installments, materialfee,
-      feedetailsbilling, totalfeewithouttax, totalpaidamount, user_id
+      feedetailsbilling, totalfeewithouttax, totalpaidamount, certificate_status, user_id
     ) 
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
@@ -483,6 +483,7 @@ app.post("/student_form", (req, res) => {
     feedetailsbillingJSON,
     req.body.totalfeewithouttax,
     req.body.totalpaidamount,
+    req.body.certificate_status,
     req.body.user_id,
   ];
   // Execute the SQL query
@@ -508,11 +509,13 @@ app.get("/getstudent_data", (req, res) => {
         const parsedTotalInstallments = JSON.parse(row.totalinstallments);
         const parsedInstallments = JSON.parse(row.installments);
         const parsedInitialpayment = JSON.parse(row.initialpayment);
+        const parsedcertificate_status = JSON.parse(row.certificate_status);
         return {
           ...row,
           totalinstallments: parsedTotalInstallments,
           installments: parsedInstallments,
           initialpayment: parsedInitialpayment,
+          certificate_status: parsedcertificate_status
         };
       });
 
@@ -951,6 +954,34 @@ app.get("/getcoursespackages", (req, res) => {
     }
   });
 });
+
+// certificates
+
+app.put('/certificatestatus/:id', (req, res) => {
+  const sql = "UPDATE student_details SET certificate_status = ? WHERE id = ?;";
+  const id = req.params.id;
+
+  const certificate_status = req.body.certificate_status;
+  const certificate_statusJSON = JSON.stringify(certificate_status);
+  
+
+  connection.query(
+    sql,
+    [
+      certificate_statusJSON,
+      id,
+    ],
+    (err, result) => {
+      if (err) {
+        console.error("Error update status:", err);
+        return res.status(500).json({ error: "Internal Server Error" }); // Return an error response
+      }
+      return res.status(200).json({ updated: true }); // Return a success response
+    }
+  );
+})
+
+
 module.exports = {
   usersCreation: app,
 };
