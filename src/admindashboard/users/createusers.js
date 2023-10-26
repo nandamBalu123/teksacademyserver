@@ -424,7 +424,9 @@ app.post("/student_form", (req, res) => {
 
   // Convert the feedetails array to JSON
   const feedetails = req.body.feedetails;
-  const installments = req.body.installments; // Assuming installments should be a separate array
+  const installments = req.body.installments;
+  const certificate_status = req.body.certificate_status;
+  const certificate_statusJSON = JSON.stringify(certificate_status)
   const feedetailsbilling = req.body.feedetailsbilling;
   const initialpayment = req.body.initialpayment;
   const initialpaymentJSON = JSON.stringify(initialpayment);
@@ -433,7 +435,7 @@ app.post("/student_form", (req, res) => {
   const feedetailsbillingJSON = JSON.stringify(feedetailsbilling);
   const assets = req.body.assets;
   const assetsJSON = JSON.stringify(assets);
-
+    
   const values = [
     req.body.name,
     req.body.email,
@@ -483,7 +485,7 @@ app.post("/student_form", (req, res) => {
     feedetailsbillingJSON,
     req.body.totalfeewithouttax,
     req.body.totalpaidamount,
-    req.body.certificate_status,
+    certificate_statusJSON,
     req.body.user_id,
   ];
   // Execute the SQL query
