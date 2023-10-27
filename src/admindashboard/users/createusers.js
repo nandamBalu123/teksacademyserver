@@ -426,7 +426,7 @@ app.post("/student_form", (req, res) => {
   const feedetails = req.body.feedetails;
   const installments = req.body.installments;
   const certificate_status = req.body.certificate_status;
-  const certificate_statusJSON = JSON.stringify(certificate_status)
+  const certificate_statusJSON = JSON.stringify(certificate_status);
   const feedetailsbilling = req.body.feedetailsbilling;
   const initialpayment = req.body.initialpayment;
   const initialpaymentJSON = JSON.stringify(initialpayment);
@@ -435,7 +435,7 @@ app.post("/student_form", (req, res) => {
   const feedetailsbillingJSON = JSON.stringify(feedetailsbilling);
   const assets = req.body.assets;
   const assetsJSON = JSON.stringify(assets);
-    
+
   const values = [
     req.body.name,
     req.body.email,
@@ -511,13 +511,13 @@ app.get("/getstudent_data", (req, res) => {
         const parsedTotalInstallments = JSON.parse(row.totalinstallments);
         const parsedInstallments = JSON.parse(row.installments);
         const parsedInitialpayment = JSON.parse(row.initialpayment);
-        const parsedcertificate_status = JSON.parse(row.certificate_status);
+        // const parsedcertificate_status = JSON.parse(row.certificate_status);
         return {
           ...row,
           totalinstallments: parsedTotalInstallments,
           installments: parsedInstallments,
           initialpayment: parsedInitialpayment,
-          certificate_status: parsedcertificate_status
+          // certificate_status: parsedcertificate_status
         };
       });
 
@@ -915,7 +915,7 @@ app.post("/addcourses", (req, res) => {
     if (err) {
       return res.json({ Error: "error adding course" });
     } else {
-      return res.status(201).json(result);
+      return res.status(201).json(req.body);
     }
   });
 });
@@ -933,21 +933,25 @@ app.get("/getcourses", (req, res) => {
 
 // coursespackage
 
-app.post("/addcoursep", (req, res) => {
+app.post("/addcoursespackages", (req, res) => {
   const sql =
     "INSERT INTO coursepackages_settings (coursepackages_name) VALUES (?)";
   const values = [req.body.coursepackages_name];
+
+  if (!values.every((value) => value !== undefined)) {
+    return res.status(422).json("Please fill in all the data");
+  }
   connection.query(sql, values, (err, result) => {
     if (err) {
-      return res.json({ Error: "get coursecp error in sql" });
-    } else {
-      res.status(201).json(req.body);
+      console.log("err insert in addcoursespackages: ", err);
     }
+    return res.status(201).json(req.body);
   });
+ 
 });
 
 app.get("/getcoursespackages", (req, res) => {
-  const sql = "SELECT * FROM coursespackages_settings";
+  const sql = "SELECT * FROM coursepackages_settings";
   connection.query(sql, (err, result) => {
     if (err) {
       return res.json({ Error: "get courses error in sql" });
@@ -959,30 +963,21 @@ app.get("/getcoursespackages", (req, res) => {
 
 // certificates
 
-app.put('/certificatestatus/:id', (req, res) => {
+app.put("/certificatestatus/:id", (req, res) => {
   const sql = "UPDATE student_details SET certificate_status = ? WHERE id = ?;";
   const id = req.params.id;
 
   const certificate_status = req.body.certificate_status;
   const certificate_statusJSON = JSON.stringify(certificate_status);
-  
 
-  connection.query(
-    sql,
-    [
-      certificate_statusJSON,
-      id,
-    ],
-    (err, result) => {
-      if (err) {
-        console.error("Error update status:", err);
-        return res.status(500).json({ error: "Internal Server Error" }); // Return an error response
-      }
-      return res.status(200).json({ updated: true }); // Return a success response
+  connection.query(sql, [certificate_statusJSON, id], (err, result) => {
+    if (err) {
+      console.error("Error update status:", err);
+      return res.status(500).json({ error: "Internal Server Error" }); // Return an error response
     }
-  );
-})
-
+    return res.status(200).json({ updated: true }); // Return a success response
+  });
+});
 
 module.exports = {
   usersCreation: app,
