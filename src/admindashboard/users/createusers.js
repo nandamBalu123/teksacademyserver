@@ -511,13 +511,13 @@ app.get("/getstudent_data", (req, res) => {
         const parsedTotalInstallments = JSON.parse(row.totalinstallments);
         const parsedInstallments = JSON.parse(row.installments);
         const parsedInitialpayment = JSON.parse(row.initialpayment);
-        // const parsedcertificate_status = JSON.parse(row.certificate_status);
+        const parsedcertificate_status = JSON.parse(row.certificate_status);
         return {
           ...row,
           totalinstallments: parsedTotalInstallments,
           installments: parsedInstallments,
           initialpayment: parsedInitialpayment,
-          // certificate_status: parsedcertificate_status
+          certificate_status: parsedcertificate_status,
         };
       });
 
@@ -947,7 +947,6 @@ app.post("/addcoursespackages", (req, res) => {
     }
     return res.status(201).json(req.body);
   });
- 
 });
 
 app.get("/getcoursespackages", (req, res) => {
