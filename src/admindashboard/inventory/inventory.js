@@ -40,9 +40,6 @@ app.post('/create', (req, res) => {
   });
   
   
-  
-  
-  
   app.get("/getassets",(req,res)=>{
   
     connection.query("SELECT * FROM assignassets",(err,result)=>{
@@ -53,7 +50,37 @@ app.post('/create', (req, res) => {
         }
     })
   });
+
+
+  // addasset view in inventory component
+  app.get("/addassetsview/:id",(req,res)=>{
   
+    const {id} = req.params;
+  
+    connection.query("SELECT * FROM inventory WHERE id = ? ",id,(err,result)=>{
+        if(err){
+            res.status(422).json("error");
+        }else{
+            res.status(201).json(result);
+        }
+    })
+  });
+  
+  app.delete("/addassetsdelete/:id",(req,res)=>{
+  
+    const {id} = req.params;
+  
+    connection.query("DELETE FROM inventory WHERE id = ? ",id,(err,result)=>{
+        if(err){
+            res.status(422).json("error");
+        }else{
+            res.status(201).json(result);
+        }
+    })
+  });
+
+
+
   app.get("/viewassets/:id",(req,res)=>{
   
     const {id} = req.params;
@@ -66,6 +93,8 @@ app.post('/create', (req, res) => {
         }
     })
   });
+  
+
   
   app.patch("/updatassignassets/:id",(req,res)=>{
   
@@ -302,7 +331,7 @@ app.post('/create', (req, res) => {
   
   if(req.body.assettype === 't-shirt'){
     const sqlInsert = "INSERT INTO assignassets (name,vendername, designation, branch, assettype, brandname, issueddate, assetcode, anonymity, remarks) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    const valuesInsert = [req.body.name, req.body.designation, req.body.branch, req.body.assettype, req.body.brandname, req.body.issueddate, req.body.assetcode, req.body.anonymity, req.body.remarks];
+    const valuesInsert = [req.body.name, req.body.vendername, req.body.designation, req.body.branch, req.body.assettype, req.body.brandname, req.body.issueddate, req.body.assetcode, req.body.anonymity, req.body.remarks];
     // Query to fetch the quantity of the asset in the inventory table
     const sqlSelect = "SELECT anonymity FROM inventory WHERE assettype = ?";
     connection.query(sqlSelect, req.body.assettype, (selectErr, selectResult) => {
@@ -598,7 +627,7 @@ app.post('/create', (req, res) => {
   // get userdata
   
   app.get("/getusers",(req,res)=>{
-  
+
     connection.query("SELECT * FROM inventory",(err,result)=>{
         if(err){
             res.status(422).json("nodata available");
@@ -661,7 +690,34 @@ app.post('/create', (req, res) => {
     })
   });
 
+// settings
+// assettype
+app.put('/addvendorname', (req, res) => {
+  const { name } = req.body;
 
+  // Assuming your table is named 'users'
+  const sql = 'UPDATE inventory_settings SET name = ? WHERE your_condition_here';
+
+  pool.query(sql, [name], (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).send('Internal Server Error');
+    } else {
+      const updatedRows = results.affectedRows;
+
+      if (updatedRows > 0) {
+        res.json({ updated: true });
+      } else {
+        res.json({ updated: false });
+      }
+    }
+  });
+});
+
+
+app.get('/getassettype', (req, res) => {
+  
+})
 
 // export this file
 

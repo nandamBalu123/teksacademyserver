@@ -86,50 +86,23 @@ const upload = multer({
   },
 });
 
-// Define a route to handle photo uploads
-app.post('/upload', (req, res) => {
-  const { filename, data } = req.body;
 
-  // Save the photo data to MySQL
-  connection.query('INSERT INTO photos (filename, data) VALUES (?, ?)', [filename, data], (err, result) => {
-    if (err) {
-      console.error('Error inserting into MySQL:', err);
-      res.status(500).json({ error: 'Internal Server Error' });
-    } else {
-      // Upload the photo to S3
-      const params = {
-        Bucket: 'teksacademyimages',
-        Key: filename,
-        Body: Buffer.from(data, 'base64'),
-        ACL: 'public-read', // Adjust the ACL as needed
-      };
 
-      s3.upload(params, (err, data) => {
-        if (err) {
-          console.error('Error uploading to S3:', err);
-          res.status(500).json({ error: 'Internal Server Error' });
-        } else {
-          res.json({ message: 'Photo uploaded successfully' });
-        }
-      });
-    }
-  });
-});
 
 app.post("/student_form", (req, res) => {
   const { filename, data } = req.body;
   const sql = `
     INSERT INTO student_details (
-      name, email, mobilenumber, parentsname, birthdate, gender, maritalstatus,
+      name, email, mobilenumber, parentsname, parentsnumber, birthdate, gender, maritalstatus,
       college, country, state, area, native, zipcode, whatsappno, educationtype, marks,
       academicyear, studentImg, imgData, enquirydate, enquirytakenby, coursepackage, courses, 
-      leadsource, branch, modeoftraining, admissionstatus, registrationnumber, 
+      leadsource, branch, modeoftraining, registrationnumber, 
       admissiondate, validitystartdate, validityenddate, feedetails, grosstotal,
       totaldiscount, totaltax, grandtotal, finaltotal, admissionremarks, assets, totalinstallments,
       dueamount, addfee, initialpayment, duedatetype, installments, materialfee,
-      feedetailsbilling, totalfeewithouttax, totalpaidamount, certificate_status, user_id
+      feedetailsbilling, totalfeewithouttax, totalpaidamount, certificate_status, extra_discount, user_id
     ) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   // Convert the feedetails array to JSON
@@ -144,6 +117,7 @@ app.post("/student_form", (req, res) => {
   const installmentsJSON = JSON.stringify(installments);
   const feedetailsbillingJSON = JSON.stringify(feedetailsbilling);
   const assets = req.body.assets;
+  const extra_discountJSON = JSON.stringify(extra_discount);
   const assetsJSON = JSON.stringify(assets);
 
 
@@ -152,6 +126,7 @@ app.post("/student_form", (req, res) => {
     req.body.email,
     req.body.mobilenumber,
     req.body.parentsname,
+    req.body.parentsnumber,
     req.body.birthdate,
     req.body.gender,
     req.body.maritalstatus,
@@ -174,7 +149,6 @@ app.post("/student_form", (req, res) => {
     req.body.leadsource,
     req.body.branch,
     req.body.modeoftraining,
-    req.body.admissionstatus,
     req.body.registrationnumber,
     req.body.admissiondate,
     req.body.validitystartdate,
@@ -198,6 +172,7 @@ app.post("/student_form", (req, res) => {
     req.body.totalfeewithouttax,
     req.body.totalpaidamount,
     certificate_statusJSON,
+    extra_discountJSON,
     req.body.user_id,
   ];
   // Execute the SQL query
@@ -227,187 +202,24 @@ app.post("/student_form", (req, res) => {
   });
 });
 
+
+
 // app.post("/student_form", (req, res) => {
-//   const {
-//     filename,
-//     data,
-//     feedetails,
-//     installments,
-//     certificate_status,
-//     initialpayment,
-//   } = req.body;
-
-//   const addFee = req.body.addfee === "false" ? 0 : 1;
-
-//   const values = [
-//     req.body.name,
-//     req.body.email,
-//     req.body.mobilenumber,
-//     req.body.parentsname,
-//     req.body.birthdate,
-//     req.body.gender,
-//     req.body.maritalstatus,
-//     req.body.college,
-//     req.body.country,
-//     req.body.state,
-//     req.body.area,
-//     req.body.native,
-//     req.body.zipcode,
-//     req.body.whatsappno,
-//     req.body.educationtype,
-//     req.body.marks,
-//     req.body.academicyear,
-//     filename,
-//     data,
-//     req.body.enquirydate,
-//     req.body.enquirytakenby,
-//     req.body.coursepackage,
-//     req.body.courses,
-//     req.body.leadsource,
-//     req.body.branch,
-//     req.body.modeoftraining,
-//     req.body.admissionstatus,
-//     req.body.registrationnumber,
-//     req.body.admissiondate,
-//     req.body.validitystartdate,
-//     req.body.validityenddate,
-//     JSON.stringify(feedetails),
-//     req.body.grosstotal,
-//     req.body.totaldiscount,
-//     req.body.totaltax,
-//     req.body.grandtotal,
-//     req.body.finaltotal,
-//     req.body.admissionremarks,
-//     req.body.assets,
-//     req.body.totalinstallments,
-//     req.body.dueamount,
-//     addFee,
-//     JSON.stringify(initialpayment),
-//     req.body.duedatetype,
-//     JSON.stringify(installments),
-//     req.body.materialfee,
-//     JSON.stringify(req.body.feedetailsbilling),
-//     req.body.totalfeewithouttax,
-//     req.body.totalpaidamount,
-//     JSON.stringify(certificate_status),
-//     req.body.user_id,
-//   ];
-
+//   const { filename, data } = req.body;
 //   const sql = `
 //     INSERT INTO student_details (
 //       name, email, mobilenumber, parentsname, birthdate, gender, maritalstatus,
 //       college, country, state, area, native, zipcode, whatsappno, educationtype, marks,
-//       academicyear, studentImg, imgData, enquirydate, enquirytakenby, coursepackage, courses, 
-//       leadsource, branch, modeoftraining, admissionstatus, registrationnumber, 
+//       academicyear, studentImg, imgData, enquirydate, enquirytakenby, coursepackage, courses,
+//       leadsource, branch, modeoftraining, admissionstatus, registrationnumber,
 //       admissiondate, validitystartdate, validityenddate, feedetails, grosstotal,
 //       totaldiscount, totaltax, grandtotal, finaltotal, admissionremarks, assets, totalinstallments,
 //       dueamount, addfee, initialpayment, duedatetype, installments, materialfee,
-//       feedetailsbilling, totalfeewithouttax, totalpaidamount, certificate_status, user_id
-//     ) 
-//     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+//       feedetailsbilling, totalfeewithouttax, totalpaidamount, certificate_status,extra_discount, user_id
+//     )
+//     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 //   `;
-
-//   connection.query(sql, values, (insertErr, insertResult) => {
-//     if (insertErr) {
-//       console.error("Error in INSERT query:", insertErr);
-//       return res.status(500).json("Internal Server Error");
-//     }
-
-//     // Upload the photo to S3
-//     const params = {
-//       Bucket: 'teksacademyimages',
-//       Key: filename,
-//       Body: Buffer.from(data, 'base64'),
-//       ACL: 'public-read', // Adjust the ACL as needed
-//     };
-
-//     s3.upload(params, (err, s3Data) => {
-//       if (err) {
-//         console.error('Error uploading to S3:', err);
-//         return res.status(500).json({ error: 'Internal Server Error' });
-//       }
-
-//       res.status(201).json({ message: 'Photo uploaded successfully', insertResult });
-//     });
-//   });
-// });
-
-
-// app.post("/upload", (req, res) => {
-//   if (!req.files || !req.files.studentImg) {
-//         return res.status(400).json({ error: "File not found in the request." });
-//       }
-//   const s3 = new AWS.S3();
-//   const studentImg = req.files.studentImg;
-  
-
-//   const params = {
-//     Bucket: "teksacademyimages",
-//     Key: studentImg.name,
-//     Body: studentImg.data,
-//   };
-
-//   // Upload to S3
-//   s3.upload(params, (err, data) => {
-//     if (err) {
-//       return res.status(500).json({
-//         error: "Error uploading the file to S3",
-//         details: err.message,
-//       });
-//     }
-
-//     // Insert file details into MySQL
-//     const sql = "INSERT INTO files (filename, s3_url) VALUES (?, ?)";
-//     const values = [studentImg.name, studentImg.data]; // You might need to adjust the column names accordingly
-
-//     connection.query(sql, values, (dbErr, result) => {
-//       if (dbErr) {
-//         return res.status(500).json({
-//           error: "Error inserting file details into the database",
-//           details: dbErr.message,
-//         });
-//       }
-
-//       res.json({
-//         response_code: 200,
-//         response_message: "Success",
-//         response_data: data,
-//       });
-//     });
-//   });
-// });
-
-
-// app.post("/student_form", (req, res) => {
-//   const s3 = new AWS.S3();
-//   const file = req.body.file;
-//   const params = {
-//     Bucket: "teksacademyimages",
-//     Key: file.name,
-//     Body: file.data,
-//   };
-
-//   s3.upload(params, (err, data) => {
-//     if (err) {
-//       return res.status(500).json({
-//         error: "Error uploading the file to S3",
-//         details: err.message,
-//       });
-//     }
-//   const sql = `
-//     INSERT INTO student_details (
-//       name, email, mobilenumber, parentsname, birthdate, gender, maritalstatus,
-//       college, country, state, area, native, zipcode, whatsappno, educationtype, marks,
-//       academicyear, studentImg, studentImg_s3_url, enquirydate, enquirytakenby, coursepackage, courses, 
-//       leadsource, branch, modeoftraining, admissionstatus, registrationnumber, 
-//       admissiondate, validitystartdate, validityenddate, feedetails, grosstotal,
-//       totaldiscount, totaltax, grandtotal, finaltotal, admissionremarks, assets, totalinstallments,
-//       dueamount, addfee, initialpayment, duedatetype, installments, materialfee,
-//       feedetailsbilling, totalfeewithouttax, totalpaidamount, certificate_status, user_id
-//     ) 
-//     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-//   `;
-
+ 
 //   // Convert the feedetails array to JSON
 //   const feedetails = req.body.feedetails;
 //   const installments = req.body.installments;
@@ -421,8 +233,8 @@ app.post("/student_form", (req, res) => {
 //   const feedetailsbillingJSON = JSON.stringify(feedetailsbilling);
 //   const assets = req.body.assets;
 //   const assetsJSON = JSON.stringify(assets);
-
-
+//   const extra_discount = req.body.extra_discount;
+//   const extra_discountJSON = JSON.stringify(extra_discount);
 //   const values = [
 //     req.body.name,
 //     req.body.email,
@@ -441,8 +253,8 @@ app.post("/student_form", (req, res) => {
 //     req.body.educationtype,
 //     req.body.marks,
 //     req.body.academicyear,
-//     file.name,
-//     data.Location,
+//     filename,
+//     data,
 //     req.body.enquirydate,
 //     req.body.enquirytakenby,
 //     req.body.coursepackage,
@@ -474,21 +286,37 @@ app.post("/student_form", (req, res) => {
 //     req.body.totalfeewithouttax,
 //     req.body.totalpaidamount,
 //     certificate_statusJSON,
+//     extra_discountJSON,
 //     req.body.user_id,
 //   ];
-
-
 //   // Execute the SQL query
 //   connection.query(sql, values, (insertErr, insertResult) => {
 //     if (insertErr) {
 //       console.error("Error in INSERT query:", insertErr);
 //       return res.status(500).json("Internal Server Error");
+//     } else {
+//       // Upload the photo to S3
+//       const params = {
+//         Bucket: "teksacademyimages",
+//         Key: filename,
+//         Body: Buffer.from(data, "base64"),
+//         ACL: "public-read", // Adjust the ACL as needed
+//       };
+ 
+//       s3.upload(params, (err, data) => {
+//         if (err) {
+//           console.error("Error uploading to S3:", err);
+//           res.status(500).json({ error: "Internal Server Error" });
+//         } else {
+//           res.json({ message: "Photo uploaded successfully" });
+//         }
+//       });
 //     }
-//     // Insertion successful, you can return a success response
 //     return res.status(201).json(insertResult);
 //   });
 // });
-// });
+
+
 
 
 app.get("/logout", (req, res) => {
@@ -651,17 +479,7 @@ app.get("/userdata", (req, res) => {
 // });
 
 
-// app.get('/getstudent_data', (req, res) => {
-//   const sql = "SELECT * FROM student_details";
 
-//   connection.query(sql,(err,result)=>{
-//       if(err){
-//           res.status(422).json("nodata available");
-//       }else{
-//           res.status(201).json(result);
-//       }
-//   })
-// });
 
 // Secret key for JWT (store this securely and use environment variables)
 // const jwtSecretKey = "your_secret_key";
@@ -1292,9 +1110,38 @@ app.put("/updateuser/:id", (req, res) => {
 //   });
 // });
 
+// app.get("/getstudent_data", (req, res) => {
+//   const sql = "SELECT * FROM student_details";
+
+//   connection.query(sql, (err, result) => {
+//     if (err) {
+//       res.status(422).json("No data available");
+//     } else {
+//       // Parse the "installments" JSON strings into JavaScript objects
+//       const parsedResults = result.map((row) => {
+//         const parsedTotalInstallments = JSON.parse(row.totalinstallments);
+//         const parsedInstallments = JSON.parse(row.installments);
+//         const parsedInitialpayment = JSON.parse(row.initialpayment);
+//         const parsedcertificate_status = JSON.parse(row.certificate_status);
+//         return {
+//           ...row,
+//           totalinstallments: parsedTotalInstallments,
+//           installments: parsedInstallments,
+//           initialpayment: parsedInitialpayment,
+//           certificate_status: parsedcertificate_status,
+//         };
+//       });
+
+//       parsedResults.reverse();
+//       res.status(201).json(parsedResults);
+//     }
+//   });
+// });
+
+
 app.get("/getstudent_data", (req, res) => {
   const sql = "SELECT * FROM student_details";
-
+ 
   connection.query(sql, (err, result) => {
     if (err) {
       res.status(422).json("No data available");
@@ -1305,15 +1152,24 @@ app.get("/getstudent_data", (req, res) => {
         const parsedInstallments = JSON.parse(row.installments);
         const parsedInitialpayment = JSON.parse(row.initialpayment);
         const parsedcertificate_status = JSON.parse(row.certificate_status);
+        const parsedAssets = JSON.parse(row.assets);
+        const ParsedExtra_discount = JSON.parse(row.extra_discount);
+        const ParsedFeeDetails = JSON.parse(row.feedetails);
+        const ParsedFeeDetailsbilling = JSON.parse(row.feedetailsbilling);
+        
         return {
           ...row,
           totalinstallments: parsedTotalInstallments,
           installments: parsedInstallments,
           initialpayment: parsedInitialpayment,
           certificate_status: parsedcertificate_status,
+          assets: parsedAssets,
+          extra_discount: ParsedExtra_discount,
+          feedetails: ParsedFeeDetails,
+          feedetailsbilling: ParsedFeeDetailsbilling,
         };
       });
-
+ 
       parsedResults.reverse();
       res.status(201).json(parsedResults);
     }
@@ -1462,6 +1318,35 @@ app.put("/feeinstallments/:id", (req, res) => {
   );
 });
 
+
+
+app.put("/extra_discount/:id", (req, res) => {
+  const sql =
+    "UPDATE student_details SET extra_discount = ?,installments=?, dueamount=?  WHERE id = ?;";
+  const id = req.params.id;
+  const Extra_Discount_remarks_history =
+    req.body.Extra_Discount_remarks_history;
+ 
+  const Extra_Discount_remarks_historyJSON = JSON.stringify(
+    Extra_Discount_remarks_history
+  );
+  const installments = req.body.installments;
+  const installmentsJSON = JSON.stringify(installments);
+  const dueamount = req.body.dueamount;
+  connection.query(
+    sql,
+    [Extra_Discount_remarks_historyJSON, installmentsJSON, dueamount, id],
+    (err, result) => {
+      if (err) {
+        console.error("Error update status:", err);
+        return res.status(500).json({ error: "Internal Server Error" }); // Return an error response
+      }
+      return res.status(200).json({ updated: true }); // Return a success response
+    }
+  );
+});
+
+
 app.put("/addnewinstallments/:id", (req, res) => {
   const sql =
     "UPDATE student_details SET installments = ?, totalinstallments = ? WHERE id = ?;";
@@ -1484,6 +1369,8 @@ app.put("/addnewinstallments/:id", (req, res) => {
     }
   );
 });
+
+
 
 // student active inactive
 app.put("/studentstatus/:id", (req, res) => {
@@ -1546,14 +1433,203 @@ app.put("/userstatus/:id", (req, res) => {
   
 // })
 
+// app.put("/updatestudentdata/:id", (req, res) => {
+//   const sql = `UPDATE student_details SET name=?, email=?, mobilenumber=?, parentsname=?,
+//     birthdate=?, gender=?, maritalstatus=?, college=?, country=?, state=?, area=?, native=?, 
+//     zipcode=?, whatsappno=?, educationtype=?, marks=?, academicyear=?, 
+//     enquirydate=?, enquirytakenby=?, coursepackage=?, courses=?, leadsource=?, branch=?, 
+//     modeoftraining=?, registrationnumber=?, admissiondate=?, validitystartdate=?,
+//      validityenddate=?, admissionremarks=?, assets=? WHERE id=?`;
+//   const id = req.params.id;
+//   const {
+//     name,
+//     email,
+//     mobilenumber,
+//     parentsname,
+//     birthdate,
+//     gender,
+//     maritalstatus,
+//     college,
+//     country,
+//     state,
+//     area,
+//     native,
+//     zipcode,
+//     whatsappno,
+//     educationtype,
+//     marks,
+//     academicyear,
+//     // profilepic,
+//     enquirydate,
+//     enquirytakenby,
+//     coursepackage,
+//     courses,
+//     leadsource,
+//     branch,
+//     modeoftraining,
+    
+//     registrationnumber,
+//     admissiondate,
+//     validitystartdate,
+//     validityenddate,
+//     // feedetails,
+//     // grosstotal,
+//     // totaldiscount,
+//     // totaltax,
+//     // grandtotal,
+//     admissionremarks,
+//     assets,
+//   } = req.body; // Destructure the request body
+
+//   connection.query(
+//     sql,
+//     [
+//       name,
+//       email,
+//       mobilenumber,
+//       parentsname,
+//       birthdate,
+//       gender,
+//       maritalstatus,
+//       college,
+//       country,
+//       state,
+//       area,
+//       native,
+//       zipcode,
+//       whatsappno,
+//       educationtype,
+//       marks,
+//       academicyear,
+//       // profilepic,
+//       enquirydate,
+//       enquirytakenby,
+//       coursepackage,
+//       courses,
+//       leadsource,
+//       branch,
+//       modeoftraining,
+      
+//       registrationnumber,
+//       admissiondate,
+//       validitystartdate,
+//       validityenddate,
+//       // feedetails,
+//       // grosstotal,
+//       // totaldiscount,
+//       // totaltax,
+//       // grandtotal,
+//       admissionremarks,
+//       assets,
+//       id
+//     ],
+//     (err, result) => {
+//       if (err) {
+//         console.error("Error updating student data:", err);
+//         return res.status(500).json({ error: "Internal Server Error" }); // Return an error response
+//       }
+//       return res.status(200).json({ updated: true }); // Return a success response
+//     }
+//   );
+// });
+
+// app.put("/updatestudentdata/:id", (req, res) => {
+//   const sql = `UPDATE student_details SET name=?, email=?, mobilenumber=?, parentsname=?,
+//     birthdate=?, gender=?, maritalstatus=?, college=?, country=?, state=?, area=?, native=?, 
+//     zipcode=?, whatsappno=?, educationtype=?, marks=?, academicyear=?, 
+//     enquirydate=?, enquirytakenby=?, coursepackage=?, courses=?, leadsource=?, branch=?, 
+//     modeoftraining=?, registrationnumber=?, admissiondate=?, validitystartdate=?,
+//      validityenddate=?, admissionremarks=?, assets=? WHERE id=?`;
+//   const id = req.params.id;
+//   const {
+//     name,
+//     email,
+//     mobilenumber,
+//     parentsname,
+//     birthdate,
+//     gender,
+//     maritalstatus,
+//     college,
+//     country,
+//     state,
+//     area,
+//     native,
+//     zipcode,
+//     whatsappno,
+//     educationtype,
+//     marks,
+//     academicyear,
+//     enquirydate,
+//     enquirytakenby,
+//     coursepackage,
+//     courses,
+//     leadsource,
+//     branch,
+//     modeoftraining,
+//     registrationnumber,
+//     admissiondate,
+//     validitystartdate,
+//     validityenddate,
+//     admissionremarks,
+//     assets,
+//   } = req.body; // Destructure the request body
+
+//   connection.query(
+//     sql,
+//     [
+//       name,
+//       email,
+//       mobilenumber,
+//       parentsname,
+//       birthdate,
+//       gender,
+//       maritalstatus,
+//       college,
+//       country,
+//       state,
+//       area,
+//       native,
+//       zipcode,
+//       whatsappno,
+//       educationtype,
+//       marks,
+//       academicyear,
+//       enquirydate,
+//       enquirytakenby,
+//       coursepackage,
+//       courses,
+//       leadsource,
+//       branch,
+//       modeoftraining,
+//       registrationnumber,
+//       admissiondate,
+//       validitystartdate,
+//       validityenddate,
+//       admissionremarks,
+//       assets,
+//     ],
+//     (err, result) => {
+//       if (err) {
+//         console.error("Error updating student data:", err);
+//         return res.status(500).json({ error: "Internal Server Error" }); // Return an error response
+//       }
+//       return res.status(200).json({ updated: true }); // Return a success response
+//     }
+//   );
+// });
+
+
 app.put("/updatestudentdata/:id", (req, res) => {
+  // const { filename, data } = req.body;
+  const assetsJsonStringify = JSON.stringify(req.body.assets);
+
   const sql = `UPDATE student_details SET name=?, email=?, mobilenumber=?, parentsname=?,
     birthdate=?, gender=?, maritalstatus=?, college=?, country=?, state=?, area=?, native=?, 
-    zipcode=?, whatsappno=?, educationtype=?, marks=?, academicyear=?, profilepic=?, 
+    zipcode=?, whatsappno=?, educationtype=?, marks=?, academicyear=?,
     enquirydate=?, enquirytakenby=?, coursepackage=?, courses=?, leadsource=?, branch=?, 
-    modeoftraining=?, admissionstatus=?, registrationnumber=?, admissiondate=?, validitystartdate=?,
-     validityenddate=?, feedetails=?, grosstotal=?, totaldiscount=?, totaltax=?, grandtotal=?, 
-     admissionremarks=?, assets=? WHERE id=?`;
+    modeoftraining=?, registrationnumber=?, admissiondate=?, validitystartdate=?,
+    validityenddate=?, admissionremarks=?, assets=? WHERE id=?`;
+
   const id = req.params.id;
   const {
     name,
@@ -1573,7 +1649,6 @@ app.put("/updatestudentdata/:id", (req, res) => {
     educationtype,
     marks,
     academicyear,
-    profilepic,
     enquirydate,
     enquirytakenby,
     coursepackage,
@@ -1581,18 +1656,11 @@ app.put("/updatestudentdata/:id", (req, res) => {
     leadsource,
     branch,
     modeoftraining,
-    admissionstatus,
     registrationnumber,
     admissiondate,
     validitystartdate,
     validityenddate,
-    feedetails,
-    grosstotal,
-    totaldiscount,
-    totaltax,
-    grandtotal,
     admissionremarks,
-    assets,
   } = req.body; // Destructure the request body
 
   connection.query(
@@ -1615,7 +1683,8 @@ app.put("/updatestudentdata/:id", (req, res) => {
       educationtype,
       marks,
       academicyear,
-      profilepic,
+      // filename,
+      // data, // Ensure data is defined, default to an empty string if not
       enquirydate,
       enquirytakenby,
       coursepackage,
@@ -1623,29 +1692,50 @@ app.put("/updatestudentdata/:id", (req, res) => {
       leadsource,
       branch,
       modeoftraining,
-      admissionstatus,
       registrationnumber,
       admissiondate,
       validitystartdate,
       validityenddate,
-      feedetails,
-      grosstotal,
-      totaldiscount,
-      totaltax,
-      grandtotal,
       admissionremarks,
-      assets,
-      id,
+      assetsJsonStringify,
+      id, // Add id for the WHERE clause
     ],
     (err, result) => {
-      if (err) {
-        console.error("Error updating student data:", err);
-        return res.status(500).json({ error: "Internal Server Error" }); // Return an error response
-      }
-      return res.status(200).json({ updated: true }); // Return a success response
-    }
+            if (err) {
+              console.error("Error updating student data:", err);
+              return res.status(500).json({ error: "Internal Server Error" }); // Return an error response
+            }
+            return res.status(200).json({ updated: true }); // Return a success response
+          }
+    // (err, result) => {
+    //   if (err) {
+    //     console.error("Error updating student data:", err);
+    //     return res.status(500).json({ error: "Internal Server Error" });
+    //   } else {
+    //     if (data) {
+    //       const params = {
+    //         Bucket: "teksacademyimages",
+    //         Key: filename,
+    //         Body: Buffer.from(data, "base64"),
+    //         ACL: "public-read", // Adjust the ACL as needed
+    //       };
+
+    //       s3.upload(params, (uploadErr, uploadData) => {
+    //         if (uploadErr) {
+    //           console.error("Error uploading to S3:", uploadErr);
+    //           return res.status(500).json({ error: "Internal Server Error" });
+    //         } else {
+    //           console.log("Photo uploaded successfully");
+    //         }
+    //       });
+    //     }
+    //     return res.status(200).json({ updated: true });
+    //   }
+    // }
   );
 });
+
+
 
 // branch settings
 
