@@ -66,6 +66,48 @@ app.post('/create', (req, res) => {
     })
   });
   
+
+
+  app.get("/getaddassets/:id",(req,res)=>{
+  
+    const {id} = req.params;
+  
+    connection.query("SELECT * FROM inventory WHERE id = ? ",id,(err,result)=>{
+        if(err){
+            res.status(422).json("error");
+        }else{
+            res.status(201).json(result);
+        }
+    })
+  });
+
+  app.put('/updateaddassets', (req, res) => {
+    const { name, vendername, designation, branch, assettype, brandname, issueddate, assetcode, anonymity, returndate, remarks, } = req.body;
+  
+
+    // Assuming your table is named 'users'
+    const sql = 'UPDATE invenotry SET name, vendername, designation, branch, assettype, brandname, issueddate, assetcode, anonymity, returndate, remarks = ? WHERE your_condition_here';
+  
+    const values = [name, vendername, designation, branch, assettype, brandname, issueddate, assetcode, anonymity, returndate, remarks]
+    connection.query(sql, values, (error, results) => {
+      if (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+      } else {
+        const updatedRows = results.affectedRows;
+  
+        if (updatedRows > 0) {
+          res.json({ updated: true });
+        } else {
+          res.json({ updated: false });
+        }
+      }
+    });
+  });
+
+
+
+
   app.delete("/addassetsdelete/:id",(req,res)=>{
   
     const {id} = req.params;
@@ -693,26 +735,65 @@ app.post('/create', (req, res) => {
 // settings
 // assettype
 app.put('/addvendorname', (req, res) => {
-  const { name } = req.body;
+  
+  const vendorName = req.body.venderName;
 
   // Assuming your table is named 'users'
-  const sql = 'UPDATE inventory_settings SET name = ? WHERE your_condition_here';
+  const sql = 'UPDATE inventory_settings SET vendorName = ? WHERE id = 1';
 
-  pool.query(sql, [name], (error, results) => {
+  const vendorNameJSON = JSON.stringify(vendorName)
+  console.log(vendorNameJSON)
+  connection.query(sql, [vendorNameJSON], (error, results) => {
     if (error) {
       console.error(error);
       res.status(500).send('Internal Server Error');
-    } else {
-      const updatedRows = results.affectedRows;
+    } 
+    // else {
+    //   return res.status(200).json({ updated: true }); // Return a success response
 
-      if (updatedRows > 0) {
-        res.json({ updated: true });
+    //   const updatedRows = results.affectedRows;
+
+    //   if (updatedRows > 0) {
+    //     res.json({ updated: true });
+    //   } else {
+    //     res.json({ updated: false });
+    //   }
+    // }
+    
+    return res.status(200).json({ updated: true }); // Return a success response
+  });
+});
+
+// app.get("/getvendorname",(req,res)=>{
+//   const sql = "SELECT * FROM inventory_settings";
+  
+//   connection.query(sql,(err,result)=>{
+//       if(err){
+//           res.status(422).json("nodata available");
+//       }else{
+//           res.status(201).json(result);
+//       }
+//   })
+// });
+
+app.get("/getvendorname", (req, res) => {
+  const sql = "SELECT vendorName FROM inventory_settings WHERE id = 1"; // Assuming you want data for a specific ID, adjust as needed
+  
+  connection.query(sql, (err, result) => {
+    if (err) {
+      console.error(err);
+      res.status(500).json("Internal Server Error");
+    } else {
+      if (result.length > 0) {
+        const vendorNames = result.map(item => item.vendorName);
+        res.status(200).json({ vendorNames });
       } else {
-        res.json({ updated: false });
+        res.status(404).json("Data not found");
       }
     }
   });
 });
+
 
 
 app.get('/getassettype', (req, res) => {
