@@ -108,6 +108,7 @@ app.post("/student_form", (req, res) => {
   // Convert the feedetails array to JSON
   const feedetails = req.body.feedetails;
   const installments = req.body.installments;
+  const extra_discount = req.body.extra_discount;
   const certificate_status = req.body.certificate_status;
   const certificate_statusJSON = JSON.stringify(certificate_status);
   const feedetailsbilling = req.body.feedetailsbilling;
@@ -1225,54 +1226,109 @@ app.get("/viewstudentdata/:id", (req, res) => {
   );
 });
 
-// app.put('/addfee/:id', (req, res) => {
+// app.put("/addfee/:id", (req, res) => {
 //   const id = req.params.id;
 //   const dueamount = req.body.dueamount;
-//   const initialamount = req.body.initialamount;
+//   const initialpayment = req.body.initialpayment;
+//   const initialpaymentJSON = JSON.stringify(initialpayment);
 //   const totalinstallments = req.body.totalinstallments;
 //   const addfee = req.body.addfee;
 //   const installments = req.body.installments;
-//   const totalpaidamount = req.body.totalpaidamount
+//   const totalpaidamount = req.body.totalpaidamount;
 
-//   const sql = "UPDATE student_details SET totalinstallments = ?, dueamount = ?, addfee = ?, initialamount = ?, installments = ?, totalpaidamount = ? WHERE id = ?;";
+//   const sql =
+//     "UPDATE student_details SET totalinstallments = ?, dueamount = ?, addfee = ?, initialpayment = ?, installments = ?, totalpaidamount = ? WHERE id = ?;";
 
 //   const totalinstallmentsJSON = JSON.stringify(totalinstallments);
 //   const installmentsJSON = JSON.stringify(installments);
 
-//   connection.query(sql, [totalinstallmentsJSON, dueamount, addfee, initialamount, installmentsJSON, totalpaidamount, id], (err, result) => {
-//     if (err) {
-//       console.error('Error updating user:', err);
-//       return res.status(500).json({ error: "Internal Server Error" }); // Return an error response
+//   connection.query(
+//     sql,
+//     [
+//       totalinstallmentsJSON,
+//       dueamount,
+//       addfee,
+//       initialpaymentJSON,
+//       installmentsJSON,
+//       totalpaidamount,
+//       id,
+//     ],
+//     (err, result) => {
+//       if (err) {
+//         console.error("Error updating user:", err);
+//         return res.status(500).json({ error: "Internal Server Error" }); // Return an error response
+//       }
+//       return res.status(200).json({ updated: true }); // Return a success response
 //     }
-//     return res.status(200).json({ updated: true }); // Return a success response
-//   });
+//   );
 // });
 
-app.put("/addfee/:id", (req, res) => {
+app.put("/noofinstallments/:id", (req, res) => {
+  const id = req.params.id;
+  const addfee = req.body.addfee;
+
+  const totalinstallments = req.body.totalinstallments;
+  const totalinstallmentsJSON = JSON.stringify(totalinstallments);
+
+  const installments = req.body.installments;
+
+  const installmentsJSON = JSON.stringify(installments);
+  const sql =
+    "UPDATE student_details SET totalinstallments = ?,addfee = ?, installments = ? WHERE id = ?;";
+
+  connection.query(
+    sql,
+    [totalinstallmentsJSON, addfee, installmentsJSON, id],
+    (err, result) => {
+      if (err) {
+        console.error("Error updating user:", err);
+        return res.status(500).json({ error: "Internal Server Error" }); // Return an error response
+      }
+      return res.status(200).json({ updated: true }); // Return a success response
+    }
+  );
+});
+
+app.put("/admissionfee/:id", (req, res) => {
   const id = req.params.id;
   const dueamount = req.body.dueamount;
   const initialpayment = req.body.initialpayment;
   const initialpaymentJSON = JSON.stringify(initialpayment);
-  const totalinstallments = req.body.totalinstallments;
-  const addfee = req.body.addfee;
-  const installments = req.body.installments;
+
   const totalpaidamount = req.body.totalpaidamount;
 
   const sql =
-    "UPDATE student_details SET totalinstallments = ?, dueamount = ?, addfee = ?, initialpayment = ?, installments = ?, totalpaidamount = ? WHERE id = ?;";
-
-  const totalinstallmentsJSON = JSON.stringify(totalinstallments);
-  const installmentsJSON = JSON.stringify(installments);
+    "UPDATE student_details SET  dueamount = ?,  initialpayment = ?,  totalpaidamount = ? WHERE id = ?;";
 
   connection.query(
     sql,
+    [dueamount, initialpaymentJSON, totalpaidamount, id],
+    (err, result) => {
+      if (err) {
+        console.error("Error updating user:", err);
+        return res.status(500).json({ error: "Internal Server Error" }); // Return an error response
+      }
+      return res.status(200).json({ updated: true }); // Return a success response
+    }
+  );
+});
+app.put("/updateduedateanddueamount/:id", (req, res) => {
+  const sql =
+    "UPDATE student_details SET installments = ?, nextduedate = ? WHERE id = ?;";
+  const id = req.params.id;
+ 
+  const installments = req.body.installments;
+  const installmentsJSON = JSON.stringify(installments);
+ 
+  const nextduedate = req.body.nextduedate;
+ 
+  connection.query(
+    sql,
     [
-      totalinstallmentsJSON,
-      dueamount,
-      addfee,
-      initialpaymentJSON,
       installmentsJSON,
-      totalpaidamount,
+ 
+      // nextduedateJSON,
+      nextduedate,
       id,
     ],
     (err, result) => {
@@ -1284,7 +1340,28 @@ app.put("/addfee/:id", (req, res) => {
     }
   );
 });
+app.put("/addnewinstallments/:id", (req, res) => {
+  const sql =
+    "UPDATE student_details SET installments = ?, totalinstallments = ? WHERE id = ?;";
+  const id = req.params.id;
 
+  const installments = req.body.installments;
+  const installmentsJSON = JSON.stringify(installments);
+  const totalinstallments = req.body.totalinstallments;
+  const totalinstallmentsJSON = JSON.stringify(totalinstallments);
+
+  connection.query(
+    sql,
+    [installmentsJSON, totalinstallmentsJSON, id],
+    (err, result) => {
+      if (err) {
+        console.error("Error updating user:", err);
+        return res.status(500).json({ error: "Internal Server Error" }); // Return an error response
+      }
+      return res.status(200).json({ updated: true }); // Return a success response
+    }
+  );
+});
 app.put("/feeinstallments/:id", (req, res) => {
   const sql =
     "UPDATE student_details SET installments = ?, totalinstallments = ?, dueamount = ?, totalpaidamount = ?, nextduedate = ? WHERE id = ?;";
