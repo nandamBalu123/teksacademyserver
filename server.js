@@ -77,14 +77,14 @@ const certificate = fs.readFileSync(certificatePath, 'utf8');
 const httpsServer = https.createServer(
   { key: privateKey, cert: certificate },
   app
-);  
+);
 
 // Start the HTTPS server on port 3000
-// const httpsPort = 3000;
-// httpsServer.listen(httpsPort, () => {
-//   console.log(`HTTPS server running on port ${httpsPort}`);
-// });
+const httpsPort = 3000;
+httpsServer.listen(httpsPort, () => {
+  console.log(`HTTPS server running on port ${httpsPort}`);
+});
 
-app.listen(3030, () => {
-  console.log('server is running on 3030')
-})
+// app.listen(3030, () => {
+//   console.log('server is running on 3030')
+// })

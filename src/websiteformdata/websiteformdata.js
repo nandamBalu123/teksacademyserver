@@ -615,8 +615,8 @@ app.post('/form-data', (req, res) => {
 
 //   webinar
 app.post('/webinars', (req, res) => {
-  const { scname, scemail, sccontactnumber, sccourse } = req.body;
-if (!scname || !scemail || !sccontactnumber || !sccourse) {
+  const { scname, scemail, sccontactnumber, sccourse, screferedby } = req.body;
+if (!scname || !scemail || !sccontactnumber || !sccourse || !screferedby) {
     console.error('Please fill in all required fields');
     return res.status(400).send('Please fill in all required fields');
   }
@@ -642,6 +642,7 @@ if (!scname || !scemail || !sccontactnumber || !sccourse) {
     ],
     customFieldValues: {
       requirementName: sccourse,
+      cfReferredBy: screferedby,
     },
     source: 1399474,
   };
@@ -665,8 +666,8 @@ if (!scname || !scemail || !sccontactnumber || !sccourse) {
     })
     .finally(() => {
       // Save the form data to MySQL
-      const query = 'INSERT INTO webinarsDec (name, email, phone, course) VALUES (?, ?, ?, ?)';
-      const values = [scname, scemail, sccontactnumber, sccourse];
+      const query = 'INSERT INTO webinarsDec (name, email, phone, course, referedby) VALUES (?, ?, ?, ?, ?)';
+      const values = [scname, scemail, sccontactnumber, sccourse, screferedby];
 
       connection.query(query, values, (err, result) => {
         if (err) {
@@ -684,7 +685,7 @@ if (!scname || !scemail || !sccontactnumber || !sccourse) {
           from: scemail,
           to: 'digitalmarketing@kapilguru.com',
           subject: 'This e-mail was sent from webinar page side form',
-          text: `Name: ${scname}\nEmail: ${scemail}\nPhone: ${sccontactnumber}\nCity: ${sccourse}\nThis e-mail was sent from single course page side form`,
+          text: `Name: ${scname}\nEmail: ${scemail}\nPhone: ${sccontactnumber}\nCity: ${sccourse}\nRefered By: ${screferedby}\n This e-mail was sent from single course page side form`,
         };
 
         mg.messages().send(data, (error, body) => {
@@ -701,3 +702,101 @@ if (!scname || !scemail || !sccontactnumber || !sccourse) {
   module.exports = {
     websiteFormDataApp: app
   } 
+
+
+
+  // get methods for webinar
+
+
+app.get("/webinardec", (req, res) => {
+  const sql = "SELECT * FROM webinarsDec";
+  connection.query(sql, (err, result) => {
+    if (err) {
+      return res.json({ Error: "get branch error in sql" });
+    } else {
+      res.status(201).json(result);
+    }
+  });
+});
+
+app.get("/whatsappleads", (req, res) => {
+  const sql = "SELECT * FROM whatsappFromData";
+  connection.query(sql, (err, result) => {
+    if (err) {
+      return res.json({ Error: "get branch error in sql" });
+    } else {
+      res.status(201).json(result);
+    }
+  });
+});
+
+app.get("/hlpefleads", (req, res) => {
+  const sql = "SELECT * FROM enquiryform";
+  connection.query(sql, (err, result) => {
+    if (err) {
+      return res.json({ Error: "get branch error in sql" });
+    } else {
+      res.status(201).json(result);
+    }
+  });
+});
+
+app.get("/slpefleads", (req, res) => {
+  const sql = "SELECT * FROM slpenquiryForm";
+  connection.query(sql, (err, result) => {
+    if (err) {
+      return res.json({ Error: "get branch error in sql" });
+    } else {
+      res.status(201).json(result);
+    }
+  });
+});
+
+app.get("/viewcoursesideleads", (req, res) => {
+  const sql = "SELECT * FROM scformdata";
+  connection.query(sql, (err, result) => {
+    if (err) {
+      return res.json({ Error: "get branch error in sql" });
+    } else {
+      res.status(201).json(result);
+    }
+  });
+});
+
+app.get("/dsleads", (req, res) => {
+  const sql = "SELECT * FROM formdata";
+  connection.query(sql, (err, result) => {
+    if (err) {
+      return res.json({ Error: "get branch error in sql" });
+    } else {
+      res.status(201).json(result);
+    }
+  });
+});
+
+app.get("/contactusleads", (req, res) => {
+  const sql = "SELECT * FROM contactusform";
+  connection.query(sql, (err, result) => {
+    if (err) {
+      return res.json({ Error: "get branch error in sql" });
+    } else {
+      res.status(201).json(result);
+    }
+  });
+});
+
+  app.get("/webinardecd", (req, res) => {
+    const sql = `SELECT * FROM webinarsDec 
+    INNER JOIN contactusform ON webinarsDec.common_column = contactusform.common_column
+    INNER JOIN formdata ON contactusform.common_column = formdata.common_column
+    INNER JOIN scformdata ON formdata.common_column = scformdata.common_column
+    ORDER BY id DESC`;
+    connection.query(sql, (err, result) => {
+      if (err) {
+        return res.json({ Error: "get error in sql" });
+      } else {
+        res.status(201).json(result);
+      }
+    });
+  });
+  
