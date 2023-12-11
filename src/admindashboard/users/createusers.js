@@ -88,6 +88,7 @@ const upload = multer({
 
 
 
+// student form
 
 app.post("/student_form", (req, res) => {
   const { filename, data } = req.body;
@@ -106,6 +107,8 @@ app.post("/student_form", (req, res) => {
   `;
 
   // Convert the feedetails array to JSON
+  const leadsource = req.body.leadsource;
+  const leadsourceJSON = JSON.stringify(leadsource);
   const feedetails = req.body.feedetails;
   const installments = req.body.installments;
   const extra_discount = req.body.extra_discount;
@@ -147,7 +150,8 @@ app.post("/student_form", (req, res) => {
     req.body.enquirytakenby,
     req.body.coursepackage,
     req.body.courses,
-    req.body.leadsource,
+    // req.body.leadsource,
+    leadsourceJSON,
     req.body.branch,
     req.body.modeoftraining,
     req.body.registrationnumber,
@@ -202,121 +206,6 @@ app.post("/student_form", (req, res) => {
     return res.status(201).json(insertResult);
   });
 });
-
-
-
-// app.post("/student_form", (req, res) => {
-//   const { filename, data } = req.body;
-//   const sql = `
-//     INSERT INTO student_details (
-//       name, email, mobilenumber, parentsname, birthdate, gender, maritalstatus,
-//       college, country, state, area, native, zipcode, whatsappno, educationtype, marks,
-//       academicyear, studentImg, imgData, enquirydate, enquirytakenby, coursepackage, courses,
-//       leadsource, branch, modeoftraining, admissionstatus, registrationnumber,
-//       admissiondate, validitystartdate, validityenddate, feedetails, grosstotal,
-//       totaldiscount, totaltax, grandtotal, finaltotal, admissionremarks, assets, totalinstallments,
-//       dueamount, addfee, initialpayment, duedatetype, installments, materialfee,
-//       feedetailsbilling, totalfeewithouttax, totalpaidamount, certificate_status,extra_discount, user_id
-//     )
-//     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-//   `;
- 
-//   // Convert the feedetails array to JSON
-//   const feedetails = req.body.feedetails;
-//   const installments = req.body.installments;
-//   const certificate_status = req.body.certificate_status;
-//   const certificate_statusJSON = JSON.stringify(certificate_status);
-//   const feedetailsbilling = req.body.feedetailsbilling;
-//   const initialpayment = req.body.initialpayment;
-//   const initialpaymentJSON = JSON.stringify(initialpayment);
-//   const feedetailsJSON = JSON.stringify(feedetails);
-//   const installmentsJSON = JSON.stringify(installments);
-//   const feedetailsbillingJSON = JSON.stringify(feedetailsbilling);
-//   const assets = req.body.assets;
-//   const assetsJSON = JSON.stringify(assets);
-//   const extra_discount = req.body.extra_discount;
-//   const extra_discountJSON = JSON.stringify(extra_discount);
-//   const values = [
-//     req.body.name,
-//     req.body.email,
-//     req.body.mobilenumber,
-//     req.body.parentsname,
-//     req.body.birthdate,
-//     req.body.gender,
-//     req.body.maritalstatus,
-//     req.body.college,
-//     req.body.country,
-//     req.body.state,
-//     req.body.area,
-//     req.body.native,
-//     req.body.zipcode,
-//     req.body.whatsappno,
-//     req.body.educationtype,
-//     req.body.marks,
-//     req.body.academicyear,
-//     filename,
-//     data,
-//     req.body.enquirydate,
-//     req.body.enquirytakenby,
-//     req.body.coursepackage,
-//     req.body.courses,
-//     req.body.leadsource,
-//     req.body.branch,
-//     req.body.modeoftraining,
-//     req.body.admissionstatus,
-//     req.body.registrationnumber,
-//     req.body.admissiondate,
-//     req.body.validitystartdate,
-//     req.body.validityenddate,
-//     feedetailsJSON,
-//     req.body.grosstotal,
-//     req.body.totaldiscount,
-//     req.body.totaltax,
-//     req.body.grandtotal,
-//     req.body.finaltotal,
-//     req.body.admissionremarks,
-//     assetsJSON,
-//     req.body.totalinstallments,
-//     req.body.dueamount,
-//     req.body.addfee,
-//     initialpaymentJSON,
-//     req.body.duedatetype,
-//     installmentsJSON,
-//     req.body.materialfee,
-//     feedetailsbillingJSON,
-//     req.body.totalfeewithouttax,
-//     req.body.totalpaidamount,
-//     certificate_statusJSON,
-//     extra_discountJSON,
-//     req.body.user_id,
-//   ];
-//   // Execute the SQL query
-//   connection.query(sql, values, (insertErr, insertResult) => {
-//     if (insertErr) {
-//       console.error("Error in INSERT query:", insertErr);
-//       return res.status(500).json("Internal Server Error");
-//     } else {
-//       // Upload the photo to S3
-//       const params = {
-//         Bucket: "teksacademyimages",
-//         Key: filename,
-//         Body: Buffer.from(data, "base64"),
-//         ACL: "public-read", // Adjust the ACL as needed
-//       };
- 
-//       s3.upload(params, (err, data) => {
-//         if (err) {
-//           console.error("Error uploading to S3:", err);
-//           res.status(500).json({ error: "Internal Server Error" });
-//         } else {
-//           res.json({ message: "Photo uploaded successfully" });
-//         }
-//       });
-//     }
-//     return res.status(201).json(insertResult);
-//   });
-// });
-
 
 
 
@@ -908,237 +797,6 @@ app.put("/updateuser/:id", (req, res) => {
 
 // student management
 
-// app.post('/student_form', (req, res) => {
-//   // SQL query with placeholders
-//   // const insertUserQuery = "INSERT INTO user (`fullname`, `email`, `password`, `phonenumber`, `designation`, `department`, `reportto`, `profile`, `branch`) VALUES (?)";
-//   // const sql = "INSERT INTO student_details (`name`, `email`, `mobilenumber`, `parentsname`, `birthdate`, `gender`, `maritalstatus`, `college`, `country`, `state`, `area`, `native`, `zipcode`, `whatsappno`, `educationtype`, `marks`, `academicyear`, `profilepic`, `enquirydate`, `enquirytakenby`, `coursepackage`, `courses`, `leadsource`, `branch`, `modeoftraining`, `admissionstatus`, `registrationnumber`, `admissiondate`, `validitystartdate`, `validityenddate`, `feedetails`, `grosstotal`, `totaldiscount`, `totaltax`, `grandtotal`, `finaltotal`, `admissionremarks`, `assets`, `totalinstallments`, `dueamount`, `addfee`, `initialamount`, `duedatetype`, `installments`, `materialfee`, `feedetailsbilling`, `totalfeewithouttax`) VALUES (?)";
-//   const sql = `
-//     INSERT INTO student_details (
-//       name, email, mobilenumber, parentsname, birthdate, gender, maritalstatus,
-//       college, country, state, area, native, zipcode, whatsappno, educationtype, marks,
-//       academicyear, profilepic, enquirydate, enquirytakenby, coursepackage, courses,
-//       leadsource, branch, modeoftraining, admissionstatus, registrationnumber,
-//       admissiondate, validitystartdate, validityenddate, feedetails, grosstotal,
-//       totaldiscount, totaltax, grandtotal, finaltotal, admissionremarks, assets, totalinstallments,
-//       dueamount, addfee, initialpayment, duedatetype, installments, materialfee,
-//       feedetailsbilling, totalfeewithouttax, totalpaidamount
-//     )
-//     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-//   `;
-
-//   // // Convert the feedetails array to JSON
-// const feedetails = req.body.feedetails;
-// const installments = req.body.installments; // Assuming installments should be a separate array
-// const feedetailsbilling = req.body.feedetailsbilling;
-// const initialpayment = req.body.initialpayment;
-// const initialpaymentJSON = JSON.stringify(initialpayment);
-// const feedetailsJSON = JSON.stringify(feedetails);
-// const installmentsJSON = JSON.stringify(installments);
-// const feedetailsbillingJSON = JSON.stringify(feedetailsbilling);
-// console.log("installment", installmentsJSON);
-// console.log("installment", feedetailsbillingJSON)
-// const values = [
-//     req.body.name, req.body.email, req.body.mobilenumber, req.body.parentsname, req.body.birthdate,
-//     req.body.gender, req.body.maritalstatus, req.body.college, req.body.country, req.body.state,
-//     req.body.area, req.body.native, req.body.zipcode, req.body.whatsappno, req.body.educationtype,
-//     req.body.marks, req.body.academicyear, req.body.profilepic, req.body.enquirydate,
-//     req.body.enquirytakenby, req.body.coursepackage, req.body.courses, req.body.leadsource,
-//     req.body.branch, req.body.modeoftraining, req.body.admissionstatus, req.body.registrationnumber,
-//     req.body.admissiondate, req.body.validitystartdate, req.body.validityenddate, feedetailsJSON,
-//     req.body.grosstotal, req.body.totaldiscount, req.body.totaltax, req.body.grandtotal, req.body.finaltotal,
-//     req.body.admissionremarks, req.body.assets, req.body.totalinstallments, req.body.dueamount,
-//     req.body.addfee, initialpaymentJSON, req.body.duedatetype, installmentsJSON, req.body.materialfee, feedetailsbillingJSON,
-//     req.body.totalfeewithouttax, req.body.totalpaidamount
-// ];
-
-//   // Execute the SQL query
-//   connection.query(sql, values, (insertErr, insertResult) => {
-//     if (insertErr) {
-//       console.error('Error in INSERT query:', insertErr);
-//       return res.status(500).json('Internal Server Error');
-//     }
-
-//     // Insertion successful, you can return a success response
-//     return res.status(201).json(insertResult);
-//   });
-// });
-
-
-// app.post("/upload", (req, res) => {
-//   if (!req.image || !req.files.studentImg) {
-//     return res.status(400).json({ error: "File not found in the request." });
-//   }
-
-//   const s3 = new AWS.S3();
-//   const studentImg = req.files.studentImg;
-
-//   const params = {
-//     Bucket: "teksacademyimages",
-//     Key: studentImg.name,
-//     Body: studentImg.data,
-//   };
-
-//   // Upload to S3
-//   s3.upload(params, (err, data) => {
-//     if (err) {
-//       return res.status(500).json({
-//         error: "Error uploading the file to S3",
-//         details: err.message,
-//       });
-//     }
-
-//     // Insert file details into MySQL
-//     const sql = "INSERT INTO student_details (studentImg, studentImg_s3_url) VALUES (?, ?)";
-//     const values = [file.name, data.Location]; // You might need to adjust the column names accordingly
-
-//     connection.query(sql, values, (dbErr, result) => {
-//       if (dbErr) {
-//         return res.status(500).json({
-//           error: "Error inserting file details into the database",
-//           details: dbErr.message,
-//         });
-//       }
-
-//       res.json({
-//         response_code: 200,
-//         response_message: "Success",
-//         response_data: data,
-//       });
-//     });
-//   });
-// });
-
-
-// working
-// app.post("/student_form", (req, res) => {
-//   const sql = `
-//     INSERT INTO student_details (
-//       name, email, mobilenumber, parentsname, birthdate, gender, maritalstatus,
-//       college, country, state, area, native, zipcode, whatsappno, educationtype, marks,
-//       academicyear, studentImg, profilepic, enquirydate, enquirytakenby, coursepackage, courses, 
-//       leadsource, branch, modeoftraining, admissionstatus, registrationnumber, 
-//       admissiondate, validitystartdate, validityenddate, feedetails, grosstotal,
-//       totaldiscount, totaltax, grandtotal, finaltotal, admissionremarks, assets, totalinstallments,
-//       dueamount, addfee, initialpayment, duedatetype, installments, materialfee,
-//       feedetailsbilling, totalfeewithouttax, totalpaidamount, certificate_status, user_id
-//     ) 
-//     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-//   `;
-
-//   // Convert the feedetails array to JSON
-//   const feedetails = req.body.feedetails;
-//   const installments = req.body.installments;
-//   const certificate_status = req.body.certificate_status;
-//   const certificate_statusJSON = JSON.stringify(certificate_status);
-//   const feedetailsbilling = req.body.feedetailsbilling;
-//   const initialpayment = req.body.initialpayment;
-//   const initialpaymentJSON = JSON.stringify(initialpayment);
-//   const feedetailsJSON = JSON.stringify(feedetails);
-//   const installmentsJSON = JSON.stringify(installments);
-//   const feedetailsbillingJSON = JSON.stringify(feedetailsbilling);
-//   // const assets = req.body.assets;
-//   // const assetsJSON = JSON.stringify(assets);
-
-//   let addfee = req.body.addfee;
-//   if(addfee === "false"){
-//       addfee=0;
-//   }else{
-//       addfee=1
-//   }
-
-
-//   const values = [
-//     req.body.name,
-//     req.body.email,
-//     req.body.mobilenumber,
-//     req.body.parentsname,
-//     req.body.birthdate,
-//     req.body.gender,
-//     req.body.maritalstatus,
-//     req.body.college,
-//     req.body.country,
-//     req.body.state,
-//     req.body.area,
-//     req.body.native,
-//     req.body.zipcode,
-//     req.body.whatsappno,
-//     req.body.educationtype,
-//     req.body.marks,
-//     req.body.academicyear,
-//     req.body.studentImg,
-//     req.body.profilepic,
-//     req.body.enquirydate,
-//     req.body.enquirytakenby,
-//     req.body.coursepackage,
-//     req.body.courses,
-//     req.body.leadsource,
-//     req.body.branch,
-//     req.body.modeoftraining,
-//     req.body.admissionstatus,
-//     req.body.registrationnumber,
-//     req.body.admissiondate,
-//     req.body.validitystartdate,
-//     req.body.validityenddate,
-//     feedetailsJSON,
-//     req.body.grosstotal,
-//     req.body.totaldiscount,
-//     req.body.totaltax,
-//     req.body.grandtotal,
-//     req.body.finaltotal,
-//     req.body.admissionremarks,
-//     req.body.assets,
-//     req.body.totalinstallments,
-//     req.body.dueamount,
-//     addfee,
-//     initialpaymentJSON,
-//     req.body.duedatetype,
-//     installmentsJSON,
-//     req.body.materialfee,
-//     feedetailsbillingJSON,
-//     req.body.totalfeewithouttax,
-//     req.body.totalpaidamount,
-//     certificate_statusJSON,
-//     req.body.user_id,
-//   ];
-//   // Execute the SQL query
-//   connection.query(sql, values, (insertErr, insertResult) => {
-//     if (insertErr) {
-//       console.error("Error in INSERT query:", insertErr);
-//       return res.status(500).json("Internal Server Error");
-//     }
-//     // Insertion successful, you can return a success response
-//     return res.status(201).json(insertResult);
-//   });
-// });
-
-// app.get("/getstudent_data", (req, res) => {
-//   const sql = "SELECT * FROM student_details";
-
-//   connection.query(sql, (err, result) => {
-//     if (err) {
-//       res.status(422).json("No data available");
-//     } else {
-//       // Parse the "installments" JSON strings into JavaScript objects
-//       const parsedResults = result.map((row) => {
-//         const parsedTotalInstallments = JSON.parse(row.totalinstallments);
-//         const parsedInstallments = JSON.parse(row.installments);
-//         const parsedInitialpayment = JSON.parse(row.initialpayment);
-//         const parsedcertificate_status = JSON.parse(row.certificate_status);
-//         return {
-//           ...row,
-//           totalinstallments: parsedTotalInstallments,
-//           installments: parsedInstallments,
-//           initialpayment: parsedInitialpayment,
-//           certificate_status: parsedcertificate_status,
-//         };
-//       });
-
-//       parsedResults.reverse();
-//       res.status(201).json(parsedResults);
-//     }
-//   });
-// });
-
 
 app.get("/getstudent_data", (req, res) => {
   const sql = "SELECT * FROM student_details";
@@ -1147,8 +805,9 @@ app.get("/getstudent_data", (req, res) => {
     if (err) {
       res.status(422).json("No data available");
     } else {
-      // Parse the "installments" JSON strings into JavaScript objects
+      
       const parsedResults = result.map((row) => {
+        const parsedLeadsource = JSON.parse(row.leadsource);
         const parsedTotalInstallments = JSON.parse(row.totalinstallments);
         const parsedInstallments = JSON.parse(row.installments);
         const parsedInitialpayment = JSON.parse(row.initialpayment);
@@ -1160,6 +819,7 @@ app.get("/getstudent_data", (req, res) => {
         
         return {
           ...row,
+          leadsource: parsedLeadsource,
           totalinstallments: parsedTotalInstallments,
           installments: parsedInstallments,
           initialpayment: parsedInitialpayment,
@@ -1176,6 +836,46 @@ app.get("/getstudent_data", (req, res) => {
     }
   });
 });
+
+
+// app.get("/getstudent_data", (req, res) => {
+//   const sql = "SELECT * FROM student_details";
+ 
+//   connection.query(sql, (err, result) => {
+//     if (err) {
+//       res.status(422).json("No data available");
+//     } else {
+//       // Parse the "installments" JSON strings into JavaScript objects
+//       const parsedResults = result.map((row) => {
+        
+//         const parsedTotalInstallments = JSON.parse(row.totalinstallments);
+//         const parsedInstallments = JSON.parse(row.installments);
+//         const parsedInitialpayment = JSON.parse(row.initialpayment);
+//         const parsedcertificate_status = JSON.parse(row.certificate_status);
+//         const parsedAssets = JSON.parse(row.assets);
+//         const ParsedExtra_discount = JSON.parse(row.extra_discount);
+//         const ParsedFeeDetails = JSON.parse(row.feedetails);
+//         const ParsedFeeDetailsbilling = JSON.parse(row.feedetailsbilling);
+        
+//         return {
+//           ...row,
+          
+//           totalinstallments: parsedTotalInstallments,
+//           installments: parsedInstallments,
+//           initialpayment: parsedInitialpayment,
+//           certificate_status: parsedcertificate_status,
+//           assets: parsedAssets,
+//           extra_discount: ParsedExtra_discount,
+//           feedetails: ParsedFeeDetails,
+//           feedetailsbilling: ParsedFeeDetailsbilling,
+//         };
+//       });
+ 
+//       parsedResults.reverse();
+//       res.status(201).json(parsedResults);
+//     }
+//   });
+// });
 
 
 

@@ -666,7 +666,16 @@ if (!scname || !scemail || !sccontactnumber || !sccourse || !screferedby) {
     })
     .finally(() => {
       // Save the form data to MySQL
-      const query = 'INSERT INTO webinarsDec (name, email, phone, course, referedby) VALUES (?, ?, ?, ?, ?)';
+      // const query = 'INSERT INTO webinarsDec (name, email, phone, course, referedby) VALUES (?, ?, ?, ?, ?)';
+      const query = `
+  INSERT INTO webinarsDec (name, email, phone, course, referedby)
+  VALUES (?, ?, ?, ?, ?)
+  ON DUPLICATE KEY UPDATE
+    name = VALUES(name),
+    email = VALUES(email),
+    course = VALUES(course),
+    referedby = VALUES(referedby)
+`;
       const values = [scname, scemail, sccontactnumber, sccourse, screferedby];
 
       connection.query(query, values, (err, result) => {
@@ -708,16 +717,55 @@ if (!scname || !scemail || !sccontactnumber || !sccourse || !screferedby) {
   // get methods for webinar
 
 
+// app.get("/webinardec", (req, res) => {
+//   const sql = "SELECT * FROM webinarsDec";
+//   connection.query(sql, (err, result) => {
+//     if (err) {
+//       return res.json({ Error: "get branch error in sql" });
+//     } else {
+      
+//       result.reverse();
+//       res.status(201).json(result);
+//     }
+//   });
+// });
+
 app.get("/webinardec", (req, res) => {
   const sql = "SELECT * FROM webinarsDec";
   connection.query(sql, (err, result) => {
     if (err) {
       return res.json({ Error: "get branch error in sql" });
     } else {
+      // Find duplicate numbers
+      
+      const numberCount = {};
+      const duplicateNumbers = [];
+
+      result.forEach((item) => {
+        const number = item.phone; // Replace 'number' with the actual field name in your database
+        if (numberCount[number]) {
+          numberCount[number]++;
+          duplicateNumbers.push(number);
+        } else {
+          numberCount[number] = 1;
+        }
+      });
+
+      // Reverse the result
+      result.reverse();
+
+      // Add 'D' only to duplicate numbers after the first occurrence
+      result.forEach((item) => {
+        if (duplicateNumbers.includes(item.phone) && numberCount[item.phone] > 1) {
+          item.phone = item.phone + 'D'; // Replace 'number' with the actual field name in your database
+        }
+      });
+
       res.status(201).json(result);
     }
   });
 });
+
 
 app.get("/whatsappleads", (req, res) => {
   const sql = "SELECT * FROM whatsappFromData";
@@ -725,6 +773,7 @@ app.get("/whatsappleads", (req, res) => {
     if (err) {
       return res.json({ Error: "get branch error in sql" });
     } else {
+      result.reverse();
       res.status(201).json(result);
     }
   });
@@ -736,6 +785,7 @@ app.get("/hlpefleads", (req, res) => {
     if (err) {
       return res.json({ Error: "get branch error in sql" });
     } else {
+      result.reverse();
       res.status(201).json(result);
     }
   });
@@ -747,6 +797,7 @@ app.get("/slpefleads", (req, res) => {
     if (err) {
       return res.json({ Error: "get branch error in sql" });
     } else {
+      result.reverse();
       res.status(201).json(result);
     }
   });
@@ -758,6 +809,7 @@ app.get("/viewcoursesideleads", (req, res) => {
     if (err) {
       return res.json({ Error: "get branch error in sql" });
     } else {
+      result.reverse();
       res.status(201).json(result);
     }
   });
@@ -769,6 +821,7 @@ app.get("/dsleads", (req, res) => {
     if (err) {
       return res.json({ Error: "get branch error in sql" });
     } else {
+      result.reverse();
       res.status(201).json(result);
     }
   });
@@ -780,6 +833,7 @@ app.get("/contactusleads", (req, res) => {
     if (err) {
       return res.json({ Error: "get branch error in sql" });
     } else {
+      result.reverse();
       res.status(201).json(result);
     }
   });
