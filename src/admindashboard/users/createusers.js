@@ -697,25 +697,58 @@ app.post("/employeelogin", (req, res) => {
   });
 });
 
-app.post("/userroles", (req, res) => {
-  const sql = "INSERT INTO roles_permissions (role,description) VALUES (?, ?)";
-  const values = [req.body.role, req.body.description];
+// app.post("/userroles", (req, res) => {
+//   const sql = "INSERT INTO roles_permissions (role,description,createdby,permissions) VALUES (?, ?, ?, ?)";
+//   const rolesPermissions = req.body.permissions;
+//   const rolesPermissionsJOSN = JSON.stringify(rolesPermissions);
+//   const values = [req.body.role, req.body.description, "blue", rolesPermissionsJOSN];
 
-  if (!values.every((value) => value !== undefined)) {
-    return res.status(422).json("Please fill in all the data");
+
+//   console.log(rolesPermissionsJOSN, rolesPermissions)
+//   // if (!values.every((value) => value !== undefined)) {
+//   //   return res.status(422).json("Please fill in all the data");
+//   // }
+
+//   //  selectResult
+  
+//   connection.query(sql, values, (insertErr, insertResult) => {
+//     if (insertErr) {
+//       console.log("Error in INSERT query: ", insertErr);
+//       return res.status(500).json("Internal Server Error");
+//     }
+
+//     return res.status(201).json(req.body);
+//   });
+// });
+
+app.post("/userroles", (req, res) => {
+  const sql = "INSERT INTO roles_permissions (role, description, createdby, permissions) VALUES (?, ?, ?, ?)";
+  
+  // Check if role and description are provided
+  if (!req.body.role || !req.body.description) {
+    return res.status(422).json("Role and description are required");
   }
 
-  //  selectResult
+  // Check if permissions are provided
+  if (!req.body.permissions) {
+    return res.status(422).json("Permissions cannot be null or undefined");
+  }
+
+  // Stringify permissions
+  const rolesPermissionsJOSN = JSON.stringify(req.body.permissions);
+  
+  const values = [req.body.role, req.body.description, "blue", rolesPermissionsJOSN];
 
   connection.query(sql, values, (insertErr, insertResult) => {
     if (insertErr) {
-      console.log("Error in INSERT query: ", insertErr);
+      console.error("Error in INSERT query: ", insertErr);
       return res.status(500).json("Internal Server Error");
     }
 
     return res.status(201).json(req.body);
   });
 });
+
 
 app.get("/getuserroles", (req, res) => {
   const sql = "SELECT * FROM roles_permissions";
@@ -1705,6 +1738,28 @@ app.put("/certificatestatus/:id", (req, res) => {
     return res.status(200).json({ updated: true }); // Return a success response
   });
 });
+
+// reports
+
+app.post("/createreport", (req, res) => {
+ 
+  const reports = req.body.reports;
+  const reportsJSON = JSON.stringify(reports);
+  const sql =
+    "INSERT INTO reports SET reports = ?";
+  connection.query(
+    sql,
+    [reportsJSON],
+    (err, result) => {
+      if (err) {
+        console.error("Error updating user:", err);
+        return res.status(500).json({ error: "Internal Server Error" }); // Return an error response
+      }
+      return res.status(200).json({ updated: true }); // Return a success response
+    }
+  );
+});
+
 
 module.exports = {
   usersCreation: app,
