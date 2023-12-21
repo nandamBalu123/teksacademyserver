@@ -745,16 +745,64 @@ app.post("/userroles", (req, res) => {
       return res.status(500).json("Internal Server Error");
     }
 
-    return res.status(201).json(req.body);
+    // return res.status(201).json(req.body);
+    return res.status(200).json(req.body);
   });
 });
 
 
 app.get("/getuserroles", (req, res) => {
   const sql = "SELECT * FROM roles_permissions";
+
   connection.query(sql, (err, result) => {
-    if (err) return res.json({ Error: "Get userroles error in sql" });
-    return res.json(result);
+    if (err) {
+      res.status(422).json("No data available");
+    } else {
+      const parsedResults = result.map((row) => {
+        const parsedPermissions = JSON.parse(row.permissions);
+        return {
+          ...row,
+          permissions: parsedPermissions,
+          
+        };
+      });
+      parsedResults.reverse();
+      res.status(201).json(parsedResults);
+    }
+  });
+});
+
+app.put("/updaterolespermissions/:id", (req, res) => {
+  const sql = "UPDATE roles_permissions SET permissions = ? WHERE id = ?;";
+  const id = req.params.id;
+  const permissions = req.body.permissions;
+
+  const permissionsJSON = JSON.stringify(permissions);
+
+
+  connection.query(sql, [permissionsJSON, id], (err, result) => {
+    if (err) {
+      console.error("Error update status:", err);
+      return res.status(500).json({ error: "Internal Server Error" }); // Return an error response
+    }
+    return res.status(200).json({ updated: true }); // Return a success response
+  });
+  
+})
+
+app.get("/userroles/:id", (req, res) => {
+  const { id } = req.params;
+ 
+  connection.query("SELECT * FROM roles_permissions WHERE id = ? ", id, (err, result) => {
+    if (err) {
+      res.status(422).json("No data available");
+    } else {
+      // let parsedResults = result;
+      // parsedResults[0].user_remarks_history = JSON.parse(
+      //   parsedResults[0].user_remarks_history
+      // );
+      res.status(201).json(parsedResults);
+    }
   });
 });
 
@@ -1760,6 +1808,28 @@ app.post("/createreport", (req, res) => {
   );
 });
 
+app.get("/getreports", (req, res) => {
+  const sql = "SELECT * FROM reports";
+ 
+  connection.query(sql, (err, result) => {
+    if (err) {
+      res.status(422).json("No data available");
+    } else {
+ 
+      const parsedResults = result.map((row) => {
+        const parsedReports = JSON.parse(row.reports);
+        return {
+          ...row,
+          reports: parsedReports,
+ 
+        };
+      });
+ 
+      parsedResults.reverse();
+      res.status(201).json(parsedResults);
+    }
+  });
+});
 
 module.exports = {
   usersCreation: app,
