@@ -451,6 +451,97 @@ app.get("/userdata", (req, res) => {
 // });
 
 
+// const jwtSecretKey = "your_secret_key";
+
+// app.post("/adminlogin", (req, res) => {
+//   const { email, password } = req.body;
+//   const sql = "SELECT * FROM user WHERE email = ?";
+
+//   // console.log('Email from Request:', email);
+//   // console.log('Password from Request:', password);
+
+//   // Ensure both variables are valid strings
+//   const trimmedEmail = String(email).trim();
+//   const trimmedPassword = String(password).trim();
+
+//   connection.query(sql, [trimmedEmail], (err, result) => {
+//     if (err) {
+//       console.error("Error running database query:", err);
+//       return res
+//         .status(500)
+//         .json({ Status: "Error", Error: "Error in running query" });
+//     }
+
+//     if (result.length === 0) {
+//       console.log("User not found");
+//       return res.status(401).json({ Status: "Error", Error: "User not found" });
+//     }
+
+//     const hashedPasswordFromDatabase = result[0].password;
+
+//     // Compare the user-provided password with the hashed password from the database
+//     bcrypt.compare(
+//       trimmedPassword,
+//       hashedPasswordFromDatabase,
+//       (bcryptErr, bcryptResult) => {
+//         console.log("bcryptErr:", bcryptErr);
+//         console.log("bcryptResult:", bcryptResult);
+
+//         if (bcryptErr || !bcryptResult) {
+//           console.log("Wrong Email or Password");
+//           return res
+//             .status(401)
+//             .json({ Status: "Error", Error: "Wrong Email or Password" });
+//         }
+
+//         var userPayload = {
+//           userId: result[0].id,
+//           username: result[0].fullname,
+//           role: result[0].profile, // Assuming you have a "role" field in your user table
+//         };
+
+//         req.session.userPayload = userPayload;
+
+
+//         const token = jwt.sign(userPayload, jwtSecretKey, {
+//           expiresIn: "1d",
+//         });
+//         res.cookie("token", token);
+//         console.log("User logged in successfully. Token generated:", token);
+//         console.log("userId: ", userPayload);
+        
+        
+//         // Fetch admin-specific data from the database here
+//         // You can execute another query to retrieve data specific to admin users
+//         // For example:
+//         const adminDataSql = "SELECT * FROM user WHERE id = ?";
+//         const adminId = result[0].id;
+
+//         connection.query(adminDataSql, [adminId], (adminErr, adminResult) => {
+//           if (adminErr) {
+//             console.error("Error fetching admin data:", adminErr);
+//             return res
+//               .status(500)
+//               .json({ Status: "Error", Error: "Error fetching admin data" });
+//           }
+//           // Assuming admin data is successfully fetched, you can include it in the response
+//           const adminData = adminResult[0];
+
+//           // res.cookie('token', token, { httpOnly: false });
+//           res.cookie("token", token);
+//           return res
+//             .status(200)
+//             .json({ Status: "Success", adminData: adminData, token: token });
+
+//           // res.cookie('token', token);
+//           // return res.status(200).json({ Status: "Success", AdminData: adminData });
+//         });
+//       }
+//     );
+//   });
+// });
+
+
 const jwtSecretKey = "your_secret_key";
 
 app.post("/adminlogin", (req, res) => {
@@ -475,6 +566,17 @@ app.post("/adminlogin", (req, res) => {
     if (result.length === 0) {
       console.log("User not found");
       return res.status(401).json({ Status: "Error", Error: "User not found" });
+    }
+
+    const userStatus = result[0].user_status;
+
+    // Check if the user is inactive
+    if (userStatus == 0) {
+      console.log("User account is inactive");
+      return res.status(401).json({
+        Status: "inactive",
+        Error: "Your account is inactive. Please contact the admin.",
+      })
     }
 
     const hashedPasswordFromDatabase = result[0].password;
@@ -511,9 +613,7 @@ app.post("/adminlogin", (req, res) => {
         console.log("userId: ", userPayload);
         
         
-        // Fetch admin-specific data from the database here
-        // You can execute another query to retrieve data specific to admin users
-        // For example:
+        
         const adminDataSql = "SELECT * FROM user WHERE id = ?";
         const adminId = result[0].id;
 
@@ -540,6 +640,8 @@ app.post("/adminlogin", (req, res) => {
     );
   });
 });
+
+
 
 
 
@@ -1712,9 +1814,26 @@ app.get("/getleadsource", (req, res) => {
 });
 
 // courses
+// app.post("/addcourses", (req, res) => {
+//   const sql = "INSERT INTO courses_settings (course_name) VALUES (?)";
+//   const values = [req.body.course_name];
+
+//   if (!values.every((value) => value !== undefined)) {
+//     return res.status(422).json("fill the fields");
+//   }
+
+//   connection.query(sql, values, (err, result) => {
+//     if (err) {
+//       return res.json({ Error: "error adding course" });
+//     } else {
+//       return res.status(201).json(req.body);
+//     }
+//   });
+// });
+
 app.post("/addcourses", (req, res) => {
-  const sql = "INSERT INTO courses_settings (course_name) VALUES (?)";
-  const values = [req.body.course_name];
+  const sql = "INSERT INTO courses_settings (course_name, fee, createdby) VALUES (?, ?, ?)";
+  const values = [req.body.course_name, req.body.fee, req.body.username];
 
   if (!values.every((value) => value !== undefined)) {
     return res.status(422).json("fill the fields");
@@ -1829,6 +1948,27 @@ app.get("/getreports", (req, res) => {
       res.status(201).json(parsedResults);
     }
   });
+});
+
+app.put("/updatereport/:id", (req, res) => {
+  const id = req.params.id;
+  const reports = req.body.reports;
+  const reportsJSON = JSON.stringify(reports);
+ 
+  const sql =
+    "UPDATE reports SET reports = ? WHERE id = ?;";
+ 
+  connection.query(
+    sql,
+    [reportsJSON, id],
+    (err, result) => {
+      if (err) {
+        console.error("Error updating user:", err);
+        return res.status(500).json({ error: "Internal Server Error" }); // Return an error response
+      }
+      return res.status(200).json({ updated: true }); // Return a success response
+    }
+  );
 });
 
 module.exports = {
