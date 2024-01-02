@@ -9,6 +9,7 @@ const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const twilio = require("twilio");
 const bodyParser = require("body-parser");
+const { body, validationResult } = require('express-validator');
 // app.use(bodyParser.json());
 // Increase the payload size limit for JSON and URL-encoded bodies
 app.use(bodyParser.json({ limit: '200mb' }));
@@ -85,6 +86,63 @@ const upload = multer({
     fileSize: 10 * 1024 * 1024, // 10MB in bytes
   },
 });
+
+// welcome msg to student
+
+const sendWelcomeMessage = async (studentName, MobileNumber) => {
+  const apiUrl = 'https://api.interakt.ai/v1/public/message/';
+  const apiKey = 'Qkw5bElEanZwZVN3Q2VVUXVxdkp2eVNJN2FOdG9nQ0pQRU1xVkpCOVhXTTo=';
+  const templateName = 'welcome_message_to_student';
+  const countryCode = '+91'; // Replace with the country code of the student
+  const phoneNumber = `${MobileNumber}`; // Replace with the phone number of the student
+
+  const requestBody = {
+    countryCode,
+    phoneNumber,
+    type: 'Template',
+    callbackData: 'some_callback_data', // Optional callback data
+
+    template: {
+      name: templateName,
+      languageCode: 'en', // Replace with the language code of your template
+      headerValues: [
+        'https://interaktstorage.blob.core.windows.net/mediastoragecontainer/91e5634a-33b0-44b4-a075-884778f02feb/message_template_sample/tcITOHfOz6vy.png?se=2026-08-13T11%3A53%3A58Z&sp=rt&sv=2019-12-12&sr=b&sig=PDn3cPLmV%2BYu3D7Wd10JYmPLQeyGyytl013wAtmbL6g%3D'
+      ],
+      bodyValues: [
+        `${studentName}` // Replace with the value for variable {{1}} in body text
+        // '1234'   // Replace with the value for variable {{2}} in body text
+      ],
+      buttonValues: {
+        '1': [
+          // '12344'  // Replace with the value for {{1}} for dynamic URL in button at index position 0
+        ]
+      }
+    },
+  };
+
+  const headers = {
+    Authorization: `Basic ${apiKey}`,
+    'Content-Type': 'application/json',
+  };
+
+  console.log('API Key:', apiKey);
+  console.log('Authorization Header:', headers.Authorization);
+  console.log('Request Body:', JSON.stringify(requestBody, null, 2));
+
+  try {
+    const response = await axios.post(apiUrl, requestBody, { headers });
+
+    if (response.data.result) {
+      console.log('Message created successfully!');
+      console.log('Message ID:', response.data.id);
+    } else {
+      console.error('Error creating message:', response.data.message);
+    }
+  } catch (error) {
+    console.error('Error:', error.message);
+    console.error('Error Response:', error.response.data);
+  }
+};
 
 
 
@@ -194,11 +252,12 @@ app.post("/student_form", (req, res) => {
         ACL: 'public-read', // Adjust the ACL as needed
       };
 
-      s3.upload(params, (err, data) => {
+      s3.upload(params, async (err, data) => {
         if (err) {
           console.error('Error uploading to S3:', err);
           res.status(500).json({ error: 'Internal Server Error' });
         } else {
+          await sendWelcomeMessage(req.body.name, req.body.mobilenumber);
           res.json({ message: 'Photo uploaded successfully' });
         }
       });
@@ -909,35 +968,44 @@ app.get("/userroles/:id", (req, res) => {
 });
 
 
-app.get("/viewuser/:id", (req, res) => {
-  const { id } = req.params;
- 
-  connection.query("SELECT * FROM user WHERE id = ? ", id, (err, result) => {
-    if (err) {
-      res.status(422).json("No data available");
-    } else {
-      let parsedResults = result;
-      parsedResults[0].user_remarks_history = JSON.parse(
-        parsedResults[0].user_remarks_history
-      );
-      res.status(201).json(parsedResults);
-    }
-  });
-});
-
-// backup 11/7/2023
 // app.get("/viewuser/:id", (req, res) => {
 //   const { id } = req.params;
-
+ 
 //   connection.query("SELECT * FROM user WHERE id = ? ", id, (err, result) => {
 //     if (err) {
-//       res.status(422).json("error");
+//       res.status(422).json("No data available");
 //     } else {
-//       res.status(201).json(result);
+//       let parsedResults = result;
+//       parsedResults[0].user_remarks_history = JSON.parse(
+//         parsedResults[0].user_remarks_history
+//       );
+//       res.status(201).json(parsedResults);
 //     }
 //   });
 // });
 
+app.get("/viewuser/:id", (req, res) => {
+  const { id } = req.params;
+
+  connection.query("SELECT * FROM user WHERE id = ? ", id, (err, result) => {
+    if (err) {
+      res.status(422).json("No data available");
+    } else if (result && result.length > 0) {
+      let parsedResults = result;
+      
+      // Check if user_remarks_history is not undefined before parsing
+      if (parsedResults[0].user_remarks_history !== undefined) {
+        parsedResults[0].user_remarks_history = JSON.parse(
+          parsedResults[0].user_remarks_history
+        );
+      }
+
+      res.status(201).json(parsedResults);
+    } else {
+      res.status(404).json("User not found");
+    }
+  });
+});
 
 
 app.put("/updateuser/:id", (req, res) => {
@@ -1021,60 +1089,6 @@ app.get("/getstudent_data", (req, res) => {
 });
 
 
-// app.get("/getstudent_data", (req, res) => {
-//   const sql = "SELECT * FROM student_details";
- 
-//   connection.query(sql, (err, result) => {
-//     if (err) {
-//       res.status(422).json("No data available");
-//     } else {
-//       // Parse the "installments" JSON strings into JavaScript objects
-//       const parsedResults = result.map((row) => {
-        
-//         const parsedTotalInstallments = JSON.parse(row.totalinstallments);
-//         const parsedInstallments = JSON.parse(row.installments);
-//         const parsedInitialpayment = JSON.parse(row.initialpayment);
-//         const parsedcertificate_status = JSON.parse(row.certificate_status);
-//         const parsedAssets = JSON.parse(row.assets);
-//         const ParsedExtra_discount = JSON.parse(row.extra_discount);
-//         const ParsedFeeDetails = JSON.parse(row.feedetails);
-//         const ParsedFeeDetailsbilling = JSON.parse(row.feedetailsbilling);
-        
-//         return {
-//           ...row,
-          
-//           totalinstallments: parsedTotalInstallments,
-//           installments: parsedInstallments,
-//           initialpayment: parsedInitialpayment,
-//           certificate_status: parsedcertificate_status,
-//           assets: parsedAssets,
-//           extra_discount: ParsedExtra_discount,
-//           feedetails: ParsedFeeDetails,
-//           feedetailsbilling: ParsedFeeDetailsbilling,
-//         };
-//       });
- 
-//       parsedResults.reverse();
-//       res.status(201).json(parsedResults);
-//     }
-//   });
-// });
-
-
-
-
-// app.get("/viewstudentdata/:id",(req,res)=>{
-
-//   const {id} = req.params;
-
-//   connection.query("SELECT * FROM student_details WHERE id = ? ",id,(err,result)=>{
-//       if(err){
-//           res.status(422).json("error");
-//       }else{
-//           res.status(201).json(result);
-//       }
-//   })
-// });
 
 app.get("/viewstudentdata/:id", (req, res) => {
   const { id } = req.params;
@@ -1280,22 +1294,49 @@ app.put("/feeinstallments/:id", (req, res) => {
 
 
 
+// app.put("/extra_discount/:id", (req, res) => {
+//   const sql =
+//     "UPDATE student_details SET extra_discount = ?,installments=?, dueamount=?  WHERE id = ?;";
+//   const id = req.params.id;
+//   const Extra_Discount_remarks_history =
+//     req.body.Extra_Discount_remarks_history;
+ 
+//   const Extra_Discount_remarks_historyJSON = JSON.stringify(
+//     Extra_Discount_remarks_history
+//   );
+//   const installments = req.body.installments;
+//   const installmentsJSON = JSON.stringify(installments);
+//   const dueamount = req.body.dueamount;
+//   connection.query(
+//     sql,
+//     [Extra_Discount_remarks_historyJSON, installmentsJSON, dueamount, id],
+//     (err, result) => {
+//       if (err) {
+//         console.error("Error update status:", err);
+//         return res.status(500).json({ error: "Internal Server Error" }); // Return an error response
+//       }
+//       return res.status(200).json({ updated: true }); // Return a success response
+//     }
+//   );
+// });
+
+
+
 app.put("/extra_discount/:id", (req, res) => {
   const sql =
-    "UPDATE student_details SET extra_discount = ?,installments=?, dueamount=?  WHERE id = ?;";
+    "UPDATE student_details SET totalinstallments = ?, extra_discount = ?,installments=?, dueamount=?  WHERE id = ?;";
   const id = req.params.id;
+  const totalinstallments = req.body.totalinstallments;
+  const totalinstallmentsJSON = JSON.stringify(totalinstallments);
   const Extra_Discount_remarks_history =
     req.body.Extra_Discount_remarks_history;
- 
-  const Extra_Discount_remarks_historyJSON = JSON.stringify(
-    Extra_Discount_remarks_history
-  );
+  const Extra_Discount_remarks_historyJSON = JSON.stringify(Extra_Discount_remarks_history);
   const installments = req.body.installments;
   const installmentsJSON = JSON.stringify(installments);
   const dueamount = req.body.dueamount;
   connection.query(
     sql,
-    [Extra_Discount_remarks_historyJSON, installmentsJSON, dueamount, id],
+    [totalinstallmentsJSON, Extra_Discount_remarks_historyJSON, installmentsJSON, dueamount, id],
     (err, result) => {
       if (err) {
         console.error("Error update status:", err);
@@ -1813,23 +1854,7 @@ app.get("/getleadsource", (req, res) => {
   });
 });
 
-// courses
-// app.post("/addcourses", (req, res) => {
-//   const sql = "INSERT INTO courses_settings (course_name) VALUES (?)";
-//   const values = [req.body.course_name];
 
-//   if (!values.every((value) => value !== undefined)) {
-//     return res.status(422).json("fill the fields");
-//   }
-
-//   connection.query(sql, values, (err, result) => {
-//     if (err) {
-//       return res.json({ Error: "error adding course" });
-//     } else {
-//       return res.status(201).json(req.body);
-//     }
-//   });
-// });
 
 app.post("/addcourses", (req, res) => {
   const sql = "INSERT INTO courses_settings (course_name, fee, createdby) VALUES (?, ?, ?)";
@@ -1847,6 +1872,58 @@ app.post("/addcourses", (req, res) => {
     }
   });
 });
+
+
+// const interaktApiKey = 'Qkw5bElEanZwZVN3Q2VVUXVxdkp2eVNJN2FOdG9nQ0pQRU1xVkpCOVhXTTo=';
+
+// const interaktApiUrl = 'https://api.interakt.com/whatsapp/send';
+
+// app.post("/addcourses", async (req, res) => {
+//   const { course_name, fee, username } = req.body;
+
+//   // Check if any required field is missing
+//   if (!course_name || !fee || !username) {
+//     return res.status(422).json({ error: "Fill all the fields" });
+//   }
+
+//   const sql = "INSERT INTO courses_settings (course_name, fee, createdby) VALUES (?, ?, ?)";
+//   const values = [course_name, fee, username];
+
+//   try {
+//     const result = await connection.query(sql, values);
+//     const courseId = result.insertId;
+
+//     const messageData = {
+//       to: '9493991327', // Replace with the recipient's phone number
+//       message: `Course "${course_name}" added by ${username}`,
+//     };
+
+//     const headers = {
+//       'Content-Type': 'application/json',
+//       'Authorization': `Bearer ${interaktApiKey}`,
+//     };
+
+//     console.log('Sending WhatsApp message:', messageData);
+    
+//     const response = await axios.post(interaktApiUrl, messageData, { headers, timeout: 10000 });
+//     // const response = await axios.post(interaktApiUrl, messageData, { headers });
+
+//     console.log('WhatsApp API response:', response.data);
+
+//     return res.status(201).json({
+//       success: true,
+//       message: "Course added successfully",
+//       course: { id: courseId, course_name, fee, createdby: username }
+//     });
+//   } catch (error) {
+//     console.error('Error adding course or sending WhatsApp message:', error.message);
+//     return res.status(500).json({ error: "Error adding course or sending WhatsApp message" });
+//   }
+// });
+
+
+
+
 
 app.get("/getcourses", (req, res) => {
   const sql = "SELECT * FROM courses_settings";
@@ -1970,6 +2047,32 @@ app.put("/updatereport/:id", (req, res) => {
     }
   );
 });
+
+
+
+app.put("/resetpassword/:id", (req, res) => {
+  const sql = "UPDATE user SET password = ? WHERE id = ?;";
+  const id = req.params.id;
+  const plainPassword = req.body.password;
+ 
+ 
+  bcrypt.hash(plainPassword, 10, (hashErr, hashedPassword) => {
+    if (hashErr) {
+      console.error("Error hashing password:", hashErr);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+ 
+   
+    connection.query(sql, [hashedPassword, id], (updateErr, result) => {
+      if (updateErr) {
+        console.error("Error updating password:", updateErr);
+        return res.status(500).json({ error: "Internal Server Error" });
+      }
+      return res.status(200).json({ updated: true });
+    });
+  });
+});
+ 
 
 module.exports = {
   usersCreation: app,

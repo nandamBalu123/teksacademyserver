@@ -19,6 +19,8 @@ app.use(cors());
 app.use(express.json());
 app.use(bodyParser.json());
 
+
+
 // db connection
 const dbConnection = require('./src/db/connection');
 
@@ -85,6 +87,129 @@ const httpsServer = https.createServer(
 //   console.log(`HTTPS server running on port ${httpsPort}`);
 // });
 
+
 app.listen(3030, () => {
   console.log('server is running on 3030')
 })
+
+
+// whatsapp interakt
+// const sendWelcomeMessage = async () => {
+//   const apiUrl = 'https://api.interakt.ai/v1/public/message/';
+//   const apiKey = 'Qkw5bElEanZwZVN3Q2VVUXVxdkp2eVNJN2FOdG9nQ0pQRU1xVkpCOVhXTTo=';
+//   const templateName = 'dm_webinar_registration';
+//   const countryCode = '+91'; // Replace with the country code of the student
+//   const phoneNumber = '9493991327'; // Replace with the phone number of the student
+
+//   const requestBody = {
+//     countryCode,
+//     phoneNumber,
+//     type: 'Template',
+//     callbackData: 'some_callback_data', // Optional callback data
+
+//     template: {
+//       name: templateName,
+//       languageCode: 'en', // Replace with the language code of your template
+//       headerValues: [
+//         'https://interaktstorage.blob.core.windows.net/mediastoragecontainer/91e5634a-33b0-44b4-a075-884778f02feb/message_template_sample/tcITOHfOz6vy.png?se=2026-08-13T11%3A53%3A58Z&sp=rt&sv=2019-12-12&sr=b&sig=PDn3cPLmV%2BYu3D7Wd10JYmPLQeyGyytl013wAtmbL6g%3D'
+//       ],
+//       bodyValues: [
+//         'There', // Replace with the value for variable {{1}} in body text
+//         '1234'   // Replace with the value for variable {{2}} in body text
+//       ],
+//       buttonValues: {
+//         '1': [
+//           '12344'  // Replace with the value for {{1}} for dynamic URL in button at index position 0
+//         ]
+//       }
+//     },
+//   };
+
+//   const headers = {
+//     Authorization: `Basic ${apiKey}`,
+//     'Content-Type': 'application/json',
+//   };
+
+//   console.log('API Key:', apiKey);
+//   console.log('Authorization Header:', headers.Authorization);
+//   console.log('Request Body:', JSON.stringify(requestBody, null, 2));
+
+//   try {
+//     const response = await axios.post(apiUrl, requestBody, { headers });
+
+//     if (response.data.result) {
+//       console.log('Message created successfully!');
+//       console.log('Message ID:', response.data.id);
+//     } else {
+//       console.error('Error creating message:', response.data.message);
+//     }
+//   } catch (error) {
+//     console.error('Error:', error.message);
+//     console.error('Error Response:', error.response.data);
+//   }
+// };
+
+// // Call the function to send the welcome message
+// sendWelcomeMessage();
+
+
+
+// 2nd
+// const sendWelcomeMessage = async () => {
+//   const apiUrl = 'https://api.interakt.ai/v1/public/message/';
+//   const apiKey = 'Qkw5bElEanZwZVN3Q2VVUXVxdkp2eVNJN2FOdG9nQ0pQRU1xVkpCOVhXTTo=';
+//   const templateName = 'welcome_message_to_student';
+//   const countryCode = '+91'; // Replace with the country code of the student
+//   const phoneNumber = '9493991327'; // Replace with the phone number of the student
+
+//   const requestBody = {
+//     countryCode,
+//     phoneNumber,
+//     type: 'Template',
+//     callbackData: 'some_callback_data', // Optional callback data
+
+//     template: {
+//       name: templateName,
+//       languageCode: 'en', // Replace with the language code of your template
+//       headerValues: [
+//         'https://interaktstorage.blob.core.windows.net/mediastoragecontainer/91e5634a-33b0-44b4-a075-884778f02feb/message_template_sample/tcITOHfOz6vy.png?se=2026-08-13T11%3A53%3A58Z&sp=rt&sv=2019-12-12&sr=b&sig=PDn3cPLmV%2BYu3D7Wd10JYmPLQeyGyytl013wAtmbL6g%3D'
+//       ],
+//       bodyValues: [
+//         'There' // Replace with the value for variable {{1}} in body text
+//         // '1234'   // Replace with the value for variable {{2}} in body text
+//       ],
+//       buttonValues: {
+//         '1': [
+//           // '12344'  // Replace with the value for {{1}} for dynamic URL in button at index position 0
+//         ]
+//       }
+//     },
+//   };
+
+//   const headers = {
+//     Authorization: `Basic ${apiKey}`,
+//     'Content-Type': 'application/json',
+//   };
+
+//   console.log('API Key:', apiKey);
+//   console.log('Authorization Header:', headers.Authorization);
+//   console.log('Request Body:', JSON.stringify(requestBody, null, 2));
+
+//   try {
+//     const response = await axios.post(apiUrl, requestBody, { headers });
+
+//     if (response.data.result) {
+//       console.log('Message created successfully!');
+//       console.log('Message ID:', response.data.id);
+//     } else {
+//       console.error('Error creating message:', response.data.message);
+//     }
+//   } catch (error) {
+//     console.error('Error:', error.message);
+//     console.error('Error Response:', error.response.data);
+//   }
+// };
+
+// // Call the function to send the welcome message
+// sendWelcomeMessage();
+
