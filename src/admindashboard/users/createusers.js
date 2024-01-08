@@ -1188,6 +1188,7 @@ app.put("/noofinstallments/:id", (req, res) => {
 
 
 
+
 app.post('/studentfeerefund', (req, res) => {
   const { refund } = req.body;
   const refundJSON = JSON.stringify(refund)
@@ -1237,7 +1238,7 @@ app.post('/studentfeerefund', (req, res) => {
       connection.query(createRefundColumnQuery, (createColumnErr) => {
         if (createColumnErr) {
           console.error('Error creating refund column:', createColumnErr);
-          return res.status(500).json({ error: 'Internal Server Error' });
+          return res.status(500).json({ error: 'Internal Server Error ' });
         }
       
         // Now update the refund for the specified registration number
@@ -1253,6 +1254,16 @@ app.post('/studentfeerefund', (req, res) => {
     }
   });
 });
+
+app.get("/studentrefundsfromrefunds", (req, res) => {
+  const sql = "SELECT * FROM refund";
+  connection.query(sql, (err, result) => {
+    if(err){
+      return res.json({Error: "get refunds error in sql"})
+    }
+    return res.json(result);
+  })
+})
 
 
 
