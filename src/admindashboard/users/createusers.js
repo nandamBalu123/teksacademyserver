@@ -604,7 +604,7 @@ app.get("/userdata", (req, res) => {
 const jwtSecretKey = "your_secret_key";
 
 app.post("/adminlogin", (req, res) => {
-  const { email, password } = req.body;
+  console.log(req.body)
   const sql = "SELECT * FROM user WHERE email = ?";
 
   // console.log('Email from Request:', email);
@@ -1185,6 +1185,76 @@ app.put("/noofinstallments/:id", (req, res) => {
     }
   );
 });
+
+
+
+app.post('/studentfeerefund', (req, res) => {
+  const { refund } = req.body;
+  const refundJSON = JSON.stringify(refund)
+  const regNum = refund[0].registrationnumber;
+  
+  if (!refund) {
+    return res.status(400).json({ error: 'Registration number and refund amount are required.' });
+  }
+
+  const checkQuery = 'SELECT * FROM student_details WHERE registrationnumber = ?';
+
+  connection.query(checkQuery, [regNum], (err, results) => {
+    if (err) {
+      console.error('Error checking registration number:', err);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+
+    if (results.length === 0) {
+      const createTableQuery = 'CREATE TABLE IF NOT EXISTS refunds (id INT AUTO_INCREMENT PRIMARY KEY, refund TEXT)';
+      
+      connection.query(createTableQuery, (createErr) => {
+        if (createErr) {
+          console.error('Error creating refund table:', createErr);
+          return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        const insertQuery = 'INSERT INTO refund (refund) VALUES (?)';
+        connection.query(insertQuery, [refundJSON], (insertErr) => {
+          if (insertErr) {
+            console.error('Error inserting refund record:', insertErr);
+            return res.status(500).json({ error: 'Internal Server Error' });
+          }
+
+          return res.json({ message: `Refund record inserted for registration number ${regNum}` });
+        });
+      });
+    } else {
+      
+      const updateQuery = 'UPDATE student_details SET refund = ? WHERE registrationnumber = ?';
+
+      // Create the refund column if it doesn't exist
+      const createRefundColumnQuery = `
+        ALTER TABLE student_details
+        ADD COLUMN IF NOT EXISTS refund TEXT;
+      `;
+      
+      connection.query(createRefundColumnQuery, (createColumnErr) => {
+        if (createColumnErr) {
+          console.error('Error creating refund column:', createColumnErr);
+          return res.status(500).json({ error: 'Internal Server Error' });
+        }
+      
+        // Now update the refund for the specified registration number
+        connection.query(updateQuery, [refundJSON, regNum], (updateErr) => {
+          if (updateErr) {
+            console.error('Error updating student_details:', updateErr);
+            return res.status(500).json({ error: 'Internal Server Error' });
+          }
+      
+          return res.json({ message: `Refund updated for registration number ${regNum}` });
+        });
+      });
+    }
+  });
+});
+
+
 
 app.put("/admissionfee/:id", (req, res) => {
   const id = req.params.id;

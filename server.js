@@ -213,3 +213,211 @@ app.listen(3030, () => {
 // // Call the function to send the welcome message
 // sendWelcomeMessage();
 
+
+
+// payment phonepy
+
+// // Replace these values with your actual credentials and payment details
+// const merchantId = 'M18B38OXJS8U';
+// const orderId = 'your_order_id';
+// const amount = 1; // Replace with the actual amount in paisa
+// const returnUrl = 'https://teksacademy.com'; // Replace with your return URL
+
+// const paymentData = {
+//   merchantId,
+//   orderId,
+//   amount,
+//   returnUrl,
+//   // Add other payment-related details as needed
+// };
+
+// const options = {
+//   method: 'post',
+//   url: 'https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/pay',
+//   headers: {
+//     accept: 'text/plain',
+//     'Content-Type': 'application/json',
+//   },
+//   data: paymentData,
+// };
+
+// axios
+//   .request(options)
+//   .then(function (response) {
+//     console.log(response.data);
+//     // Redirect the user to the PhonePe payment page using the response data
+//     // Example: res.redirect(response.data.paymentUrl);
+//   })
+//   .catch(function (error) {
+//     console.error(error);
+//     // Handle errors appropriately
+//   });
+
+
+
+// const merchantId = 'M18B38OXJS8U';
+// const merchantTransactionId = 'TXSCAN2311111252386710790446';
+// const amount = 100;
+// const redirectUrl = 'https://teksacademy.com';
+// const redirectMode = 'REDIRECT';
+// const callbackUrl = 'https://teksacademy.com';
+
+// const userTimestamp = Date.now().toString();
+// const merchantUserId = `user_${userTimestamp}`;
+
+// const paymentData = {
+//   merchantId,
+//   merchantTransactionId,
+//   amount,
+//   merchantUserId,
+//   redirectUrl,
+//   redirectMode,
+//   callbackUrl,
+//   paymentInstrument: {
+//     type: 'PAY_PAGE',
+//   },
+// };
+
+// const options = {
+//   method: 'post',
+//   url: 'https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/pay',
+//   headers: {
+//     'Accept': 'application/json', // Check PhonePe documentation for the correct value
+//     'Content-Type': 'application/json',
+//   },
+//   data: paymentData,
+// };
+
+// axios
+//   .request(options)
+//   .then(function (response) {
+//     console.log(response.data);
+//   })
+//   .catch(function (error) {
+//     console.error('Error details:', error.message);
+//     console.error('Error response:', error.response.data);
+//     console.error('Error status code:', error.response.status);
+//   });
+
+
+
+// const crypto = require('crypto');
+
+// const merchantId = 'M18B38OXJS8U';
+// const merchantTransactionId = 'TXSCAN2311111252386710790446';
+// const amount = 100;
+// const redirectUrl = 'https://teksacademy.com';
+// const redirectMode = 'REDIRECT';
+// const callbackUrl = 'https://teksacademy.com';
+
+// const userTimestamp = Date.now().toString();
+// const merchantUserId = `user_${userTimestamp}`;
+
+// const paymentData = {
+//   merchantId,
+//   merchantTransactionId,
+//   amount,
+//   merchantUserId,
+//   redirectUrl,
+//   redirectMode,
+//   callbackUrl,
+//   paymentInstrument: {
+//     type: 'PAY_PAGE',
+//   },
+// };
+
+// // Create the payload as a JSON string
+// const payload = JSON.stringify(paymentData);
+
+// // Replace 'your_salt_key' and 'your_salt_index' with your actual salt key and index
+// const saltKey = '099eb0cd-02cf-4e2a-8aca-3e6c6aff0399';
+// const saltIndex = 1;
+
+// // Create the hash for X-VERIFY header
+// const hash = crypto.createHash('sha256');
+// hash.update(Buffer.from(payload, 'utf-8'));
+// hash.update("/pg/v1/pay");
+// hash.update(saltKey);
+// const xVerifyValue = hash.digest('base64') + "###" + saltIndex;
+
+// const options = {
+//   method: 'post',
+//   url: 'https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/pay',
+//   headers: {
+//     'Content-Type': 'application/json',
+//     'X-VERIFY': xVerifyValue,
+//   },
+//   data: payload,
+// };
+
+// axios
+//   .request(options)
+//   .then(function (response) {
+//     console.log(response.data);
+//   })
+//   .catch(function (error) {
+//     console.error('Error details:', error.message);
+//     console.error('Error response:', error.response.data);
+//     console.error('Error status code:', error.response.status);
+//   });
+
+// const { createHash } = require('crypto');
+
+
+// const merchantId = 'PGTESTPAYUAT';
+// const merchantTransactionId = 'TXSCAN2311111252386710790446';
+// const amount = 100;
+// const redirectUrl = 'https://teksacademy.com';
+// const redirectMode = 'REDIRECT';
+// const callbackUrl = 'https://teksacademy.com';
+
+// const userTimestamp = Date.now().toString();
+// const merchantUserId = `user_${userTimestamp}`;
+
+// const paymentData = {
+//   merchantId,
+//   merchantTransactionId,
+//   amount,
+//   merchantUserId,
+//   redirectUrl,
+//   redirectMode,
+//   callbackUrl,
+//   paymentInstrument: {
+//     type: 'PAY_PAGE',
+//   },
+// };
+
+
+// const payload = JSON.stringify(paymentData);
+
+
+// const saltKey = '099eb0cd-02cf-4e2a-8aca-3e6c6aff0399';
+// const saltIndex = 1;
+
+
+// const hash = createHash('sha256');
+// hash.update(Buffer.from(payload, 'utf-8'));
+// hash.update("/pg/v1/pay");
+// hash.update(saltKey);
+// const xVerifyValue = hash.digest('base64') + "||" + saltIndex;
+
+// const options = {
+//   method: 'post',
+//   url: 'https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/pay',
+//   headers: {
+//     'Content-Type': 'application/json',
+//     'X-VERIFY': xVerifyValue,
+//   },
+//   data: payload,
+// };
+
+// axios
+//   .request(options)
+//   .then(function (response) {
+//     console.log(response.data);
+//   })
+//   .catch(function (error) {
+//     console.error('Error details:', error.message);
+//     console.error('Error response:', error.response.data);
+//     console.error('Error status code:', error.response.status);
+//   });
