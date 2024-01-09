@@ -604,11 +604,21 @@ app.get("/userdata", (req, res) => {
 const jwtSecretKey = "your_secret_key";
 
 app.post("/adminlogin", (req, res) => {
-  console.log(req.body)
-  const sql = "SELECT * FROM user WHERE email = ?";
+  // console.log(req.body)
+  // const sql = "SELECT * FROM user WHERE email = ?";
 
-  // console.log('Email from Request:', email);
-  // console.log('Password from Request:', password);
+  // // console.log('Email from Request:', email);
+  // // console.log('Password from Request:', password);
+
+  // // Ensure both variables are valid strings
+  // const trimmedEmail = String(email).trim();
+  // const trimmedPassword = String(password).trim();
+
+  // connection.query(sql, [trimmedEmail], (err, result) => {
+    
+  const { email, password } = req.body; 
+
+  const sql = "SELECT * FROM user WHERE email = ?";
 
   // Ensure both variables are valid strings
   const trimmedEmail = String(email).trim();
