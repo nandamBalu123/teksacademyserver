@@ -605,16 +605,7 @@ const jwtSecretKey = "your_secret_key";
 
 app.post("/adminlogin", (req, res) => {
   // console.log(req.body)
-  // const sql = "SELECT * FROM user WHERE email = ?";
-
-  // // console.log('Email from Request:', email);
-  // // console.log('Password from Request:', password);
-
-  // // Ensure both variables are valid strings
-  // const trimmedEmail = String(email).trim();
-  // const trimmedPassword = String(password).trim();
-
-  // connection.query(sql, [trimmedEmail], (err, result) => {
+  
     
   const { email, password } = req.body; 
 
@@ -1947,22 +1938,103 @@ app.get("/getleadsource", (req, res) => {
 
 
 
+// app.post("/addcourses", (req, res) => {
+//   const sql = "INSERT INTO courses_settings (course_name, fee, createdby) VALUES (?, ?, ?)";
+//   const values = [req.body.course_name, req.body.fee, req.body.username];
+
+//   if (!values.every((value) => value !== undefined)) {
+//     return res.status(422).json("fill the fields");
+//   }
+
+//   connection.query(sql, values, (err, result) => {
+//     if (err) {
+//       return res.json({ Error: "error adding course" });
+//     } else {
+//       return res.status(201).json(req.body);
+//     }
+//   });
+// });
+
 app.post("/addcourses", (req, res) => {
-  const sql = "INSERT INTO courses_settings (course_name, fee, createdby) VALUES (?, ?, ?)";
-  const values = [req.body.course_name, req.body.fee, req.body.username];
-
-  if (!values.every((value) => value !== undefined)) {
-    return res.status(422).json("fill the fields");
-  }
-
-  connection.query(sql, values, (err, result) => {
-    if (err) {
-      return res.json({ Error: "error adding course" });
-    } else {
-      return res.status(201).json(req.body);
+  const sqlAddColumn = "ALTER TABLE courses_settings ADD COLUMN IF NOT EXISTS max_discount VARCHAR(255) DEFAULT 0";
+  connection.query(sqlAddColumn, (alterErr) => {
+    if (alterErr) {
+      console.error("Error adding column:", alterErr);
+      return res.status(500).json({ Error: "Internal Server Error" });
     }
+
+    const sqlInsertCourse = "INSERT INTO courses_settings (course_name, fee, createdby, max_discount) VALUES (?, ?, ?, ?)";
+    const values = [req.body.course_name, req.body.fee, req.body.username, req.body.max_discount];
+
+    if (!values.every((value) => value !== undefined)) {
+      return res.status(422).json("Fill all the fields");
+    }
+
+    connection.query(sqlInsertCourse, values, (err, result) => {
+      if (err) {
+        console.error("Error adding course:", err);
+        return res.status(500).json({ Error: "Error adding course" });
+      } else {
+        return res.status(201).json(req.body);
+      }
+    });
   });
 });
+
+
+// app.post("/addcourses", (req, res) => {
+//   const courseName = req.body.course_name;
+//   const fee = req.body.fee;
+//   const createdBy = req.body.username;
+
+//   // Check if the "max_discount" column exists
+//   const checkColumnQuery = "SHOW COLUMNS FROM courses_settings LIKE 'max_discount'";
+  
+//   connection.query(checkColumnQuery, (checkColumnErr, checkColumnResult) => {
+//     if (checkColumnErr) {
+//       console.error('Error checking if column exists:', checkColumnErr);
+//       return res.status(500).json({ Error: 'Internal Server Error' });
+//     }
+
+//     if (checkColumnResult.length === 0) {
+//       // If the column does not exist, add it using ALTER TABLE
+//       const addColumnQuery = "ALTER TABLE courses_settings ADD COLUMN max_discount INT DEFAULT 0";
+
+//       connection.query(addColumnQuery, (addColumnErr, addColumnResult) => {
+//         if (addColumnErr) {
+//           console.error('Error adding column:', addColumnErr);
+//           return res.status(500).json({ Error: 'Internal Server Error' });
+          
+//         }
+//         console.log("res", res);
+//         // Now that the column is added, proceed with the course insertion
+//         insertCourse(courseName, fee, createdBy, res);
+//       });
+//     } else {
+//       // If the column already exists, proceed with the course insertion
+//       insertCourse(courseName, fee, createdBy, res);
+//     }
+//   });
+// });
+
+// function insertCourse(courseName, fee, createdBy, res) {
+//   const insertQuery = "INSERT INTO courses_settings (course_name, fee, createdby) VALUES (?, ?, ?)";
+//   const values = [courseName, fee, createdBy];
+
+//   if (!values.every((value) => value !== undefined)) {
+//     return res.status(422).json("Fill all the fields");
+//   }
+
+//   connection.query(insertQuery, values, (err, result) => {
+//     if (err) {
+//       console.error('Error adding course:', err);
+//       return res.json({ Error: "Error adding course" });
+//     } else {
+//       return res.status(201).json(req.body);
+//     }
+//   });
+// }
+
 
 
 // const interaktApiKey = 'Qkw5bElEanZwZVN3Q2VVUXVxdkp2eVNJN2FOdG9nQ0pQRU1xVkpCOVhXTTo=';
