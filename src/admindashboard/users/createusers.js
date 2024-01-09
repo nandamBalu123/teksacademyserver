@@ -1955,31 +1955,68 @@ app.get("/getleadsource", (req, res) => {
 //   });
 // });
 
+// app.post("/addcourses", (req, res) => {
+//   const sqlAddColumn = "ALTER TABLE courses_settings ADD COLUMN IF NOT EXISTS max_discount VARCHAR(255) DEFAULT 0";
+//   const sqlAddColumn2 = "ALTER TABLE courses_settings ADD COLUMN IF NOT EXISTS course_package VARCHAR(255) DEFAULT NULL";
+//   connection.query(sqlAddColumn, sqlAddColumn2, (alterErr) => {
+//     if (alterErr) {
+//       console.error("Error adding column:", alterErr);
+//       return res.status(500).json({ Error: "Internal Server Error" });
+//     }
+
+//     const sqlInsertCourse = "INSERT INTO courses_settings (course_name, fee, createdby, max_discount, course_package) VALUES (?, ?, ?, ?, ?)";
+//     const values = [req.body.course_name, req.body.fee, req.body.createdby, req.body.max_discount, req.body.course_package];
+
+//     if (!values.every((value) => value !== undefined)) {
+//       return res.status(422).json("Fill all the fields");
+//     }
+
+//     connection.query(sqlInsertCourse, values, (err, result) => {
+//       if (err) {
+//         console.error("Error adding course:", err);
+//         return res.status(500).json({ Error: "Error adding course" });
+//       } else {
+//         return res.status(201).json(req.body);
+//       }
+//     });
+//   });
+// });
+
 app.post("/addcourses", (req, res) => {
   const sqlAddColumn = "ALTER TABLE courses_settings ADD COLUMN IF NOT EXISTS max_discount VARCHAR(255) DEFAULT 0";
-  connection.query(sqlAddColumn, (alterErr) => {
-    if (alterErr) {
-      console.error("Error adding column:", alterErr);
+  const sqlAddColumn2 = "ALTER TABLE courses_settings ADD COLUMN IF NOT EXISTS course_package VARCHAR(255) DEFAULT NULL";
+  
+  connection.query(sqlAddColumn, (alterErr1) => {
+    if (alterErr1) {
+      console.error("Error adding column 1:", alterErr1);
       return res.status(500).json({ Error: "Internal Server Error" });
     }
 
-    const sqlInsertCourse = "INSERT INTO courses_settings (course_name, fee, createdby, max_discount) VALUES (?, ?, ?, ?)";
-    const values = [req.body.course_name, req.body.fee, req.body.username, req.body.max_discount];
-
-    if (!values.every((value) => value !== undefined)) {
-      return res.status(422).json("Fill all the fields");
-    }
-
-    connection.query(sqlInsertCourse, values, (err, result) => {
-      if (err) {
-        console.error("Error adding course:", err);
-        return res.status(500).json({ Error: "Error adding course" });
-      } else {
-        return res.status(201).json(req.body);
+    connection.query(sqlAddColumn2, (alterErr2) => {
+      if (alterErr2) {
+        console.error("Error adding column 2:", alterErr2);
+        return res.status(500).json({ Error: "Internal Server Error" });
       }
+
+      const sqlInsertCourse = "INSERT INTO courses_settings (course_name, fee, createdby, max_discount, course_package, date) VALUES (?, ?, ?, ?, ?, ?)";
+      const values = [req.body.course_name, req.body.fee, req.body.createdby, req.body.max_discount, req.body.course_package, req.body.date];
+
+      if (values.some((value) => value === undefined || value === null)) {
+        return res.status(422).json({ error: "Fill all the fields" });
+      }
+
+      connection.query(sqlInsertCourse, values, (err, result) => {
+        if (err) {
+          console.error("Error adding course:", err);
+          return res.status(500).json({ Error: "Error adding course" });
+        } else {
+          return res.status(201).json(req.body);
+        }
+      });
     });
   });
 });
+
 
 
 // app.post("/addcourses", (req, res) => {
