@@ -208,7 +208,6 @@ app.post("/student_form", (req, res) => {
     req.body.enquirytakenby,
     req.body.coursepackage,
     req.body.courses,
-    // req.body.leadsource,
     leadsourceJSON,
     req.body.branch,
     req.body.modeoftraining,
@@ -415,198 +414,12 @@ app.get("/userdata", (req, res) => {
   });
 });
 
-// backup 11/7/2023
-// app.get("/userdata", (req, res) => {
-//   const sql = "SELECT * FROM user ORDER BY id DESC";
-//   connection.query(sql, (err, result) => {
-//     if (err) {
-//       res.status(422).json("nodata available");
-//     } else {
-//       res.status(201).json(result);
-//     }
-//   });
-// });
-
-
-
-
-// Secret key for JWT (store this securely and use environment variables)
-// const jwtSecretKey = "your_secret_key";
-// app.post("/adminlogin", (req, res) => {
-//   const { email, password } = req.body;
-//   const sql = "SELECT * FROM user WHERE email = ?";
-
-//   // console.log('Email from Request:', email);
-//   // console.log('Password from Request:', password);
-
-//   // Ensure both variables are valid strings
-//   const trimmedEmail = String(email).trim();
-//   const trimmedPassword = String(password).trim();
-
-//   connection.query(sql, [trimmedEmail], (err, result) => {
-//     if (err) {
-//       console.error("Error running database query:", err);
-//       return res
-//         .status(500)
-//         .json({ Status: "Error", Error: "Error in running query" });
-//     }
-
-//     if (result.length === 0) {
-//       console.log("User not found");
-//       return res.status(401).json({ Status: "Error", Error: "User not found" });
-//     }
-
-//     const hashedPasswordFromDatabase = result[0].password;
-
-//     // Compare the user-provided password with the hashed password from the database
-//     bcrypt.compare(
-//       trimmedPassword,
-//       hashedPasswordFromDatabase,
-//       (bcryptErr, bcryptResult) => {
-//         console.log("bcryptErr:", bcryptErr);
-//         console.log("bcryptResult:", bcryptResult);
-
-//         if (bcryptErr || !bcryptResult) {
-//           console.log("Wrong Email or Password");
-//           return res
-//             .status(401)
-//             .json({ Status: "Error", Error: "Wrong Email or Password" });
-//         }
-
-//         const token = jwt.sign({ profile: "admin" }, jwtSecretKey, {
-//           expiresIn: "1d",
-//         });
-//         res.cookie("token", token);
-//         console.log("User logged in successfully. Token generated:", token);
-
-//         // Fetch admin-specific data from the database here
-//         // You can execute another query to retrieve data specific to admin users
-//         // For example:
-//         const adminDataSql = "SELECT * FROM user WHERE id = ?";
-//         const adminId = result[0].id;
-
-//         connection.query(adminDataSql, [adminId], (adminErr, adminResult) => {
-//           if (adminErr) {
-//             console.error("Error fetching admin data:", adminErr);
-//             return res
-//               .status(500)
-//               .json({ Status: "Error", Error: "Error fetching admin data" });
-//           }
-//           // Assuming admin data is successfully fetched, you can include it in the response
-//           const adminData = adminResult[0];
-
-//           // res.cookie('token', token, { httpOnly: false });
-//           res.cookie("token", token);
-//           return res
-//             .status(200)
-//             .json({ Status: "Success", adminData: adminData, token: token });
-
-//           // res.cookie('token', token);
-//           // return res.status(200).json({ Status: "Success", AdminData: adminData });
-//         });
-//       }
-//     );
-//   });
-// });
-
-
-// const jwtSecretKey = "your_secret_key";
-
-// app.post("/adminlogin", (req, res) => {
-//   const { email, password } = req.body;
-//   const sql = "SELECT * FROM user WHERE email = ?";
-
-//   // console.log('Email from Request:', email);
-//   // console.log('Password from Request:', password);
-
-//   // Ensure both variables are valid strings
-//   const trimmedEmail = String(email).trim();
-//   const trimmedPassword = String(password).trim();
-
-//   connection.query(sql, [trimmedEmail], (err, result) => {
-//     if (err) {
-//       console.error("Error running database query:", err);
-//       return res
-//         .status(500)
-//         .json({ Status: "Error", Error: "Error in running query" });
-//     }
-
-//     if (result.length === 0) {
-//       console.log("User not found");
-//       return res.status(401).json({ Status: "Error", Error: "User not found" });
-//     }
-
-//     const hashedPasswordFromDatabase = result[0].password;
-
-//     // Compare the user-provided password with the hashed password from the database
-//     bcrypt.compare(
-//       trimmedPassword,
-//       hashedPasswordFromDatabase,
-//       (bcryptErr, bcryptResult) => {
-//         console.log("bcryptErr:", bcryptErr);
-//         console.log("bcryptResult:", bcryptResult);
-
-//         if (bcryptErr || !bcryptResult) {
-//           console.log("Wrong Email or Password");
-//           return res
-//             .status(401)
-//             .json({ Status: "Error", Error: "Wrong Email or Password" });
-//         }
-
-//         var userPayload = {
-//           userId: result[0].id,
-//           username: result[0].fullname,
-//           role: result[0].profile, // Assuming you have a "role" field in your user table
-//         };
-
-//         req.session.userPayload = userPayload;
-
-
-//         const token = jwt.sign(userPayload, jwtSecretKey, {
-//           expiresIn: "1d",
-//         });
-//         res.cookie("token", token);
-//         console.log("User logged in successfully. Token generated:", token);
-//         console.log("userId: ", userPayload);
-        
-        
-//         // Fetch admin-specific data from the database here
-//         // You can execute another query to retrieve data specific to admin users
-//         // For example:
-//         const adminDataSql = "SELECT * FROM user WHERE id = ?";
-//         const adminId = result[0].id;
-
-//         connection.query(adminDataSql, [adminId], (adminErr, adminResult) => {
-//           if (adminErr) {
-//             console.error("Error fetching admin data:", adminErr);
-//             return res
-//               .status(500)
-//               .json({ Status: "Error", Error: "Error fetching admin data" });
-//           }
-//           // Assuming admin data is successfully fetched, you can include it in the response
-//           const adminData = adminResult[0];
-
-//           // res.cookie('token', token, { httpOnly: false });
-//           res.cookie("token", token);
-//           return res
-//             .status(200)
-//             .json({ Status: "Success", adminData: adminData, token: token });
-
-//           // res.cookie('token', token);
-//           // return res.status(200).json({ Status: "Success", AdminData: adminData });
-//         });
-//       }
-//     );
-//   });
-// });
 
 
 const jwtSecretKey = "your_secret_key";
 
 app.post("/adminlogin", (req, res) => {
   // console.log(req.body)
-  
-    
   const { email, password } = req.body; 
 
   const sql = "SELECT * FROM user WHERE email = ?";
@@ -701,30 +514,6 @@ app.post("/adminlogin", (req, res) => {
   });
 });
 
-
-
-
-
-// function authenticateUser(req, res, next) {
-//   const token = req.cookies.token;
-//   console.log("token cookie", token)
-
-//   if (!token) {
-//     return res.status(401).json({ Status: "Error", Error: "Unauthorized" });
-//   }
-
-//   jwt.verify(token, jwtSecretKey, (err, user) => {
-//     if (err) {
-//       return res.status(401).json({ Status: "Error", Error: "Invalid token" });
-//     }
-
-//     req.user = user;
-//     console.log("req.user: ", req.user)
-//     next();
-
-//     console.log("req.user", req.user)
-//   });
-// }
 
 
 
@@ -859,29 +648,7 @@ app.post("/employeelogin", (req, res) => {
   });
 });
 
-// app.post("/userroles", (req, res) => {
-//   const sql = "INSERT INTO roles_permissions (role,description,createdby,permissions) VALUES (?, ?, ?, ?)";
-//   const rolesPermissions = req.body.permissions;
-//   const rolesPermissionsJOSN = JSON.stringify(rolesPermissions);
-//   const values = [req.body.role, req.body.description, "blue", rolesPermissionsJOSN];
 
-
-//   console.log(rolesPermissionsJOSN, rolesPermissions)
-//   // if (!values.every((value) => value !== undefined)) {
-//   //   return res.status(422).json("Please fill in all the data");
-//   // }
-
-//   //  selectResult
-  
-//   connection.query(sql, values, (insertErr, insertResult) => {
-//     if (insertErr) {
-//       console.log("Error in INSERT query: ", insertErr);
-//       return res.status(500).json("Internal Server Error");
-//     }
-
-//     return res.status(201).json(req.body);
-//   });
-// });
 
 app.post("/userroles", (req, res) => {
   const sql = "INSERT INTO roles_permissions (role, description, createdby, permissions) VALUES (?, ?, ?, ?)";
@@ -1059,7 +826,17 @@ app.get("/getstudent_data", (req, res) => {
     } else {
       
       const parsedResults = result.map((row) => {
-        const parsedLeadsource = JSON.parse(row.leadsource);
+        // const parsedLeadsource = JSON.parse(row.leadsource);
+        let parsedLeadsource;
+        try{
+          parsedLeadsource = JSON.parse(row.leadsource);
+
+          if(!Array.Array(parsedLeadsource)){
+            parsedLeadsource = ["leadsource is not an array"]
+          }
+        }catch(error){
+          parsedLeadsource = ["Invalid leadsource format"]
+        }
         const parsedTotalInstallments = JSON.parse(row.totalinstallments);
         const parsedInstallments = JSON.parse(row.installments);
         const parsedInitialpayment = JSON.parse(row.initialpayment);
@@ -1088,6 +865,8 @@ app.get("/getstudent_data", (req, res) => {
     }
   });
 });
+
+
 
 
 
