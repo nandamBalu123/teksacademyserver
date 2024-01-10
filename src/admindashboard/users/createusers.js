@@ -27,7 +27,7 @@ const session = require('express-session');
 const multer = require("multer");
 const multerS3 = require('multer-s3');
 const cors = require('cors');
-app.use(cors()); 
+app.use(cors());
 app.use(cookieParser());
 const fileUpload = require('express-fileupload');
 // Set a higher file size limit (20 MB in this example)
@@ -41,16 +41,16 @@ app.use(express.json({ limit: '20mb' }));
 app.use((req, res, next) => {
   // Allow requests from any origin
   res.setHeader('Access-Control-Allow-Origin', '*');
-  
+
   // Allow specific HTTP methods
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-  
+
   // Allow specific headers
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  
+
   // Allow sending cookies across different origins
   res.setHeader('Access-Control-Allow-Credentials', true);
-  
+
   // Continue to the next middleware or route handler
   next();
 });
@@ -148,6 +148,127 @@ const sendWelcomeMessage = async (studentName, MobileNumber) => {
 
 // student form
 
+// app.post("/student_form", (req, res) => {
+//   const { filename, data } = req.body;
+//   const sql = `
+//     INSERT INTO student_details (
+//       name, email, mobilenumber, parentsname, parentsnumber, birthdate, gender, maritalstatus,
+//       college, country, state, area, native, zipcode, whatsappno, educationtype, marks,
+//       academicyear, studentImg, imgData, enquirydate, enquirytakenby, coursepackage, courses, 
+//       leadsource, branch, modeoftraining, registrationnumber, 
+//       admissiondate, validitystartdate, validityenddate, feedetails, grosstotal,
+//       totaldiscount, totaltax, grandtotal, finaltotal, admissionremarks, assets, totalinstallments,
+//       dueamount, addfee, initialpayment, duedatetype, installments, materialfee,
+//       feedetailsbilling, totalfeewithouttax, totalpaidamount, certificate_status, extra_discount, user_id
+//     ) 
+//     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+//   `;
+
+
+
+
+//   // Convert the feedetails array to JSON
+//   const leadsource = req.body.leadsource;
+//   const leadsourceJSON = JSON.stringify(leadsource);
+//   const feedetails = req.body.feedetails;
+//   const installments = req.body.installments;
+//   const extra_discount = req.body.extra_discount;
+//   const certificate_status = req.body.certificate_status;
+//   const certificate_statusJSON = JSON.stringify(certificate_status);
+//   const feedetailsbilling = req.body.feedetailsbilling;
+//   const initialpayment = req.body.initialpayment;
+//   const initialpaymentJSON = JSON.stringify(initialpayment);
+//   const feedetailsJSON = JSON.stringify(feedetails);
+//   const installmentsJSON = JSON.stringify(installments);
+//   const feedetailsbillingJSON = JSON.stringify(feedetailsbilling);
+//   const assets = req.body.assets;
+//   const extra_discountJSON = JSON.stringify(extra_discount);
+//   const assetsJSON = JSON.stringify(assets);
+
+
+//   const values = [
+//     req.body.name,
+//     req.body.email,
+//     req.body.mobilenumber,
+//     req.body.parentsname,
+//     req.body.parentsnumber,
+//     req.body.birthdate,
+//     req.body.gender,
+//     req.body.maritalstatus,
+//     req.body.college,
+//     req.body.country,
+//     req.body.state,
+//     req.body.area,
+//     req.body.native,
+//     req.body.zipcode,
+//     req.body.whatsappno,
+//     req.body.educationtype,
+//     req.body.marks,
+//     req.body.academicyear,
+//     filename,
+//     data,
+//     req.body.enquirydate,
+//     req.body.enquirytakenby,
+//     req.body.coursepackage,
+//     req.body.courses,
+//     leadsourceJSON,
+//     req.body.branch,
+//     req.body.modeoftraining,
+//     req.body.registrationnumber,
+//     req.body.admissiondate,
+//     req.body.validitystartdate,
+//     req.body.validityenddate,
+//     feedetailsJSON,
+//     req.body.grosstotal,
+//     req.body.totaldiscount,
+//     req.body.totaltax,
+//     req.body.grandtotal,
+//     req.body.finaltotal,
+//     req.body.admissionremarks,
+//     assetsJSON,
+//     req.body.totalinstallments,
+//     req.body.dueamount,
+//     req.body.addfee,
+//     initialpaymentJSON,
+//     req.body.duedatetype,
+//     installmentsJSON,
+//     req.body.materialfee,
+//     feedetailsbillingJSON,
+//     req.body.totalfeewithouttax,
+//     req.body.totalpaidamount,
+//     certificate_statusJSON,
+//     extra_discountJSON,
+//     req.body.user_id,
+//   ];
+//   // Execute the SQL query
+//   connection.query(sql, values, (insertErr, insertResult) => {
+//     if (insertErr) {
+//       console.error("Error in INSERT query:", insertErr);
+//       return res.status(500).json("Internal Server Error");
+//     }else {
+//       // Upload the photo to S3
+//       const params = {
+//         Bucket: 'teksacademyimages',
+//         Key: filename,
+//         Body: Buffer.from(data, 'base64'),
+//         ACL: 'public-read', // Adjust the ACL as needed
+//       };
+
+//       s3.upload(params, async (err, data) => {
+//         if (err) {
+//           console.error('Error uploading to S3:', err);
+//           res.status(500).json({ error: 'Internal Server Error' });
+//         } else {
+//           await sendWelcomeMessage(req.body.name, req.body.mobilenumber);
+//           // res.json({ message: 'Photo uploaded successfully' });
+//         }
+//       });
+//     }
+//     return res.status(201).json(insertResult);
+//   });
+// });
+
+
 app.post("/student_form", (req, res) => {
   const { filename, data } = req.body;
   const sql = `
@@ -164,104 +285,151 @@ app.post("/student_form", (req, res) => {
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
-  // Convert the feedetails array to JSON
-  const leadsource = req.body.leadsource;
-  const leadsourceJSON = JSON.stringify(leadsource);
-  const feedetails = req.body.feedetails;
-  const installments = req.body.installments;
-  const extra_discount = req.body.extra_discount;
-  const certificate_status = req.body.certificate_status;
-  const certificate_statusJSON = JSON.stringify(certificate_status);
-  const feedetailsbilling = req.body.feedetailsbilling;
-  const initialpayment = req.body.initialpayment;
-  const initialpaymentJSON = JSON.stringify(initialpayment);
-  const feedetailsJSON = JSON.stringify(feedetails);
-  const installmentsJSON = JSON.stringify(installments);
-  const feedetailsbillingJSON = JSON.stringify(feedetailsbilling);
-  const assets = req.body.assets;
-  const extra_discountJSON = JSON.stringify(extra_discount);
-  const assetsJSON = JSON.stringify(assets);
+  const checkEmail = "SELECT COUNT(*) AS count FROM student_details WHERE email = ?"
+  const checkMobileNumber = "SELECT COUNT(*) AS count FROM student_details WHERE mobilenumber = ?"
+  const checkRgNumber = "SELECT COUNT(*) AS count FROM student_details WHERE registrationnumber = ?"
 
 
-  const values = [
-    req.body.name,
-    req.body.email,
-    req.body.mobilenumber,
-    req.body.parentsname,
-    req.body.parentsnumber,
-    req.body.birthdate,
-    req.body.gender,
-    req.body.maritalstatus,
-    req.body.college,
-    req.body.country,
-    req.body.state,
-    req.body.area,
-    req.body.native,
-    req.body.zipcode,
-    req.body.whatsappno,
-    req.body.educationtype,
-    req.body.marks,
-    req.body.academicyear,
-    filename,
-    data,
-    req.body.enquirydate,
-    req.body.enquirytakenby,
-    req.body.coursepackage,
-    req.body.courses,
-    leadsourceJSON,
-    req.body.branch,
-    req.body.modeoftraining,
-    req.body.registrationnumber,
-    req.body.admissiondate,
-    req.body.validitystartdate,
-    req.body.validityenddate,
-    feedetailsJSON,
-    req.body.grosstotal,
-    req.body.totaldiscount,
-    req.body.totaltax,
-    req.body.grandtotal,
-    req.body.finaltotal,
-    req.body.admissionremarks,
-    assetsJSON,
-    req.body.totalinstallments,
-    req.body.dueamount,
-    req.body.addfee,
-    initialpaymentJSON,
-    req.body.duedatetype,
-    installmentsJSON,
-    req.body.materialfee,
-    feedetailsbillingJSON,
-    req.body.totalfeewithouttax,
-    req.body.totalpaidamount,
-    certificate_statusJSON,
-    extra_discountJSON,
-    req.body.user_id,
-  ];
-  // Execute the SQL query
-  connection.query(sql, values, (insertErr, insertResult) => {
-    if (insertErr) {
-      console.error("Error in INSERT query:", insertErr);
-      return res.status(500).json("Internal Server Error");
-    }else {
-      // Upload the photo to S3
-      const params = {
-        Bucket: 'teksacademyimages',
-        Key: filename,
-        Body: Buffer.from(data, 'base64'),
-        ACL: 'public-read', // Adjust the ACL as needed
-      };
-
-      s3.upload(params, async (err, data) => {
-        if (err) {
-          console.error('Error uploading to S3:', err);
-          res.status(500).json({ error: 'Internal Server Error' });
-        } else {
-          await sendWelcomeMessage(req.body.name, req.body.mobilenumber);
-          res.json({ message: 'Photo uploaded successfully' });
-        }
-      });
+  connection.query(checkEmail, [req.body.email], (err, emailResult) => {
+    if (err) {
+      console.error("Error checking email in the db", err);
+      return res.json({ Status: "Error" });
     }
-    return res.status(201).json(insertResult);
+
+    if (emailResult[0].count > 0) {
+      console.log("Email already exists.");
+      return res(500).json({ Status: "exists", field: "email" });
+    }
+
+    // Check Mobile Number
+    connection.query(checkMobileNumber, [req.body.mobilenumber], (err, mobileNumberResult) => {
+      if (err) {
+        console.error("Error checking mobile number in the db", err);
+        return res.json({ Status: "Error" });
+      }
+
+      if (mobileNumberResult[0].count > 0) {
+        console.log("Mobile number already exists.");
+        return res(500).json({ Status: "exists", field: "mobilenumber" });
+      }
+
+      // Check Registration Number
+      connection.query(checkRgNumber, [req.body.registrationnumber], (err, rgNumberResult) => {
+        if (err) {
+          console.error("Error checking registration number in the db", err);
+          return res.json({ Status: "Error" });
+        }
+
+        if (rgNumberResult[0].count > 0) {
+          console.log("Registration number already exists.");
+          return res.json({ Status: "exists", field: "registrationnumber" });
+        }
+
+
+
+
+        // Convert the feedetails array to JSON
+        const leadsource = req.body.leadsource;
+        const leadsourceJSON = JSON.stringify(leadsource);
+        const feedetails = req.body.feedetails;
+        const installments = req.body.installments;
+        const extra_discount = req.body.extra_discount;
+        const certificate_status = req.body.certificate_status;
+        const certificate_statusJSON = JSON.stringify(certificate_status);
+        const feedetailsbilling = req.body.feedetailsbilling;
+        const initialpayment = req.body.initialpayment;
+        const initialpaymentJSON = JSON.stringify(initialpayment);
+        const feedetailsJSON = JSON.stringify(feedetails);
+        const installmentsJSON = JSON.stringify(installments);
+        const feedetailsbillingJSON = JSON.stringify(feedetailsbilling);
+        const assets = req.body.assets;
+        const extra_discountJSON = JSON.stringify(extra_discount);
+        const assetsJSON = JSON.stringify(assets);
+
+
+        const values = [
+          req.body.name,
+          req.body.email,
+          req.body.mobilenumber,
+          req.body.parentsname,
+          req.body.parentsnumber,
+          req.body.birthdate,
+          req.body.gender,
+          req.body.maritalstatus,
+          req.body.college,
+          req.body.country,
+          req.body.state,
+          req.body.area,
+          req.body.native,
+          req.body.zipcode,
+          req.body.whatsappno,
+          req.body.educationtype,
+          req.body.marks,
+          req.body.academicyear,
+          filename,
+          data,
+          req.body.enquirydate,
+          req.body.enquirytakenby,
+          req.body.coursepackage,
+          req.body.courses,
+          leadsourceJSON,
+          req.body.branch,
+          req.body.modeoftraining,
+          req.body.registrationnumber,
+          req.body.admissiondate,
+          req.body.validitystartdate,
+          req.body.validityenddate,
+          feedetailsJSON,
+          req.body.grosstotal,
+          req.body.totaldiscount,
+          req.body.totaltax,
+          req.body.grandtotal,
+          req.body.finaltotal,
+          req.body.admissionremarks,
+          assetsJSON,
+          req.body.totalinstallments,
+          req.body.dueamount,
+          req.body.addfee,
+          initialpaymentJSON,
+          req.body.duedatetype,
+          installmentsJSON,
+          req.body.materialfee,
+          feedetailsbillingJSON,
+          req.body.totalfeewithouttax,
+          req.body.totalpaidamount,
+          certificate_statusJSON,
+          extra_discountJSON,
+          req.body.user_id,
+        ];
+        // Execute the SQL query
+        connection.query(sql, values, (insertErr, insertResult) => {
+          if (insertErr) {
+            console.error("Error in INSERT query:", insertErr);
+            return res.status(500).json("Internal Server Error");
+          } else {
+            // Upload the photo to S3
+            const params = {
+              Bucket: 'teksacademyimages',
+              Key: filename,
+              Body: Buffer.from(data, 'base64'),
+              ACL: 'public-read', // Adjust the ACL as needed
+            };
+
+            s3.upload(params, async (err, data) => {
+              if (err) {
+                console.error('Error uploading to S3:', err);
+                res.status(500).json({ error: 'Internal Server Error' });
+              } else {
+                await sendWelcomeMessage(req.body.name, req.body.whatsappno);
+                res.json({ message: 'Photo uploaded successfully' });
+              }
+            });
+          }
+          // return res.status(201).json(insertResult);
+        });
+
+      });
+    });
   });
 });
 
@@ -278,7 +446,7 @@ app.post("/createuser", (req, res) => {
   const passwordd = email.split("@")[0];
   // const passworddwithnum = passwordd;
   // console.log(passworddwithnum);
- 
+
   // Check if the email already exists in the database
   const checkEmailQuery = "SELECT COUNT(*) AS count FROM user WHERE email = ?";
   connection.query(checkEmailQuery, [email], (err, emailResult) => {
@@ -286,24 +454,24 @@ app.post("/createuser", (req, res) => {
       console.error("Error checking email in the database:", err);
       return res.json({ Status: "Error" });
     }
- 
+
     // Check if the email count is greater than 0, indicating that the email already exists
     if (emailResult[0].count > 0) {
       console.log("Email already exists.");
       // return res.json({ Status: "Email already exists" });
       return res.json({ Status: "exists" });
     }
- 
+
     // If the email is not found, proceed with user creation
     bcrypt.hash(passwordd, 10, (hashErr, hash) => {
       if (hashErr) {
         console.error("Error in hashing password:", hashErr);
         return res.json({ Error: "Error in hashing password" });
       }
- 
+
       const insertUserQuery =
         "INSERT INTO user (`fullname`, `email`, `password`, `phonenumber`, `designation`, `department`, `reportto`, `profile`, `branch`,`user_remarks_history`) VALUES (?)";
- 
+
       const user_remarks_history = req.body.user_remarks_history;
       const user_remarks_historyJSON = JSON.stringify(user_remarks_history);
       const values = [
@@ -318,7 +486,7 @@ app.post("/createuser", (req, res) => {
         req.body.branch,
         user_remarks_historyJSON,
       ];
- 
+
       connection.query(insertUserQuery, [values], (insertErr, result) => {
         if (insertErr) {
           console.error("Error in database query:", insertErr);
@@ -338,7 +506,7 @@ app.post("/createuser", (req, res) => {
 //   const passwordd = email.split("@")[0];
 //   // const passworddwithnum = passwordd;
 //   // console.log(passworddwithnum);
- 
+
 //   // Check if the email already exists in the database
 //   const checkEmailQuery = "SELECT COUNT(*) AS count FROM user WHERE email = ?";
 //   connection.query(checkEmailQuery, [email], (err, emailResult) => {
@@ -346,24 +514,24 @@ app.post("/createuser", (req, res) => {
 //       console.error("Error checking email in the database:", err);
 //       return res.json({ Status: "Error" });
 //     }
- 
+
 //     // Check if the email count is greater than 0, indicating that the email already exists
 //     if (emailResult[0].count > 0) {
 //       console.log("Email already exists.");
 //       // return res.json({ Status: "Email already exists" });
 //       return res.json({ Status: "exists" });
 //     }
- 
+
 //     // If the email is not found, proceed with user creation
 //     bcrypt.hash(passwordd, 10, (hashErr, hash) => {
 //       if (hashErr) {
 //         console.error("Error in hashing password:", hashErr);
 //         return res.json({ Error: "Error in hashing password" });
 //       }
- 
+
 //       const insertUserQuery =
 //         "INSERT INTO user (`fullname`, `email`, `password`, `phonenumber`, `designation`, `department`, `reportto`, `profile`, `branch`,`user_status`) VALUES (?)";
- 
+
 //       const user_status = req.body.user_status;
 //       const user_statusJSON = JSON.stringify(user_status);
 //       const values = [
@@ -378,7 +546,7 @@ app.post("/createuser", (req, res) => {
 //         req.body.branch,
 //         user_statusJSON,
 //       ];
- 
+
 //       connection.query(insertUserQuery, [values], (insertErr, result) => {
 //         if (insertErr) {
 //           console.error("Error in database query:", insertErr);
@@ -394,7 +562,7 @@ app.post("/createuser", (req, res) => {
 
 app.get("/userdata", (req, res) => {
   const sql = "SELECT * FROM user ORDER BY id DESC";
- 
+
   connection.query(sql, (err, result) => {
     if (err) {
       res.status(422).json("No data available");
@@ -402,13 +570,13 @@ app.get("/userdata", (req, res) => {
       // Parse the "installments" JSON strings into JavaScript objects
       const parsedResults = result.map((row) => {
         const userRemarksHistory = JSON.parse(row.user_remarks_history);
- 
+
         return {
           ...row,
           user_remarks_history: userRemarksHistory,
         };
       });
- 
+
       res.status(201).json(parsedResults);
     }
   });
@@ -420,7 +588,7 @@ const jwtSecretKey = "your_secret_key";
 
 app.post("/adminlogin", (req, res) => {
   // console.log(req.body)
-  const { email, password } = req.body; 
+  const { email, password } = req.body;
 
   const sql = "SELECT * FROM user WHERE email = ?";
 
@@ -484,9 +652,9 @@ app.post("/adminlogin", (req, res) => {
         res.cookie("token", token);
         console.log("User logged in successfully. Token generated:", token);
         console.log("userId: ", userPayload);
-        
-        
-        
+
+
+
         const adminDataSql = "SELECT * FROM user WHERE id = ?";
         const adminId = result[0].id;
 
@@ -521,7 +689,7 @@ app.post("/adminlogin", (req, res) => {
 // app.get("/getstudent_data", authenticateUser, (req, res) => {
 //   console.log('User profile from req.user:', req.user.profile);
 //   console.log('User ID from req.user:', req.user.user_id);
-  
+
 //   console.log("reeqquserPayload: ", userPayload);
 //   // Check if the user has an "admin" role
 //   if (req.user.profile === 'admin') {
@@ -577,7 +745,7 @@ app.post("/adminlogin", (req, res) => {
 //       }
 //     });
 //   }
-  
+
 // });
 
 
@@ -652,7 +820,7 @@ app.post("/employeelogin", (req, res) => {
 
 app.post("/userroles", (req, res) => {
   const sql = "INSERT INTO roles_permissions (role, description, createdby, permissions) VALUES (?, ?, ?, ?)";
-  
+
   // Check if role and description are provided
   if (!req.body.role || !req.body.description) {
     return res.status(422).json("Role and description are required");
@@ -665,7 +833,7 @@ app.post("/userroles", (req, res) => {
 
   // Stringify permissions
   const rolesPermissionsJOSN = JSON.stringify(req.body.permissions);
-  
+
   const values = [req.body.role, req.body.description, "blue", rolesPermissionsJOSN];
 
   connection.query(sql, values, (insertErr, insertResult) => {
@@ -692,7 +860,7 @@ app.get("/getuserroles", (req, res) => {
         return {
           ...row,
           permissions: parsedPermissions,
-          
+
         };
       });
       parsedResults.reverse();
@@ -716,12 +884,12 @@ app.put("/updaterolespermissions/:id", (req, res) => {
     }
     return res.status(200).json({ updated: true }); // Return a success response
   });
-  
+
 })
 
 app.get("/userroles/:id", (req, res) => {
   const { id } = req.params;
- 
+
   connection.query("SELECT * FROM roles_permissions WHERE id = ? ", id, (err, result) => {
     if (err) {
       res.status(422).json("No data available");
@@ -738,7 +906,7 @@ app.get("/userroles/:id", (req, res) => {
 
 // app.get("/viewuser/:id", (req, res) => {
 //   const { id } = req.params;
- 
+
 //   connection.query("SELECT * FROM user WHERE id = ? ", id, (err, result) => {
 //     if (err) {
 //       res.status(422).json("No data available");
@@ -760,7 +928,7 @@ app.get("/viewuser/:id", (req, res) => {
       res.status(422).json("No data available");
     } else if (result && result.length > 0) {
       let parsedResults = result;
-      
+
       // Check if user_remarks_history is not undefined before parsing
       if (parsedResults[0].user_remarks_history !== undefined) {
         parsedResults[0].user_remarks_history = JSON.parse(
@@ -819,22 +987,22 @@ app.put("/updateuser/:id", (req, res) => {
 
 app.get("/getstudent_data", (req, res) => {
   const sql = "SELECT * FROM student_details";
- 
+
   connection.query(sql, (err, result) => {
     if (err) {
       res.status(422).json("No data available");
     } else {
-      
+
       const parsedResults = result.map((row) => {
         // const parsedLeadsource = JSON.parse(row.leadsource);
         let parsedLeadsource;
-        try{
+        try {
           parsedLeadsource = JSON.parse(row.leadsource);
 
-          if(!Array.Array(parsedLeadsource)){
+          if (!Array.Array(parsedLeadsource)) {
             parsedLeadsource = ["leadsource is not an array"]
           }
-        }catch(error){
+        } catch (error) {
           parsedLeadsource = ["Invalid leadsource format"]
         }
         const parsedTotalInstallments = JSON.parse(row.totalinstallments);
@@ -845,7 +1013,7 @@ app.get("/getstudent_data", (req, res) => {
         const ParsedExtra_discount = JSON.parse(row.extra_discount);
         const ParsedFeeDetails = JSON.parse(row.feedetails);
         const ParsedFeeDetailsbilling = JSON.parse(row.feedetailsbilling);
-        
+
         return {
           ...row,
           leadsource: parsedLeadsource,
@@ -859,7 +1027,7 @@ app.get("/getstudent_data", (req, res) => {
           feedetailsbilling: ParsedFeeDetailsbilling,
         };
       });
- 
+
       parsedResults.reverse();
       res.status(201).json(parsedResults);
     }
@@ -885,15 +1053,15 @@ app.get("/viewstudentdata/:id", (req, res) => {
           const parsedTotalInstallments = JSON.parse(row.totalinstallments);
           const parsedInstallments = JSON.parse(row.installments);
           const parsedInitialpayment = JSON.parse(row.initialpayment);
-          
-          
+
+
 
           return {
             ...row,
             totalinstallments: parsedTotalInstallments,
             installments: parsedInstallments,
             initialpayment: parsedInitialpayment,
-            
+
           };
         });
 
@@ -973,7 +1141,7 @@ app.post('/studentfeerefund', (req, res) => {
   const { refund } = req.body;
   const refundJSON = JSON.stringify(refund)
   const regNum = refund[0].registrationnumber;
-  
+
   if (!refund) {
     return res.status(400).json({ error: 'Registration number and refund amount are required.' });
   }
@@ -988,7 +1156,7 @@ app.post('/studentfeerefund', (req, res) => {
 
     if (results.length === 0) {
       const createTableQuery = 'CREATE TABLE IF NOT EXISTS refunds (id INT AUTO_INCREMENT PRIMARY KEY, refund TEXT)';
-      
+
       connection.query(createTableQuery, (createErr) => {
         if (createErr) {
           console.error('Error creating refund table:', createErr);
@@ -1006,7 +1174,7 @@ app.post('/studentfeerefund', (req, res) => {
         });
       });
     } else {
-      
+
       const updateQuery = 'UPDATE student_details SET refund = ? WHERE registrationnumber = ?';
 
       // Create the refund column if it doesn't exist
@@ -1014,20 +1182,20 @@ app.post('/studentfeerefund', (req, res) => {
         ALTER TABLE student_details
         ADD COLUMN IF NOT EXISTS refund TEXT;
       `;
-      
+
       connection.query(createRefundColumnQuery, (createColumnErr) => {
         if (createColumnErr) {
           console.error('Error creating refund column:', createColumnErr);
           return res.status(500).json({ error: 'Internal Server Error ' });
         }
-      
+
         // Now update the refund for the specified registration number
         connection.query(updateQuery, [refundJSON, regNum], (updateErr) => {
           if (updateErr) {
             console.error('Error updating student_details:', updateErr);
             return res.status(500).json({ error: 'Internal Server Error' });
           }
-      
+
           return res.json({ message: `Refund updated for registration number ${regNum}` });
         });
       });
@@ -1038,8 +1206,8 @@ app.post('/studentfeerefund', (req, res) => {
 app.get("/studentrefundsfromrefunds", (req, res) => {
   const sql = "SELECT * FROM refund";
   connection.query(sql, (err, result) => {
-    if(err){
-      return res.json({Error: "get refunds error in sql"})
+    if (err) {
+      return res.json({ Error: "get refunds error in sql" })
     }
     return res.json(result);
   })
@@ -1074,17 +1242,17 @@ app.put("/updateduedateanddueamount/:id", (req, res) => {
   const sql =
     "UPDATE student_details SET installments = ?, nextduedate = ? WHERE id = ?;";
   const id = req.params.id;
- 
+
   const installments = req.body.installments;
   const installmentsJSON = JSON.stringify(installments);
- 
+
   const nextduedate = req.body.nextduedate;
- 
+
   connection.query(
     sql,
     [
       installmentsJSON,
- 
+
       // nextduedateJSON,
       nextduedate,
       id,
@@ -1161,7 +1329,7 @@ app.put("/feeinstallments/:id", (req, res) => {
 //   const id = req.params.id;
 //   const Extra_Discount_remarks_history =
 //     req.body.Extra_Discount_remarks_history;
- 
+
 //   const Extra_Discount_remarks_historyJSON = JSON.stringify(
 //     Extra_Discount_remarks_history
 //   );
@@ -1250,7 +1418,7 @@ app.put("/studentstatus/:id", (req, res) => {
     }
     return res.status(200).json({ updated: true }); // Return a success response
   });
-  
+
 })
 
 
@@ -1260,9 +1428,9 @@ app.put("/userstatus/:id", (req, res) => {
   const id = req.params.id;
   const user_remarks_history = req.body.user_remarks_history;
   const user_status = req.body.user_status;
- 
+
   const user_remarks_historyJSON = JSON.stringify(user_remarks_history);
- 
+
   connection.query(
     sql,
     [user_remarks_historyJSON, user_status, id],
@@ -1292,7 +1460,7 @@ app.put("/userstatus/:id", (req, res) => {
 //     }
 //     return res.status(200).json({ updated: true }); // Return a success response
 //   });
-  
+
 // })
 
 // app.put("/updatestudentdata/:id", (req, res) => {
@@ -1329,7 +1497,7 @@ app.put("/userstatus/:id", (req, res) => {
 //     leadsource,
 //     branch,
 //     modeoftraining,
-    
+
 //     registrationnumber,
 //     admissiondate,
 //     validitystartdate,
@@ -1371,7 +1539,7 @@ app.put("/userstatus/:id", (req, res) => {
 //       leadsource,
 //       branch,
 //       modeoftraining,
-      
+
 //       registrationnumber,
 //       admissiondate,
 //       validitystartdate,
@@ -1563,12 +1731,12 @@ app.put("/updatestudentdata/:id", (req, res) => {
       id, // Add id for the WHERE clause
     ],
     (err, result) => {
-            if (err) {
-              console.error("Error updating student data:", err);
-              return res.status(500).json({ error: "Internal Server Error" }); // Return an error response
-            }
-            return res.status(200).json({ updated: true }); // Return a success response
-          }
+      if (err) {
+        console.error("Error updating student data:", err);
+        return res.status(500).json({ error: "Internal Server Error" }); // Return an error response
+      }
+      return res.status(200).json({ updated: true }); // Return a success response
+    }
     // (err, result) => {
     //   if (err) {
     //     console.error("Error updating student data:", err);
@@ -1764,7 +1932,7 @@ app.get("/getleadsource", (req, res) => {
 app.post("/addcourses", (req, res) => {
   const sqlAddColumn = "ALTER TABLE courses_settings ADD COLUMN IF NOT EXISTS max_discount VARCHAR(255) DEFAULT 0";
   const sqlAddColumn2 = "ALTER TABLE courses_settings ADD COLUMN IF NOT EXISTS course_package VARCHAR(255) DEFAULT NULL";
-  
+
   connection.query(sqlAddColumn, (alterErr1) => {
     if (alterErr1) {
       console.error("Error adding column 1:", alterErr1);
@@ -1796,6 +1964,29 @@ app.post("/addcourses", (req, res) => {
   });
 });
 
+app.delete("/deletecourse/:id", (req, res) => {
+  const courseId = req.params.id;
+
+  if (!courseId) {
+    return res.status(422).json({ error: "Course ID is required" });
+  }
+
+  const sqlDeleteCourse = "DELETE FROM courses_settings WHERE id = ?";
+  connection.query(sqlDeleteCourse, [courseId], (err, result) => {
+    if (err) {
+      console.error("Error deleting course:", err);
+      return res.status(500).json({ Error: "Error deleting course" });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ Error: "Course not found" });
+    }
+
+    return res.status(200).json({ message: "Course deleted successfully" });
+  });
+});
+
+
 
 
 // app.post("/addcourses", (req, res) => {
@@ -1805,7 +1996,7 @@ app.post("/addcourses", (req, res) => {
 
 //   // Check if the "max_discount" column exists
 //   const checkColumnQuery = "SHOW COLUMNS FROM courses_settings LIKE 'max_discount'";
-  
+
 //   connection.query(checkColumnQuery, (checkColumnErr, checkColumnResult) => {
 //     if (checkColumnErr) {
 //       console.error('Error checking if column exists:', checkColumnErr);
@@ -1820,7 +2011,7 @@ app.post("/addcourses", (req, res) => {
 //         if (addColumnErr) {
 //           console.error('Error adding column:', addColumnErr);
 //           return res.status(500).json({ Error: 'Internal Server Error' });
-          
+
 //         }
 //         console.log("res", res);
 //         // Now that the column is added, proceed with the course insertion
@@ -1883,7 +2074,7 @@ app.post("/addcourses", (req, res) => {
 //     };
 
 //     console.log('Sending WhatsApp message:', messageData);
-    
+
 //     const response = await axios.post(interaktApiUrl, messageData, { headers, timeout: 10000 });
 //     // const response = await axios.post(interaktApiUrl, messageData, { headers });
 
@@ -1965,7 +2156,7 @@ app.put("/certificatestatus/:id", (req, res) => {
 // reports
 
 app.post("/createreport", (req, res) => {
- 
+
   const reports = req.body.reports;
   const reportsJSON = JSON.stringify(reports);
   const sql =
@@ -1985,21 +2176,21 @@ app.post("/createreport", (req, res) => {
 
 app.get("/getreports", (req, res) => {
   const sql = "SELECT * FROM reports";
- 
+
   connection.query(sql, (err, result) => {
     if (err) {
       res.status(422).json("No data available");
     } else {
- 
+
       const parsedResults = result.map((row) => {
         const parsedReports = JSON.parse(row.reports);
         return {
           ...row,
           reports: parsedReports,
- 
+
         };
       });
- 
+
       parsedResults.reverse();
       res.status(201).json(parsedResults);
     }
@@ -2010,10 +2201,10 @@ app.put("/updatereport/:id", (req, res) => {
   const id = req.params.id;
   const reports = req.body.reports;
   const reportsJSON = JSON.stringify(reports);
- 
+
   const sql =
     "UPDATE reports SET reports = ? WHERE id = ?;";
- 
+
   connection.query(
     sql,
     [reportsJSON, id],
@@ -2033,15 +2224,15 @@ app.put("/resetpassword/:id", (req, res) => {
   const sql = "UPDATE user SET password = ? WHERE id = ?;";
   const id = req.params.id;
   const plainPassword = req.body.password;
- 
- 
+
+
   bcrypt.hash(plainPassword, 10, (hashErr, hashedPassword) => {
     if (hashErr) {
       console.error("Error hashing password:", hashErr);
       return res.status(500).json({ error: "Internal Server Error" });
     }
- 
-   
+
+
     connection.query(sql, [hashedPassword, id], (updateErr, result) => {
       if (updateErr) {
         console.error("Error updating password:", updateErr);
@@ -2051,7 +2242,7 @@ app.put("/resetpassword/:id", (req, res) => {
     });
   });
 });
- 
+
 
 module.exports = {
   usersCreation: app,
