@@ -82,15 +82,15 @@ const httpsServer = https.createServer(
 );
 
 // Start the HTTPS server on port 3000
-const httpsPort = 3000;
-httpsServer.listen(httpsPort, () => {
-  console.log(`HTTPS server running on port ${httpsPort}`);
-});
+// const httpsPort = 3000;
+// httpsServer.listen(httpsPort, () => {
+//   console.log(`HTTPS server running on port ${httpsPort}`);
+// });
 
 
-// app.listen(3030, () => {
-//   console.log('server is running on 3030')
-// })
+app.listen(3030, () => {
+  console.log('server is running on 3030')
+})
 
 
 // whatsapp interakt
