@@ -1203,6 +1203,41 @@ app.post('/studentfeerefund', (req, res) => {
   });
 });
 
+app.put("/refundpermissions/:registrationnumber", (req, res) => {
+  const registrationnumber = req.params.registrationnumber;
+  const refund = req.body.refund;
+  const refundJSON = JSON.stringify(refund);
+
+  // Check if registrationnumber exists in student_details
+  const checkStudentQuery = "SELECT * FROM student_details WHERE registrationnumber = ?";
+
+  connection.query(checkStudentQuery, [registrationnumber], (checkErr, checkResult) => {
+    if (checkErr) {
+      console.error("Error checking student details:", checkErr);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+
+    if (checkResult.length === 0) {
+      // If registrationnumber not found in student_details, update refund table
+      // const updateRefundQuery = "UPDATE refund SET refund = ? WHERE registrationnumber = ?";
+      const updateRefundQuery = "UPDATE refund SET refund = ? WHERE JSON_EXTRACT(refund, '$[0].registrationnumber') = ?";
+      connection.query(updateRefundQuery, [refundJSON, registrationnumber], (updateErr, updateResult) => {
+        if (updateErr) {
+          console.error("Error updating refund table:", updateErr);
+          return res.status(500).json({ error: "Internal Server Error" });
+        }
+
+        return res.status(200).json({ updated: true });
+      });
+    } else {
+      // Registration number exists in student_details, return an appropriate response
+      return res.status(404).json({ error: "Registration Number already exists in student_details" });
+    }
+  });
+});
+
+
+
 app.get("/studentrefundsfromrefunds", (req, res) => {
   const sql = "SELECT * FROM refund";
   connection.query(sql, (err, result) => {
@@ -2241,6 +2276,52 @@ app.put("/resetpassword/:id", (req, res) => {
       return res.status(200).json({ updated: true });
     });
   });
+});
+
+
+
+const razorpay = require('razorpay');
+
+// payment gatway
+
+// Razorpay setup
+const razorpayKey = 'rzp_test_HXWg7EjjGBM1JY';
+const razorpaySecret = 'EdTfexoyKzGAADPD3SjidgUX';
+
+const razorpayInstance = new razorpay({
+  key_id: razorpayKey,
+  key_secret: razorpaySecret,
+});
+
+// Routes
+app.post('/create-order', async (req, res) => {
+  const amount = req.body.amount; // Amount in paise
+
+  const options = {
+    amount: amount,
+    currency: 'INR', // Change currency as needed
+  };
+
+  try {
+    const order = await razorpayInstance.orders.create(options);
+    res.json({ order });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/capture-payment', async (req, res) => {
+  const paymentId = req.body.payment_id;
+  const orderId = req.body.order_id;
+
+  try {
+    const payment = await razorpayInstance.payments.capture(paymentId, orderId);
+    res.json({ payment });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
 
