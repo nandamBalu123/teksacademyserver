@@ -985,20 +985,70 @@ app.put("/updateuser/:id", (req, res) => {
 // student management
 
 
+// app.get("/getstudent_data", (req, res) => {
+//   const sql = "SELECT * FROM student_details";
+
+//   connection.query(sql, (err, result) => {
+//     if (err) {
+//       res.status(422).json("No data available");
+//     } else {
+
+//       const parsedResults = result.map((row) => {
+//         // const parsedLeadsource = JSON.parse(row.leadsource);
+//         let parsedLeadsource;
+//         try {
+//           parsedLeadsource = JSON.parse(row.leadsource);
+
+//           if (!Array.Array(parsedLeadsource)) {
+//             parsedLeadsource = ["leadsource is not an array"]
+//           }
+//         } catch (error) {
+//           parsedLeadsource = ["Invalid leadsource format"]
+//         }
+//         const parsedTotalInstallments = JSON.parse(row.totalinstallments);
+//         const parsedInstallments = JSON.parse(row.installments);
+//         const parsedInitialpayment = JSON.parse(row.initialpayment);
+//         const parsedcertificate_status = JSON.parse(row.certificate_status);
+//         const parsedAssets = JSON.parse(row.assets);
+//         const ParsedExtra_discount = JSON.parse(row.extra_discount);
+//         const ParsedFeeDetails = JSON.parse(row.feedetails);
+//         const ParsedFeeDetailsbilling = JSON.parse(row.feedetailsbilling);
+
+//         return {
+//           ...row,
+//           leadsource: parsedLeadsource,
+//           totalinstallments: parsedTotalInstallments,
+//           installments: parsedInstallments,
+//           initialpayment: parsedInitialpayment,
+//           certificate_status: parsedcertificate_status,
+//           assets: parsedAssets,
+//           extra_discount: ParsedExtra_discount,
+//           feedetails: ParsedFeeDetails,
+//           feedetailsbilling: ParsedFeeDetailsbilling,
+//         };
+//       });
+
+//       parsedResults.reverse();
+//       res.status(201).json(parsedResults);
+//     }
+//   });
+// });
+
+
 app.get("/getstudent_data", (req, res) => {
   const sql = "SELECT * FROM student_details";
-
+ 
   connection.query(sql, (err, result) => {
     if (err) {
       res.status(422).json("No data available");
     } else {
-
+ 
       const parsedResults = result.map((row) => {
         // const parsedLeadsource = JSON.parse(row.leadsource);
         let parsedLeadsource;
         try {
           parsedLeadsource = JSON.parse(row.leadsource);
-
+ 
           if (!Array.Array(parsedLeadsource)) {
             parsedLeadsource = ["leadsource is not an array"]
           }
@@ -1013,7 +1063,13 @@ app.get("/getstudent_data", (req, res) => {
         const ParsedExtra_discount = JSON.parse(row.extra_discount);
         const ParsedFeeDetails = JSON.parse(row.feedetails);
         const ParsedFeeDetailsbilling = JSON.parse(row.feedetailsbilling);
-
+        let parsedRefund = row.refund
+        if (row.refund) {
+          parsedRefund = JSON.parse(row.refund);
+ 
+        }
+ 
+ 
         return {
           ...row,
           leadsource: parsedLeadsource,
@@ -1025,14 +1081,17 @@ app.get("/getstudent_data", (req, res) => {
           extra_discount: ParsedExtra_discount,
           feedetails: ParsedFeeDetails,
           feedetailsbilling: ParsedFeeDetailsbilling,
+          refund: parsedRefund
         };
       });
-
+ 
       parsedResults.reverse();
       res.status(201).json(parsedResults);
     }
   });
 });
+ 
+ 
 
 
 
@@ -1137,65 +1196,131 @@ app.put("/noofinstallments/:id", (req, res) => {
 
 
 
-app.post('/studentfeerefund', (req, res) => {
-  const { refund } = req.body;
-  const refundJSON = JSON.stringify(refund)
-  const regNum = refund[0].registrationnumber;
+// app.post('/studentfeerefund', (req, res) => {
+//   const { refund } = req.body;
+//   const refundJSON = JSON.stringify(refund)
+//   const regNum = refund[0].registrationnumber;
 
-  if (!refund) {
+//   if (!refund) {
+//     return res.status(400).json({ error: 'Registration number and refund amount are required.' });
+//   }
+
+//   const checkQuery = 'SELECT * FROM student_details WHERE registrationnumber = ?';
+
+//   connection.query(checkQuery, [regNum], (err, results) => {
+//     if (err) {
+//       console.error('Error checking registration number:', err);
+//       return res.status(500).json({ error: 'Internal Server Error' });
+//     }
+
+//     if (results.length === 0) {
+//       const createTableQuery = 'CREATE TABLE IF NOT EXISTS refunds (id INT AUTO_INCREMENT PRIMARY KEY, refund TEXT)';
+
+//       connection.query(createTableQuery, (createErr) => {
+//         if (createErr) {
+//           console.error('Error creating refund table:', createErr);
+//           return res.status(500).json({ error: 'Internal Server Error' });
+//         }
+
+//         const insertQuery = 'INSERT INTO refund (refund) VALUES (?)';
+//         connection.query(insertQuery, [refundJSON], (insertErr) => {
+//           if (insertErr) {
+//             console.error('Error inserting refund record:', insertErr);
+//             return res.status(500).json({ error: 'Internal Server Error' });
+//           }
+
+//           return res.json({ message: `Refund record inserted for registration number ${regNum}` });
+//         });
+//       });
+//     } else {
+
+//       const updateQuery = 'UPDATE student_details SET refund = ? WHERE registrationnumber = ?';
+
+//       // Create the refund column if it doesn't exist
+//       const createRefundColumnQuery = `
+//         ALTER TABLE student_details
+//         ADD COLUMN IF NOT EXISTS refund TEXT;
+//       `;
+
+//       connection.query(createRefundColumnQuery, (createColumnErr) => {
+//         if (createColumnErr) {
+//           console.error('Error creating refund column:', createColumnErr);
+//           return res.status(500).json({ error: 'Internal Server Error ' });
+//         }
+
+//         // Now update the refund for the specified registration number
+//         connection.query(updateQuery, [refundJSON, regNum], (updateErr) => {
+//           if (updateErr) {
+//             console.error('Error updating student_details:', updateErr);
+//             return res.status(500).json({ error: 'Internal Server Error' });
+//           }
+
+//           return res.json({ message: `Refund updated for registration number ${regNum}` });
+//         });
+//       });
+//     }
+//   });
+// });
+
+ 
+app.post('/studentfeerefund', (req, res) => {
+  const { refund, registrationnumber } = req.body;
+  const refundJSON = JSON.stringify(refund);
+  const regNum = refund[0].registrationnumber;
+ 
+  if (!refund || !registrationnumber) {
     return res.status(400).json({ error: 'Registration number and refund amount are required.' });
   }
-
+ 
   const checkQuery = 'SELECT * FROM student_details WHERE registrationnumber = ?';
-
+ 
   connection.query(checkQuery, [regNum], (err, results) => {
     if (err) {
       console.error('Error checking registration number:', err);
       return res.status(500).json({ error: 'Internal Server Error' });
     }
-
+ 
     if (results.length === 0) {
-      const createTableQuery = 'CREATE TABLE IF NOT EXISTS refunds (id INT AUTO_INCREMENT PRIMARY KEY, refund TEXT)';
-
+      const createTableQuery = 'CREATE TABLE IF NOT EXISTS refunds (id INT AUTO_INCREMENT PRIMARY KEY, registrationnumber TEXT, refund TEXT)';
+ 
       connection.query(createTableQuery, (createErr) => {
         if (createErr) {
           console.error('Error creating refund table:', createErr);
           return res.status(500).json({ error: 'Internal Server Error' });
         }
-
-        const insertQuery = 'INSERT INTO refund (refund) VALUES (?)';
-        connection.query(insertQuery, [refundJSON], (insertErr) => {
+ 
+        const insertQuery = 'INSERT INTO refunds (registrationnumber, refund) VALUES (?, ?)';
+        connection.query(insertQuery, [registrationnumber, refundJSON], (insertErr) => {
           if (insertErr) {
             console.error('Error inserting refund record:', insertErr);
             return res.status(500).json({ error: 'Internal Server Error' });
           }
-
+ 
           return res.json({ message: `Refund record inserted for registration number ${regNum}` });
         });
       });
     } else {
-
       const updateQuery = 'UPDATE student_details SET refund = ? WHERE registrationnumber = ?';
-
+ 
       // Create the refund column if it doesn't exist
       const createRefundColumnQuery = `
         ALTER TABLE student_details
         ADD COLUMN IF NOT EXISTS refund TEXT;
       `;
-
+ 
       connection.query(createRefundColumnQuery, (createColumnErr) => {
         if (createColumnErr) {
           console.error('Error creating refund column:', createColumnErr);
           return res.status(500).json({ error: 'Internal Server Error ' });
         }
-
+ 
         // Now update the refund for the specified registration number
         connection.query(updateQuery, [refundJSON, regNum], (updateErr) => {
           if (updateErr) {
             console.error('Error updating student_details:', updateErr);
             return res.status(500).json({ error: 'Internal Server Error' });
           }
-
+ 
           return res.json({ message: `Refund updated for registration number ${regNum}` });
         });
       });
@@ -1203,35 +1328,76 @@ app.post('/studentfeerefund', (req, res) => {
   });
 });
 
+// app.put("/refundpermissions/:registrationnumber", (req, res) => {
+//   const registrationnumber = req.params.registrationnumber;
+//   const refund = req.body.refund;
+//   const refundJSON = JSON.stringify(refund);
+
+//   // Check if registrationnumber exists in student_details
+//   const checkStudentQuery = "SELECT * FROM student_details WHERE registrationnumber = ?";
+
+//   connection.query(checkStudentQuery, [registrationnumber], (checkErr, checkResult) => {
+//     if (checkErr) {
+//       console.error("Error checking student details:", checkErr);
+//       return res.status(500).json({ error: "Internal Server Error" });
+//     }
+
+//     if (checkResult.length === 0) {
+//       // If registrationnumber not found in student_details, update refund table
+//       // const updateRefundQuery = "UPDATE refund SET refund = ? WHERE registrationnumber = ?";
+//       const updateRefundQuery = "UPDATE refund SET refund = ? WHERE JSON_EXTRACT(refund, '$[0].registrationnumber') = ?";
+//       connection.query(updateRefundQuery, [refundJSON, registrationnumber], (updateErr, updateResult) => {
+//         if (updateErr) {
+//           console.error("Error updating refund table:", updateErr);
+//           return res.status(500).json({ error: "Internal Server Error" });
+//         }
+
+//         return res.status(200).json({ updated: true });
+//       });
+//     } else {
+//       // Registration number exists in student_details, return an appropriate response
+//       return res.status(404).json({ error: "Registration Number already exists in student_details" });
+//     }
+//   });
+// });
+
+
 app.put("/refundpermissions/:registrationnumber", (req, res) => {
   const registrationnumber = req.params.registrationnumber;
   const refund = req.body.refund;
   const refundJSON = JSON.stringify(refund);
-
+ 
   // Check if registrationnumber exists in student_details
   const checkStudentQuery = "SELECT * FROM student_details WHERE registrationnumber = ?";
-
+ 
   connection.query(checkStudentQuery, [registrationnumber], (checkErr, checkResult) => {
     if (checkErr) {
       console.error("Error checking student details:", checkErr);
       return res.status(500).json({ error: "Internal Server Error" });
     }
-
+ 
     if (checkResult.length === 0) {
       // If registrationnumber not found in student_details, update refund table
-      // const updateRefundQuery = "UPDATE refund SET refund = ? WHERE registrationnumber = ?";
-      const updateRefundQuery = "UPDATE refund SET refund = ? WHERE JSON_EXTRACT(refund, '$[0].registrationnumber') = ?";
+      const updateRefundQuery = "UPDATE refunds SET refund = ? WHERE registrationnumber = ?";
       connection.query(updateRefundQuery, [refundJSON, registrationnumber], (updateErr, updateResult) => {
         if (updateErr) {
           console.error("Error updating refund table:", updateErr);
           return res.status(500).json({ error: "Internal Server Error" });
         }
-
+ 
         return res.status(200).json({ updated: true });
       });
     } else {
-      // Registration number exists in student_details, return an appropriate response
-      return res.status(404).json({ error: "Registration Number already exists in student_details" });
+      // Registration number exists in student_details, update student_details table
+      const updateStudentQuery = "UPDATE student_details SET refund = ? WHERE registrationnumber = ?";
+      connection.query(updateStudentQuery, [refundJSON, registrationnumber], (updateErr, updateResult) => {
+        if (updateErr) {
+          console.error("Error updating student_details table:", updateErr);
+          return res.status(500).json({ error: "Internal Server Error" });
+        }
+ 
+        return res.status(200).json({ updated: true });
+      });
     }
   });
 });
@@ -1239,15 +1405,111 @@ app.put("/refundpermissions/:registrationnumber", (req, res) => {
 
 
 app.get("/studentrefundsfromrefunds", (req, res) => {
-  const sql = "SELECT * FROM refund";
-  connection.query(sql, (err, result) => {
-    if (err) {
-      return res.json({ Error: "get refunds error in sql" })
+  const sqlRefund = "SELECT refund FROM refunds ORDER BY id DESC";
+  const sqlExistingStudents = "SELECT refund FROM student_details ORDER BY id DESC";
+ 
+  connection.query(sqlRefund, (errRefund, resultRefund) => {
+    if (errRefund) {
+      res.status(422).json({ error: "Error fetching refund data" });
+    } else {
+      const parsedRefundResults = resultRefund.map((row) => {
+        const refund = JSON.parse(row.refund);
+        return {
+          ...row,
+          refund: refund,
+        };
+      });
+ 
+      connection.query(sqlExistingStudents, (errStudents, resultStudents) => {
+        if (errStudents) {
+          res.status(422).json({ error: "Error fetching student data" });
+        } else {
+          const filteredData = resultStudents.filter(item => item.refund !== null);
+          const parsedStudentResults = filteredData.map((row) => {
+            const refund = JSON.parse(row.refund);
+            return {
+              ...row,
+              refund: refund,
+            };
+ 
+ 
+          });
+ 
+          // Combine results from both queries and send a single response
+ 
+          let mergedData = [
+            ...parsedRefundResults,
+            ...parsedStudentResults
+          ];
+          mergedData = mergedData.sort((a, b) => new Date(b.refund[0].date) - new Date(a.refund[0].date));
+          res.status(200).json(mergedData);
+        }
+      });
     }
-    return res.json(result);
-  })
-})
+  });
+});
+ 
 
+app.get("/singlerefundview/:registrationnumber", (req, res) => {
+  const { registrationnumber } = req.params;
+ 
+  if (!registrationnumber) {
+    return res.status(400).json({ error: 'Registration number is required.' });
+  }
+ 
+  const sqlRefund = "SELECT refund FROM refunds WHERE registrationnumber = ? ORDER BY id DESC";
+  const sqlExistingStudents = "SELECT refund FROM student_details WHERE registrationnumber = ? ORDER BY id DESC";
+ 
+  connection.query(sqlRefund, [registrationnumber], (errRefund, resultRefund) => {
+    if (errRefund) {
+      return res.status(422).json({ error: "Error fetching refund data" });
+    }
+ 
+    const parsedRefundResults = resultRefund.map((row) => {
+      const refund = JSON.parse(row.refund);
+      return {
+        ...row,
+        refund: refund,
+      };
+    });
+ 
+    connection.query(sqlExistingStudents, [registrationnumber], (errStudents, resultStudents) => {
+      if (errStudents) {
+        return res.status(422).json({ error: "Error fetching student data" });
+      }
+ 
+      const filteredData = resultStudents.filter(item => item.refund !== null);
+      const parsedStudentResults = filteredData.map((row) => {
+        const refund = JSON.parse(row.refund);
+        return {
+          ...row,
+          refund: refund,
+        };
+      });
+ 
+      // Combine results from both queries and send a single response
+      let mergedData;
+      if (parsedRefundResults.length !== 0) {
+        mergedData = [
+          ...parsedRefundResults,
+        ];
+ 
+      }
+      else {
+        mergedData = [
+          ...parsedStudentResults,
+        ];
+      }
+ 
+      // Sorting based on a field (replace 'date' with the actual field you want to sort by)
+      mergedData = mergedData.sort((a, b) => new Date(b.date) - new Date(a.date));
+ 
+      return res.status(200).json(mergedData);
+    });
+  });
+});
+ 
+ 
 
 
 app.put("/admissionfee/:id", (req, res) => {
@@ -2279,7 +2541,7 @@ app.put("/resetpassword/:id", (req, res) => {
 });
 
 
-
+const nodemailer = require('nodemailer');
 const razorpay = require('razorpay');
 
 // payment gatway
@@ -2293,36 +2555,92 @@ const razorpayInstance = new razorpay({
   key_secret: razorpaySecret,
 });
 
-// Routes
-app.post('/create-order', async (req, res) => {
-  const amount = req.body.amount; // Amount in paise
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'nirajkr00024@gmail.com',
+    pass: 'fkjj xtju fauu tgai'
+  },
+});
 
-  const options = {
-    amount: amount,
-    currency: 'INR', // Change currency as needed
+app.post('/create-order', async (req, res) => {
+  const { amount: reqAmount, currency: reqCurrency, studentEmail } = req.body;
+
+  const razorpayBaseUrl = 'https://api.razorpay.com/v1';
+  const razorpayCreateOrderUrl = `${razorpayBaseUrl}/orders`;
+
+  const headers = {
+    Authorization: `Basic ${Buffer.from(`${razorpayKey}:${razorpaySecret}`).toString('base64')}`,
+    'Content-Type': 'application/json',
   };
 
   try {
-    const order = await razorpayInstance.orders.create(options);
-    res.json({ order });
+    // Create an order using Razorpay API
+    const response = await axios.post(razorpayCreateOrderUrl, {
+      amount: reqAmount * 100, // Amount in paise
+      currency: reqCurrency,
+    }, {
+      headers,
+    });
+    console.log('Razorpay API response:', response.data);
+    const { id, amount, currency, short_url } = response.data;
+    const paymentLink = `https://teksacademy.com/pay/${id}`; // Replace with your actual domain
+    // Send payment link to student via email
+    const mailOptions = {
+      from: 'nbkrishna32@gmail.com', // Replace with your email
+      to: studentEmail,
+      subject: 'Payment Link',
+      text: `Click on the link to make the payment: ${paymentLink}`,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+      } else {
+        console.log('Email sent: ' + info.response);
+        res.json({ id, amount, currency, paymentLink  });
+      }
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
-app.post('/capture-payment', async (req, res) => {
-  const paymentId = req.body.payment_id;
-  const orderId = req.body.order_id;
 
-  try {
-    const payment = await razorpayInstance.payments.capture(paymentId, orderId);
-    res.json({ payment });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
+// // Routes
+// app.post('/create-order', async (req, res) => {
+//   const amount = req.body.amount; // Amount in paise
+
+//   const options = {
+//     amount: amount,
+//     currency: 'INR', // Change currency as needed
+//   };
+
+//   try {
+//     const order = await razorpayInstance.orders.create(options);
+//     res.json({ order });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: 'Internal Server Error' });
+//   }
+// });
+
+// app.post('/capture-payment', async (req, res) => {
+//   const paymentId = req.body.payment_id;
+//   const orderId = req.body.order_id;
+
+//   try {
+//     const payment = await razorpayInstance.payments.capture(paymentId, orderId);
+//     res.json({ payment });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: 'Internal Server Error' });
+//   }
+// });
+
+
 
 
 module.exports = {
