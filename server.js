@@ -236,12 +236,6 @@ app.post('/createOrder', (req, res) => {
 
 
 
-
-
-
-
-
-
 // whatsapp interakt
 // const sendWelcomeMessage = async () => {
 //   const apiUrl = 'https://api.interakt.ai/v1/public/message/';
