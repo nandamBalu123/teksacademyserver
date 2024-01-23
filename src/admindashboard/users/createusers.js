@@ -2541,72 +2541,72 @@ app.put("/resetpassword/:id", (req, res) => {
 });
 
 
-const nodemailer = require('nodemailer');
+// const nodemailer = require('nodemailer');
 const razorpay = require('razorpay');
 
-// payment gatway
+// // payment gatway
 
-// Razorpay setup
-const razorpayKey = 'rzp_test_HXWg7EjjGBM1JY';
-const razorpaySecret = 'EdTfexoyKzGAADPD3SjidgUX';
+// // Razorpay setup
+// const razorpayKey = 'rzp_test_HXWg7EjjGBM1JY';
+// const razorpaySecret = 'EdTfexoyKzGAADPD3SjidgUX';
 
-const razorpayInstance = new razorpay({
-  key_id: razorpayKey,
-  key_secret: razorpaySecret,
-});
+// const razorpayInstance = new razorpay({
+//   key_id: razorpayKey,
+//   key_secret: razorpaySecret,
+// });
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'nirajkr00024@gmail.com',
-    pass: 'fkjj xtju fauu tgai'
-  },
-});
+// const transporter = nodemailer.createTransport({
+//   service: 'gmail',
+//   auth: {
+//     user: 'nirajkr00024@gmail.com',
+//     pass: 'fkjj xtju fauu tgai'
+//   },
+// });
 
-app.post('/create-order', async (req, res) => {
-  const { amount: reqAmount, currency: reqCurrency, studentEmail } = req.body;
+// app.post('/create-order', async (req, res) => {
+//   const { amount: reqAmount, currency: reqCurrency, studentEmail } = req.body;
 
-  const razorpayBaseUrl = 'https://api.razorpay.com/v1';
-  const razorpayCreateOrderUrl = `${razorpayBaseUrl}/orders`;
+//   const razorpayBaseUrl = 'https://api.razorpay.com/v1';
+//   const razorpayCreateOrderUrl = `${razorpayBaseUrl}/orders`;
 
-  const headers = {
-    Authorization: `Basic ${Buffer.from(`${razorpayKey}:${razorpaySecret}`).toString('base64')}`,
-    'Content-Type': 'application/json',
-  };
+//   const headers = {
+//     Authorization: `Basic ${Buffer.from(`${razorpayKey}:${razorpaySecret}`).toString('base64')}`,
+//     'Content-Type': 'application/json',
+//   };
 
-  try {
-    // Create an order using Razorpay API
-    const response = await axios.post(razorpayCreateOrderUrl, {
-      amount: reqAmount * 100, // Amount in paise
-      currency: reqCurrency,
-    }, {
-      headers,
-    });
-    console.log('Razorpay API response:', response.data);
-    const { id, amount, currency, short_url } = response.data;
-    const paymentLink = `https://teksacademy.com/pay/${id}`; // Replace with your actual domain
-    // Send payment link to student via email
-    const mailOptions = {
-      from: 'nbkrishna32@gmail.com', // Replace with your email
-      to: studentEmail,
-      subject: 'Payment Link',
-      text: `Click on the link to make the payment: ${paymentLink}`,
-    };
+//   try {
+//     // Create an order using Razorpay API
+//     const response = await axios.post(razorpayCreateOrderUrl, {
+//       amount: reqAmount * 100, // Amount in paise
+//       currency: reqCurrency,
+//     }, {
+//       headers,
+//     });
+//     console.log('Razorpay API response:', response.data);
+//     const { id, amount, currency, short_url } = response.data;
+//     const paymentLink = `https://teksacademy.com/pay/${id}`; // Replace with your actual domain
+//     // Send payment link to student via email
+//     const mailOptions = {
+//       from: 'nbkrishna32@gmail.com', // Replace with your email
+//       to: studentEmail,
+//       subject: 'Payment Link',
+//       text: `Click on the link to make the payment: ${paymentLink}`,
+//     };
 
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Internal Server Error' });
-      } else {
-        console.log('Email sent: ' + info.response);
-        res.json({ id, amount, currency, paymentLink  });
-      }
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
+//     transporter.sendMail(mailOptions, (error, info) => {
+//       if (error) {
+//         console.error(error);
+//         res.status(500).json({ error: 'Internal Server Error' });
+//       } else {
+//         console.log('Email sent: ' + info.response);
+//         res.json({ id, amount, currency, paymentLink  });
+//       }
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: 'Internal Server Error' });
+//   }
+// });
 
 
 // // Routes

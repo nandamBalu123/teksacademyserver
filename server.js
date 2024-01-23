@@ -95,11 +95,13 @@ app.listen(3030, () => {
 })
 
 
-// const Razorpay = require('razorpay'); 
+
+// payment razorpay start
+
+// const Razorpay = require('razorpay');
 // // app.use(express.json());
 // app.use(express.urlencoded({ extended: true }));
 
-// // payment
 // const { RAZORPAY_ID_KEY, RAZORPAY_SECRET_KEY } = process.env;
 
 // const razorpayInstance = new Razorpay({
@@ -107,61 +109,58 @@ app.listen(3030, () => {
 //     key_secret: RAZORPAY_SECRET_KEY
 // });
 
-// const renderProductPage = async(req,res)=>{
-
-//     try {
-        
-//         res.render('product');
-
-//     } catch (error) {
-//         console.log(error.message);
-//     }
-
+// const renderProductPage = async (req, res) => {
+//   try {
+//       res.send('Hello, this is the product page!');
+//   } catch (error) {
+//       console.log(error.message);
+//       res.status(500).send('Internal Server Error');
+//   }
 // }
 
-// const createOrder = async(req,res)=>{
-//     try {
-//         const amount = req.body.amount*100
-//         const options = {
-//             amount: amount,
-//             currency: 'INR',
-//             receipt: 'balunandam1122@gmail.com'
-//         }
+// app.get('/', renderProductPage);
 
-//         razorpayInstance.orders.create(options, 
-//             (err, order)=>{
-//                 if(!err){
-//                     res.status(200).send({
-//                         success:true,
-//                         msg:'Order Created',
-//                         order_id:order.id,
-//                         amount:amount,
-//                         key_id:RAZORPAY_ID_KEY,
-//                         product_name:req.body.name,
-//                         description:req.body.description,
-//                         contact:"9493991327",
-//                         name: "balu",
-//                         email: "balunandam1122@gmail.com"
-//                     });
-//                 }
-//                 else{
-//                     res.status(400).send({success:false,msg:'Something went wrong!'});
-//                 }
-//             }
-//         );
+// app.post('/createOrder', (req, res) => {
+//   try {
+//       const amount = req.body.amount * 100;
+//       const options = {
+//           amount: amount,
+//           currency: 'INR',
+//           receipt: 'balunandam1122@gmail.com'
+//       }
 
-//     } catch (error) {
-//         console.log(error.message);
-//     }
-// }
+//       razorpayInstance.orders.create(options, (err, order) => {
+//           if (!err) {
+//               res.status(200).json({
+//                   success: true,
+//                   msg: 'Order Created',
+//                   order_id: order.id,
+//                   amount: amount,
+//                   key_id: RAZORPAY_ID_KEY,
+//                   product_name: req.body.name,
+//                   description: req.body.description,
+//                   contact: "9493991327",
+//                   name: "balu",
+//                   email: "balunandam1122@gmail.com"
+//               });
+//           } else {
+//               res.status(400).json({ success: false, msg: 'Something went wrong!' });
+//           }
+//       });
+
+//   } catch (error) {
+//       console.log(error.message);
+//       res.status(500).json({ success: false, msg: 'Internal Server Error' });
+//   }
+// });
+
+// payment razorpay end
 
 
 const Razorpay = require('razorpay');
 
-
-
-// app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 const { RAZORPAY_ID_KEY, RAZORPAY_SECRET_KEY } = process.env;
 
@@ -170,53 +169,68 @@ const razorpayInstance = new Razorpay({
     key_secret: RAZORPAY_SECRET_KEY
 });
 
-const renderProductPage = async (req, res) => {
-  try {
-      res.send('Hello, this is the product page!');
-  } catch (error) {
-      console.log(error.message);
-      res.status(500).send('Internal Server Error');
-  }
-}
 
-app.get('/', renderProductPage);
+// const renderProductPage = async (req, res) => {
+//     try {
+//         res.send('Hello, this is the product page!');
+//     } catch (error) {
+//         console.log(error.message);
+//         res.status(500).send('Internal Server Error');
+//     }
+// }
+
+// app.get('/', renderProductPage);
 
 app.post('/createOrder', (req, res) => {
-  try {
-      const amount = req.body.amount * 100;
-      const options = {
-          amount: amount,
-          currency: 'INR',
-          receipt: 'balunandam1122@gmail.com'
-      }
+    try {
+        const amount = req.body.amount * 100;
+        const options = {
+            amount: amount,
+            currency: 'INR',
+            receipt: 'balunandam1122@gmail.com'
+        }
 
-      razorpayInstance.orders.create(options, (err, order) => {
-          if (!err) {
-              res.status(200).json({
-                  success: true,
-                  msg: 'Order Created',
-                  order_id: order.id,
-                  amount: amount,
-                  key_id: RAZORPAY_ID_KEY,
-                  product_name: req.body.name,
-                  description: req.body.description,
-                  contact: "9493991327",
-                  name: "balu",
-                  email: "balunandam1122@gmail.com"
-              });
-          } else {
-              res.status(400).json({ success: false, msg: 'Something went wrong!' });
-          }
-      });
+        razorpayInstance.orders.create(options, (err, order) => {
+            if (!err) {
+                // Use the order object to create a payment link
+                const paymentLinkOptions = {
+                    amount: amount,
+                    currency: 'INR',
+                    accept_partial: true, // Include any other relevant payment link options
+                    reference_id: order.id, // Use the order ID as the reference ID
+                    description: req.body.description,
+                    customer: {
+                        // name: req.body.name,
+                        // contact: req.body.contact,
+                        // email: req.body.email
+                        name: "balu",
+                        contact: "9493991327",
+                        email: "nbkrishna32@gmail.com",
+                    },
+                    notify: {
+                        sms: true,
+                        email: true
+                    }
+                };
 
-  } catch (error) {
-      console.log(error.message);
-      res.status(500).json({ success: false, msg: 'Internal Server Error' });
-  }
+                razorpayInstance.paymentLink.create(paymentLinkOptions, (err, paymentLink) => {
+                    if (!err) {
+                        // Redirect the user to the payment link
+                        res.redirect(paymentLink.short_url);
+                    } else {
+                        res.status(400).json({ success: false, msg: 'Something went wrong while creating the payment link!' });
+                    }
+                });
+            } else {
+                res.status(400).json({ success: false, msg: 'Something went wrong while creating the order!' });
+            }
+        });
+
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).json({ success: false, msg: 'Internal Server Error' });
+    }
 });
-
-
-
 
 
 
