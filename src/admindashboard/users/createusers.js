@@ -64,10 +64,16 @@ app.use(session({
 // const fileUpload = require("express-fileupload");
 const AWS = require("aws-sdk");
 
+// AWS.config.update({
+//   accessKeyId: "AKIARCHFX7O6LLRZW5EE",
+//   secretAccessKey: "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",
+//   region: "us-east-1",
+// });
+
 AWS.config.update({
-  accessKeyId: "AKIARCHFX7O6LLRZW5EE",
-  secretAccessKey: "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",
-  region: "us-east-1",
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region: process.env.AWS_REGION,
 });
 
 
@@ -985,20 +991,21 @@ app.put("/updateuser/:id", (req, res) => {
 // student management
 
 
+
 // app.get("/getstudent_data", (req, res) => {
 //   const sql = "SELECT * FROM student_details";
-
+ 
 //   connection.query(sql, (err, result) => {
 //     if (err) {
 //       res.status(422).json("No data available");
 //     } else {
-
+ 
 //       const parsedResults = result.map((row) => {
 //         // const parsedLeadsource = JSON.parse(row.leadsource);
 //         let parsedLeadsource;
 //         try {
 //           parsedLeadsource = JSON.parse(row.leadsource);
-
+ 
 //           if (!Array.Array(parsedLeadsource)) {
 //             parsedLeadsource = ["leadsource is not an array"]
 //           }
@@ -1013,7 +1020,13 @@ app.put("/updateuser/:id", (req, res) => {
 //         const ParsedExtra_discount = JSON.parse(row.extra_discount);
 //         const ParsedFeeDetails = JSON.parse(row.feedetails);
 //         const ParsedFeeDetailsbilling = JSON.parse(row.feedetailsbilling);
-
+//         let parsedRefund = row.refund
+//         if (row.refund) {
+//           parsedRefund = JSON.parse(row.refund);
+ 
+//         }
+ 
+ 
 //         return {
 //           ...row,
 //           leadsource: parsedLeadsource,
@@ -1025,9 +1038,10 @@ app.put("/updateuser/:id", (req, res) => {
 //           extra_discount: ParsedExtra_discount,
 //           feedetails: ParsedFeeDetails,
 //           feedetailsbilling: ParsedFeeDetailsbilling,
+//           refund: parsedRefund
 //         };
 //       });
-
+ 
 //       parsedResults.reverse();
 //       res.status(201).json(parsedResults);
 //     }
@@ -1090,6 +1104,8 @@ app.get("/getstudent_data", (req, res) => {
     }
   });
 });
+ 
+ 
  
  
 
@@ -1263,6 +1279,7 @@ app.put("/noofinstallments/:id", (req, res) => {
 // });
 
  
+ 
 app.post('/studentfeerefund', (req, res) => {
   const { refund, registrationnumber } = req.body;
   const refundJSON = JSON.stringify(refund);
@@ -1360,6 +1377,7 @@ app.post('/studentfeerefund', (req, res) => {
 //     }
 //   });
 // });
+
 
 
 app.put("/refundpermissions/:registrationnumber", (req, res) => {
@@ -1508,6 +1526,8 @@ app.get("/singlerefundview/:registrationnumber", (req, res) => {
     });
   });
 });
+ 
+ 
  
  
 
@@ -2261,6 +2281,57 @@ app.post("/addcourses", (req, res) => {
   });
 });
 
+
+app.get("/getcourse/:courseId", (req, res) => {
+  const courseId = req.params.courseId;
+  const sqlGetCourse = "SELECT * FROM courses_settings WHERE id = ?";
+ 
+  connection.query(sqlGetCourse, [courseId], (err, result) => {
+    if (err) {
+      console.error("Error retrieving course:", err);
+      return res.status(500).json({ Error: "Error retrieving course" });
+    } else {
+      if (result.length === 0) {
+        return res.status(404).json({ Error: "Course not found" });
+      }
+      const course = result[0];
+      return res.status(200).json(course);
+    }
+  });
+});
+ 
+ 
+app.put("/updatecourse/:courseId", (req, res) => {
+  const courseId = req.params.courseId;
+  const sqlUpdateCourse = "UPDATE courses_settings SET course_name=?, fee=?, createdby=?, max_discount=?, course_package=?, date=? WHERE id=?";
+  const values = [
+    req.body.course_name,
+    req.body.fee,
+    req.body.createdby,
+    req.body.max_discount,
+    req.body.course_package,
+    req.body.date,
+    courseId
+  ];
+ 
+  if (values.slice(0, -1).some((value) => value === undefined || value === null)) {
+    return res.status(422).json({ error: "Fill all the fields" });
+  }
+ 
+  connection.query(sqlUpdateCourse, values, (err, result) => {
+    if (err) {
+      console.error("Error updating course:", err);
+      return res.status(500).json({ Error: "Error updating course" });
+    } else {
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ Error: "Course not found" });
+      }
+      return res.status(200).json({ message: "Course updated successfully" });
+    }
+  });
+});
+ 
+
 app.delete("/deletecourse/:id", (req, res) => {
   const courseId = req.params.id;
 
@@ -2428,6 +2499,53 @@ app.get("/getcoursespackages", (req, res) => {
       return res.json({ Error: "get courses error in sql" });
     } else {
       return res.status(201).json(result);
+    }
+  });
+});
+
+app.delete("/deletecoursepackage/:id", (req, res) => {
+  const courseId = req.params.id;
+
+  if (!courseId) {
+    return res.status(422).json({ error: "Course ID is required" });
+  }
+
+  const sqlDeleteCourse = "DELETE FROM coursepackages_settings WHERE id = ?";
+  connection.query(sqlDeleteCourse, [courseId], (err, result) => {
+    if (err) {
+      console.error("Error deleting course:", err);
+      return res.status(500).json({ Error: "Error deleting course" });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ Error: "Course not found" });
+    }
+
+    return res.status(200).json({ message: "Course deleted successfully" });
+  });
+});
+
+app.put("/updatecoursepackages/:courseId", (req, res) => {
+  const courseId = req.params.courseId;
+  const sqlUpdateCourse = "UPDATE coursepackages_settings SET coursepackages_name=? WHERE id=?";
+  const values = [
+    req.body.coursepackages_name,
+    
+  ];
+ 
+  if (values.slice(0, -1).some((value) => value === undefined || value === null)) {
+    return res.status(422).json({ error: "Fill all the fields" });
+  }
+ 
+  connection.query(sqlUpdateCourse, values, (err, result) => {
+    if (err) {
+      console.error("Error updating course:", err);
+      return res.status(500).json({ Error: "Error updating course" });
+    } else {
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ Error: "Course not found" });
+      }
+      return res.status(200).json({ message: "Course updated successfully" });
     }
   });
 });
