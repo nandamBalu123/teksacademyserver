@@ -430,8 +430,9 @@ app.post("/student_form", (req, res) => {
                 res.json({ message: 'Photo uploaded successfully' });
               }
             });
+            // return res.status(201).json(insertResult);
           }
-          // return res.status(201).json(insertResult);
+          return res.status(201).json(insertResult);
         });
 
       });
@@ -1759,7 +1760,7 @@ app.put("/userstatus/:id", (req, res) => {
       return res.status(200).json({ updated: true }); // Return a success response
     }
   );
-});
+}); 
 
 // // user active inactive
 // app.put("/userstatus/:id", (req, res) => {
@@ -2246,6 +2247,8 @@ app.get("/getleadsource", (req, res) => {
 //   });
 // });
 
+
+// courses setting
 app.post("/addcourses", (req, res) => {
   const sqlAddColumn = "ALTER TABLE courses_settings ADD COLUMN IF NOT EXISTS max_discount VARCHAR(255) DEFAULT 0";
   const sqlAddColumn2 = "ALTER TABLE courses_settings ADD COLUMN IF NOT EXISTS course_package VARCHAR(255) DEFAULT NULL";
@@ -2492,6 +2495,25 @@ app.post("/addcoursespackages", (req, res) => {
   });
 });
 
+
+app.get("/getcoursepackages/:courseId", (req, res) => {
+  const courseId = req.params.courseId;
+  const sqlGetCourse = "SELECT * FROM coursepackages_settings WHERE id = ?";
+ 
+  connection.query(sqlGetCourse, [courseId], (err, result) => {
+    if (err) {
+      console.error("Error retrieving course:", err);
+      return res.status(500).json({ Error: "Error retrieving course" });
+    } else {
+      if (result.length === 0) {
+        return res.status(404).json({ Error: "Course not found" });
+      }
+      const course = result[0];
+      return res.status(200).json(course);
+    }
+  });
+});
+
 app.get("/getcoursespackages", (req, res) => {
   const sql = "SELECT * FROM coursepackages_settings";
   connection.query(sql, (err, result) => {
@@ -2530,6 +2552,7 @@ app.put("/updatecoursepackages/:courseId", (req, res) => {
   const sqlUpdateCourse = "UPDATE coursepackages_settings SET coursepackages_name=? WHERE id=?";
   const values = [
     req.body.coursepackages_name,
+    courseId
     
   ];
  
