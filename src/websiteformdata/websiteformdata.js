@@ -181,7 +181,7 @@ app.post('/form-data', (req, res) => {
   });
   
   // single overview page side form data
-  app.post('/scform-data', (req, res) => {
+app.post('/scform-data', (req, res) => {
     const { scname, scemail, sccontactnumber, sccourse } = req.body;
   if (!scname || !scemail || !sccontactnumber || !sccourse) {
       console.error('Please fill in all required fields');
@@ -265,6 +265,278 @@ app.post('/form-data', (req, res) => {
         });
       });
   });
+
+  // // book a demo
+  // app.post('/bookademo', (req, res) => {
+  //   const { bfdname, bfdemail, bfdcontactnumber, bfdcourse, bfddatetime } = req.body;
+  // if (!bfdname || !bfdemail || !bfdcontactnumber || !bfdcourse || !bfddatetime) {
+  //     console.error('Please fill in all required fields');
+  //     return res.status(400).send('Please fill in all required fields');
+  //   }
+  
+  //   const kylasapiData = {
+  //     firstName: bfdname,
+  //     lastName: '',
+  //     phoneNumbers: [
+  //       {
+  //         type: 'MOBILE',
+  //         code: 'IN',
+  //         value: bfdcontactnumber,
+  //         dialCode: '91',
+  //         primary: true,
+  //       },
+  //     ],
+  //     emails: [
+  //       {
+  //         type: 'OFFICE',
+  //         value: bfdemail,
+  //         primary: true,
+  //       },
+  //     ],
+  //     customFieldValues: {
+  //       requirementName: bfdcourse,
+  //       cfBookDemoDateAndTime: bfddatetime,
+  //     },
+  //     source: 1056041,
+  //   };
+  
+  //   axios
+  //     .post('https://api.kylas.io/v1/leads/', kylasapiData, {
+  //       headers: {
+  //         'api-key': '944d1a61-c3cb-454b-96cc-018894f679c8:7549', // API KEY Here
+  //         'Content-Type': 'application/json',
+  //         Accept: 'application/json',
+  //       },
+  //     })
+  //     .then(() => {
+  //       const successMessage = `Thank you for your submission, ${bfdname}! We will contact you at ${bfdcontactnumber} or ${bfdemail} regarding the ${bfdcourse} course.`;
+  //       res.status(200).send(successMessage);
+  //       res.redirect('https://teksacademy.com/thank-you');
+  //     })
+  //     .catch((error) => {
+  //       console.error('Error submitting form data:', error);
+  //       res.status(500).send('There was an error submitting your form. Please try again later.');
+  //     })
+  //     .finally(() => {
+  //       // Save the form data to MySQL
+  //       const query = 'INSERT INTO bookademoforms (name, email, phone, course, demodatetime) VALUES (?, ?, ?, ?, ?)';
+  //       const values = [bfdname, bfdemail, bfdcontactnumber, bfdcourse, bfddatetime];
+  
+  //       connection.query(query, values, (err, result) => {
+  //         if (err) {
+  //           console.error('Error saving form data to MySQL:', err);
+  //           return res.status(500).send('Internal Server Error');
+  //         }
+  
+  //         // Send form data as an email using Mailgun
+  //         const mg = mailgun({
+  //           apiKey: '864d92ccca4a4fb6d86873f898ab23f4-6d8d428c-d5579fe9', // Replace with your Mailgun API key
+  //           domain: 'sandbox2636d284a2034591af3a83bed7cf00c9.mailgun.org', // Replace with your Mailgun domain
+  //         });
+  
+  //         const data = {
+  //           from: bfdemail,
+  //           to: 'digitalmarketing@kapilguru.com',
+  //           subject: 'This e-mail was sent from single course page side form',
+  //           text: `Name: ${bfdname}\nEmail: ${bfdemail}\nPhone: ${bfdcontactnumber}\nCity: ${bfdcourse}\nThis e-mail was sent from single course page side form`,
+  //         };
+  
+  //         mg.messages().send(data, (error, body) => {
+  //           if (error) {
+  //             console.error('Error sending email:', error);
+  //           } else {
+  //             console.log('Email sent:', body);
+  //           }
+  //         });
+          
+  //       });
+  //     });
+  // });
+
+  app.post('/bookademo', (req, res) => {
+    const { bfdname, bfdemail, bfdcontactnumber, bfdcourse, bfddatetime } = req.body;
+    if (!bfdname || !bfdemail || !bfdcontactnumber || !bfdcourse || !bfddatetime) {
+      console.error('Please fill in all required fields');
+      return res.status(400).send('Please fill in all required fields');
+    }
+  
+    const kylasapiData = {
+      firstName: bfdname,
+      lastName: '',
+      phoneNumbers: [
+        {
+          type: 'MOBILE',
+          code: 'IN',
+          value: bfdcontactnumber,
+          dialCode: '91',
+          primary: true,
+        },
+      ],
+      emails: [
+        {
+          type: 'OFFICE',
+          value: bfdemail,
+          primary: true,
+        },
+      ],
+      customFieldValues: {
+        requirementName: bfdcourse,
+        cfBookDemoDateAndTime: bfddatetime,
+      },
+      source: 1056041,
+    };
+  
+    axios
+      .post('https://api.kylas.io/v1/leads/', kylasapiData, {
+        headers: {
+          'api-key': '944d1a61-c3cb-454b-96cc-018894f679c8:7549', // API KEY Here
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+      })
+      .then(() => {
+        const successMessage = `Thank you for your submission, ${bfdname}! We will contact you at ${bfdcontactnumber} or ${bfdemail} regarding the ${bfdcourse} course.`;
+        console.log('Form submitted successfully');
+        res.status(200).send(successMessage);
+        // res.redirect('https://teksacademy.com/thank-you'); // Redirect the user after successful submission
+      })
+      .catch((error) => {
+        console.error('Error submitting form data:', error);
+        res.status(500).send('There was an error submitting your form. Please try again later.');
+      })
+      .finally(() => {
+        // Save the form data to MySQL
+        const query = 'INSERT INTO bookademoforms (name, email, phone, course, demodatetime) VALUES (?, ?, ?, ?, ?)';
+        const values = [bfdname, bfdemail, bfdcontactnumber, bfdcourse, bfddatetime];
+  
+        connection.query(query, values, (err, result) => {
+          if (err) {
+            console.error('Error saving form data to MySQL:', err);
+            return res.status(500).send('Internal Server Error');
+          }
+  
+          // Send form data as an email using Mailgun
+          const mg = mailgun({
+            apiKey: '864d92ccca4a4fb6d86873f898ab23f4-6d8d428c-d5579fe9', // Replace with your Mailgun API key
+            domain: 'sandbox2636d284a2034591af3a83bed7cf00c9.mailgun.org', // Replace with your Mailgun domain
+          });
+  
+          const data = {
+            from: bfdemail,
+            to: 'digitalmarketing@kapilguru.com',
+            subject: 'This e-mail was sent from single course page side form',
+            text: `Name: ${bfdname}\nEmail: ${bfdemail}\nPhone: ${bfdcontactnumber}\nCity: ${bfdcourse}\nThis e-mail was sent from single course page side form`,
+          };
+  
+          mg.messages().send(data, (error, body) => {
+            if (error) {
+              console.error('Error sending email:', error);
+            } else {
+              console.log('Email sent:', body);
+            }
+          });
+        });
+      });
+  });
+
+  // ebook
+  app.post('/ebook', (req, res) => {
+    const { ebname, ebmail, ebphone, ebcourse } = req.body;
+    let successFlag = false; // Flag to track successful form submission
+
+    if (!ebname || !ebmail || !ebphone || !ebcourse) {
+        console.error('Please fill in all required fields');
+        return res.status(400).send('Please fill in all required fields');
+    }
+
+    const kylasapiData = {
+        firstName: ebname,
+        lastName: '',
+        phoneNumbers: [
+            {
+                type: 'MOBILE',
+                code: 'IN',
+                value: ebphone,
+                dialCode: '91',
+                primary: true,
+            },
+        ],
+        emails: [
+            {
+                type: 'OFFICE',
+                value: ebmail,
+                primary: true,
+            },
+        ],
+        customFieldValues: {
+            requirementName: ebcourse,
+        },
+        source: 1056041,
+    };
+
+    axios
+        .post('https://api.kylas.io/v1/leads/', kylasapiData, {
+            headers: {
+                'api-key': '944d1a61-c3cb-454b-96cc-018894f679c8:7549', // API KEY Here
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+            },
+        })
+        .then(() => {
+          const successMessage = `Thank you for your submission, ${ebname}! We will contact you at ${ebphone} or ${ebmail} regarding the ${ebcourse} course.`;
+          console.log('Form submitted successfully');
+          res.status(200).send(successMessage);
+            // successFlag = true;
+          
+            // res.redirect('https://teksacademy.com/thank-you'); // Redirect the user after successful submission
+        })
+        .catch((error) => {
+          res.status(500).send('There was an error submitting your form. Please try again later.');
+            console.error('Error submitting form data:', error);
+            
+        })
+        .finally(() => {
+            // Save the form data to MySQL
+            const query = 'INSERT INTO ebookforms (name, email, phone, course) VALUES (?, ?, ?, ?)';
+            const values = [ebname, ebmail, ebphone, ebcourse];
+
+            connection.query(query, values, (err, result) => {
+                if (err) {
+                    console.error('Error saving form data to MySQL:', err);
+                    // return res.status(500).send('Internal Server Error');
+                }
+
+                // Send form data as an email using Mailgun
+                const mg = mailgun({
+                    apiKey: '864d92ccca4a4fb6d86873f898ab23f4-6d8d428c-d5579fe9', // Replace with your Mailgun API key
+                    domain: 'sandbox2636d284a2034591af3a83bed7cf00c9.mailgun.org', // Replace with your Mailgun domain
+                });
+
+                const data = {
+                    from: ebmail,
+                    to: 'digitalmarketing@kapilguru.com',
+                    subject: 'This e-mail was sent from single course page side form',
+                    text: `Name: ${ebname}\nEmail: ${ebmail}\nPhone: ${ebphone}\nCity: ${ebcourse}\nThis e-mail was sent from single course page side form`,
+                };
+
+                mg.messages().send(data, (error, body) => {
+                    if (error) {
+                        console.error('Error sending email:', error);
+                    } else {
+                        console.log('Email sent:', body);
+                    }
+                    // Send response only after email sending is complete
+                    if (successFlag) {
+                        const successMessage = `Thank you for your submission, ${ebname}! We will contact you at ${ebphone} or ${ebmail} regarding the ${ebcourse} course.`;
+                        res.status(200).send(successMessage);
+                    }
+                });
+            });
+        });
+});
+
+  
+
   
   app.post('/slpform-data', (req, res) => {
     const { slpname, slpemail, slpcontactnumber, slpcourse } = req.body;

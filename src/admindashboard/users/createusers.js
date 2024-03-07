@@ -440,6 +440,248 @@ app.post("/student_form", (req, res) => {
   });
 });
 
+// const List_User = async (req, res) => {
+//   try {
+//     const page = parseInt(req.query.page, 10) || 1;
+//     const pageSize = parseInt(req.query.pageSize, 10) || 10;
+//     const sortBy = req.query.sortBy || 'createdAt';
+//     const searchQuery = req.query.search || '';
+//     const profile = req.query.search || '';
+//     const branch = req.query.search || '';
+//     const department = req.query.search || '';
+
+//     let sql = `
+//       SELECT * FROM users
+//       WHERE fullname LIKE ?
+//         OR email LIKE ?
+//         OR phonenumber LIKE ?
+//         OR designation LIKE ?
+//         OR department LIKE ?
+//         OR reportto LIKE ?
+//         OR profile LIKE ?
+//         OR branch LIKE ?
+//         OR user_remarks_history LIKE ?
+//       ORDER BY ${sortBy}
+//       LIMIT ?, ?
+//     `;
+    
+
+//     const offset = (page - 1) * pageSize;
+
+//     // Execute the SQL query
+//     connection.query(sql, [`%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery && department}%`, `%${searchQuery}%`, `%${searchQuery && profile}%`, `%${searchQuery && branch}%`, `%${searchQuery && profile && branch && department}%`, offset, pageSize], (err, results) => {
+//       if (err) {
+//         console.error('Error fetching users:', err);
+//         res.status(500).json({ error: 'Internal Server Error' });
+//         return;
+//       }
+
+//       // Fetch total count of users
+//       connection.query('SELECT COUNT(*) AS count FROM users WHERE fullname LIKE ? OR email LIKE ? OR phonenumber LIKE ? OR designation LIKE ? OR department LIKE ? OR reportto LIKE ? OR profile LIKE ? OR branch LIKE ? OR user_remarks_history LIKE ?', [`%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`], (err, totalCountResult) => {
+//         if (err) {
+//           console.error('Error fetching total users count:', err);
+//           res.status(500).json({ error: 'Internal Server Error' });
+//           return;
+//         }
+
+//         const totalUsers = totalCountResult[0].count;
+//         const totalPages = Math.ceil(totalUsers / pageSize);
+//         const startUser = (page - 1) * pageSize + 1;
+//         const endUser = Math.min(page * pageSize, totalUsers);
+
+//         res.status(200).json({
+//           users: results,
+//           totalUsers,
+//           totalPages,
+//           currentPage: page,
+//           pageSize,
+//           startUser,
+//           endUser
+//         });
+//       });
+//     });
+//   } catch (error) {
+//     console.error('Error fetching Users:', error);
+//     res.status(500).json({ error: 'Internal Server Error' });
+//   }
+// };
+
+
+// app.get('/list_user', List_User);
+
+app.get('/list_user', async (req, res) => {
+  try {
+    const page = parseInt(req.query.page, 10) || 1;
+    const pageSize = parseInt(req.query.pageSize, 10) || 10;
+    const sortBy = ['createdAt', 'fullname', 'email'].includes(req.query.sortBy) ? req.query.sortBy : 'createdAt'; // Validate sortBy
+    const searchQuery = req.query.search || '';
+
+    let sql = `
+      SELECT * FROM users
+      WHERE fullname LIKE ?
+        OR email LIKE ?
+        OR phonenumber LIKE ?
+        OR designation LIKE ?
+        OR department LIKE ?
+        OR reportto LIKE ?
+        OR profile LIKE ?
+        OR branch LIKE ?
+        OR user_remarks_history LIKE ?
+      ORDER BY ${sortBy}
+      LIMIT ?, ?
+    `;
+
+    const offset = (page - 1) * pageSize;
+    const queryParams = Array(9).fill(`%${searchQuery}%`).concat([offset, pageSize]);
+
+    connection.query(sql, queryParams, (err, results) => {
+      if (err) {
+        console.error('Error fetching users:', err);
+        res.status(500).json({ error: 'Internal Server Error' });
+        return;
+      }
+
+      connection.query('SELECT COUNT(*) AS count FROM users WHERE fullname LIKE ? OR email LIKE ? OR phonenumber LIKE ? OR designation LIKE ? OR department LIKE ? OR reportto LIKE ? OR profile LIKE ? OR branch LIKE ? OR user_remarks_history LIKE ?', Array(9).fill(`%${searchQuery}%`), (err, totalCountResult) => {
+        if (err) {
+          console.error('Error fetching total users count:', err);
+          res.status(500).json({ error: 'Internal Server Error' });
+          return;
+        }
+
+        const totalUsers = totalCountResult[0].count;
+        const totalPages = Math.ceil(totalUsers / pageSize);
+        const startUser = (page - 1) * pageSize + 1;
+        const endUser = Math.min(page * pageSize, totalUsers);
+
+        res.status(200).json({
+          users: results,
+          totalUsers,
+          totalPages,
+          currentPage: page,
+          pageSize,
+          startUser,
+          endUser
+        });
+      });
+    });
+  } catch (error) {
+    console.error('Error fetching Users:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+
+
+const List_Student = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page, 10) || 1;
+    const pageSize = parseInt(req.query.pageSize, 10) || 10;
+    const sortBy = req.query.sortBy || 'createdAt';
+    const searchQuery = req.query.search || '';
+    
+
+    let sql = `
+  SELECT FROM student_data
+  WHERE 
+    name LIKE ? OR
+    email LIKE ? OR
+    mobilenumber LIKE ? OR
+    parentsname LIKE ? OR
+    parentsnumber LIKE ? OR
+    birthdate LIKE ? OR
+    gender LIKE ? OR
+    maritalstatus LIKE ? OR
+    college LIKE ? OR
+    country LIKE ? OR
+    state LIKE ? OR
+    area LIKE ? OR
+    native LIKE ? OR
+    zipcode LIKE ? OR
+    whatsappno LIKE ? OR
+    educationtype LIKE ? OR
+    marks LIKE ? OR
+    academicyear LIKE ? OR
+    studentImg LIKE ? OR
+    imgData LIKE ? OR
+    enquirydate LIKE ? OR
+    enquirytakenby LIKE ? OR
+    coursepackage LIKE ? OR
+    courses LIKE ? OR
+    leadsource LIKE ? OR
+    branch LIKE ? OR
+    modeoftraining LIKE ? OR
+    registrationnumber LIKE ? OR
+    admissiondate LIKE ? OR
+    validitystartdate LIKE ? OR
+    validityenddate LIKE ? OR
+    feedetails LIKE ? OR
+    grosstotal LIKE ? OR
+    totaldiscount LIKE ? OR
+    totaltax LIKE ? OR
+    grandtotal LIKE ? OR
+    finaltotal LIKE ? OR
+    admissionremarks LIKE ? OR
+    assets LIKE ? OR
+    totalinstallments LIKE ? OR
+    dueamount LIKE ? OR
+    addfee LIKE ? OR
+    initialpayment LIKE ? OR
+    duedatetype LIKE ? OR
+    installments LIKE ? OR
+    materialfee LIKE ? OR
+    feedetailsbilling LIKE ? OR
+    totalfeewithouttax LIKE ? OR
+    totalpaidamount LIKE ? OR
+    certificate_status LIKE ? OR
+    extra_discount LIKE ?
+  ORDER BY ${sortBy}
+  LIMIT ?, ?
+`;
+
+    const offset = (page - 1) * pageSize;
+
+    // Execute the SQL query
+    connection.query(sql, [`%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, offset, pageSize], (err, results) => {
+      if (err) {
+        console.error('Error fetching users:', err);
+        res.status(500).json({ error: 'Internal Server Error' });
+        return;
+      }
+
+      // Fetch total count of users
+      connection.query('SELECT COUNT(*) AS count FROM user WHERE fullname LIKE ? OR email LIKE ? OR phonenumber LIKE ? OR designation LIKE ? OR department LIKE ? OR reportto LIKE ? OR profile LIKE ? OR branch LIKE ? OR user_remarks_history LIKE ?', [`%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`], (err, totalCountResult) => {
+        if (err) {
+          console.error('Error fetching total users count:', err);
+          res.status(500).json({ error: 'Internal Server Error' });
+          return;
+        }
+
+        const totalUsers = totalCountResult[0].count;
+        const totalPages = Math.ceil(totalUsers / pageSize);
+        const startUser = (page - 1) * pageSize + 1;
+        const endUser = Math.min(page * pageSize, totalUsers);
+
+        res.status(200).json({
+          users: results,
+          totalUsers,
+          totalPages,
+          currentPage: page,
+          pageSize,
+          startUser,
+          endUser
+        });
+      });
+    });
+  } catch (error) {
+    console.error('Error fetching Users:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+
+app.get('/list_student', List_Student);
+
 
 
 app.get("/logout", (req, res) => {
