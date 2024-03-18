@@ -923,6 +923,37 @@ app.get("/userdata", (req, res) => {
 });
 
 
+app.get("/userdata/:id", (req, res) => {
+  const userId = req.params.id;
+  const sql = "SELECT * FROM user WHERE id = ?";
+
+  connection.query(sql, [userId], (err, result) => {
+    if (err) {
+      res.status(422).json("Error retrieving user data");
+    } else {
+      if (result.length === 0) {
+        res.status(404).json("User not found");
+      } else {
+        const row = result[0]; // Since there should be only one result
+        let userRemarksHistory;
+        try {
+          userRemarksHistory = JSON.parse(row.user_remarks_history);
+        } catch (error) {
+          userRemarksHistory = ["Invalid user remarks history format"];
+        }
+
+        const parsedResult = {
+          ...row,
+          user_remarks_history: userRemarksHistory,
+          // Add more parsed fields here if needed
+        };
+
+        res.status(200).json(parsedResult);
+      }
+    }
+  });
+});
+
 
 const jwtSecretKey = "your_secret_key";
 
@@ -1441,7 +1472,86 @@ app.get("/getstudent_data", (req, res) => {
  
  
  
+app.get("/getstudent_data/:id", (req, res) => {
+  const studentId = req.params.id;
+  const sql = "SELECT * FROM student_details WHERE id = ?";
  
+  connection.query(sql, [studentId], (err, result) => {
+    if (err) {
+      res.status(422).json("Error retrieving student data");
+    } else {
+      if (result.length === 0) {
+        res.status(404).json("Student not found");
+      } else {
+        const row = result[0]; // Since there should be only one result
+        let parsedLeadsource;
+        try {
+          parsedLeadsource = JSON.parse(row.leadsource);
+ 
+          if (!Array.isArray(parsedLeadsource)) {
+            parsedLeadsource = ["leadsource is not an array"];
+          }
+        } catch (error) {
+          parsedLeadsource = ["Invalid leadsource format"];
+        }
+        
+        // Parse other fields here...
+        // For example:
+        const parsedTotalInstallments = JSON.parse(row.totalinstallments);
+        const parsedInstallments = JSON.parse(row.installments);
+        const parsedInitialpayment = JSON.parse(row.initialpayment);
+        const parsedCertificateStatus = JSON.parse(row.certificate_status);
+        const parsedAssets = JSON.parse(row.assets);
+        const parsedExtraDiscount = JSON.parse(row.extra_discount);
+        const parsedFeeDetails = JSON.parse(row.feedetails);
+        const parsedFeeDetailsBilling = JSON.parse(row.feedetailsbilling);
+        let parsedRefund = row.refund;
+        if (row.refund) {
+          parsedRefund = JSON.parse(row.refund);
+        }
+        
+        const parsedResult = {
+          ...row,
+          leadsource: parsedLeadsource,
+          totalinstallments: parsedTotalInstallments,
+          installments: parsedInstallments,
+          initialpayment: parsedInitialpayment,
+          certificate_status: parsedCertificateStatus,
+          assets: parsedAssets,
+          extra_discount: parsedExtraDiscount,
+          feedetails: parsedFeeDetails,
+          feedetailsbilling: parsedFeeDetailsBilling,
+          refund: parsedRefund
+          // Add more parsed fields as needed...
+        };
+ 
+        res.status(200).json(parsedResult);
+      }
+    }
+  });
+});
+
+
+// app.get("/getUser_data/:id", (req, res) => {
+//   const userId = req.params.id;
+//   const sql = "SELECT * FROM user WHERE id = ?";
+
+//   connection.query(sql, [userId], (err, result) => {
+//     if(err){
+//       res.status(422).json("Error retrieving user data");
+//     }else {
+//       if(result.length === 0){
+//         res.status(404).json("user not found")
+//       }else {
+//         const row = result[0];
+//         let parsedUserStatus;
+//         try{
+//           parsedUserStatus = JSON.parse(row.userRemarksHistory)
+//         }
+//       }
+//     }
+//   })
+// })
 
 
 
