@@ -2557,182 +2557,47 @@ app.put("/updatestudentdata/:id", (req, res) => {
 //   })
 // })
 
-app.post("/addbranch", (req, res) => {
-  const sql = "INSERT INTO branch_settings (branch_name) VALUES (?)";
-  const values = [req.body.branch_name];
-
-  if (!values.every((value) => value !== undefined)) {
-    return res.status(422).json("Please fill in all the data");
-  }
-  connection.query(sql, values, (err, result) => {
-    if (err) {
-      console.log("err insert in addbranch: ", err);
-    }
-    return res.status(201).json(req.body);
-  });
-});
-
-app.get("/getbranch", (req, res) => {
-  const sql = "SELECT * FROM branch_settings";
-  connection.query(sql, (err, result) => {
-    if (err) {
-      return res.json({ Error: "get branch error in sql" });
-    } else {
-      res.status(201).json(result);
-    }
-  });
-});
-
-// department
-
-app.post("/adddepartment", (req, res) => {
-  const sql = "INSERT INTO department_settings (department_name) VALUES (?)";
-  const values = [req.body.department_name];
-
-  if (!values.every((value) => value !== undefined)) {
-    return res.status(422).json("fill the field");
-  }
-
-  connection.query(sql, values, (err, result) => {
-    if (err) {
-      return res.json({ Error: "get department error in sql" });
-    } else {
-      res.status(201).json(req.body);
-    }
-  });
-});
-
-app.get("/getdepartment", (req, res) => {
-  const sql = "SELECT * FROM department_settings";
-  connection.query(sql, (err, result) => {
-    if (err) {
-      return res.json({ Error: "get department error in sql" });
-    } else {
-      res.status(201).json(result);
-    }
-  });
-});
-
-// leadsource
-
-app.post("/addleadsource", (req, res) => {
-  const sql = "INSERT INTO leadsource_settings (leadsource) VALUES (?)";
-  const values = [req.body.leadsource];
-
-  if (!values.every((value) => value !== undefined)) {
-    res.status(422).json("fill the fields");
-  }
-
-  connection.query(sql, values, (err, result) => {
-    if (err) {
-      return res.json({ Error: "error adding loadsource" });
-    } else {
-      res.status(201).json(req.body);
-    }
-  });
-});
-
-app.get("/getleadsource", (req, res) => {
-  const sql = "SELECT * FROM leadsource_settings";
-
-  connection.query(sql, (err, result) => {
-    if (err) {
-      return res.json({ Error: "get leadsource error in sql" });
-    } else {
-      res.status(201).json(result);
-    }
-  });
-});
 
 
 
-// app.post("/addcourses", (req, res) => {
-//   const sql = "INSERT INTO courses_settings (course_name, fee, createdby) VALUES (?, ?, ?)";
-//   const values = [req.body.course_name, req.body.fee, req.body.username];
 
-//   if (!values.every((value) => value !== undefined)) {
-//     return res.status(422).json("fill the fields");
-//   }
-
-//   connection.query(sql, values, (err, result) => {
-//     if (err) {
-//       return res.json({ Error: "error adding course" });
-//     } else {
-//       return res.status(201).json(req.body);
-//     }
-//   });
-// });
-
-// app.post("/addcourses", (req, res) => {
-//   const sqlAddColumn = "ALTER TABLE courses_settings ADD COLUMN IF NOT EXISTS max_discount VARCHAR(255) DEFAULT 0";
-//   const sqlAddColumn2 = "ALTER TABLE courses_settings ADD COLUMN IF NOT EXISTS course_package VARCHAR(255) DEFAULT NULL";
-//   connection.query(sqlAddColumn, sqlAddColumn2, (alterErr) => {
-//     if (alterErr) {
-//       console.error("Error adding column:", alterErr);
-//       return res.status(500).json({ Error: "Internal Server Error" });
-//     }
-
-//     const sqlInsertCourse = "INSERT INTO courses_settings (course_name, fee, createdby, max_discount, course_package) VALUES (?, ?, ?, ?, ?)";
-//     const values = [req.body.course_name, req.body.fee, req.body.createdby, req.body.max_discount, req.body.course_package];
-
-//     if (!values.every((value) => value !== undefined)) {
-//       return res.status(422).json("Fill all the fields");
-//     }
-
-//     connection.query(sqlInsertCourse, values, (err, result) => {
-//       if (err) {
-//         console.error("Error adding course:", err);
-//         return res.status(500).json({ Error: "Error adding course" });
-//       } else {
-//         return res.status(201).json(req.body);
-//       }
-//     });
-//   });
-// });
 
 
 // courses setting
 app.post("/addcourses", (req, res) => {
-  const sqlAddColumn = "ALTER TABLE courses_settings ADD COLUMN IF NOT EXISTS max_discount VARCHAR(255) DEFAULT 0";
-  const sqlAddColumn2 = "ALTER TABLE courses_settings ADD COLUMN IF NOT EXISTS course_package VARCHAR(255) DEFAULT NULL";
+  const sql = "INSERT INTO courses_settings (course_name, course_package, fee, max_discount, createdby) VALUES (?, ?, ?, ?, ?)";
+  const values = [req.body.course_name, req.body.course_package, req.body.fee, req.body.max_discount, req.body.createdby];
 
-  connection.query(sqlAddColumn, (alterErr1) => {
-    if (alterErr1) {
-      console.error("Error adding column 1:", alterErr1);
-      return res.status(500).json({ Error: "Internal Server Error" });
+  if (!values.every((value) => value !== undefined)) {
+    return res.status(422).json("fill the fields");
+  }
+
+  connection.query(sql, values, (err, result) => {
+    if (err) {
+      return res.json({ Error: "error adding course" });
+    } else {
+      return res.status(201).json(req.body);
     }
-
-    connection.query(sqlAddColumn2, (alterErr2) => {
-      if (alterErr2) {
-        console.error("Error adding column 2:", alterErr2);
-        return res.status(500).json({ Error: "Internal Server Error" });
-      }
-
-      const sqlInsertCourse = "INSERT INTO courses_settings (course_name, fee, createdby, max_discount, course_package, date) VALUES (?, ?, ?, ?, ?, ?)";
-      const values = [req.body.course_name, req.body.fee, req.body.createdby, req.body.max_discount, req.body.course_package, req.body.date];
-
-      if (values.some((value) => value === undefined || value === null)) {
-        return res.status(422).json({ error: "Fill all the fields" });
-      }
-
-      connection.query(sqlInsertCourse, values, (err, result) => {
-        if (err) {
-          console.error("Error adding course:", err);
-          return res.status(500).json({ Error: "Error adding course" });
-        } else {
-          return res.status(201).json(req.body);
-        }
-      });
-    });
   });
 });
 
 
-app.get("/getcourse/:courseId", (req, res) => {
-  const courseId = req.params.courseId;
+app.get("/getcourses", (req, res) => {
+  const sql = "SELECT * FROM courses_settings";
+  connection.query(sql, (err, result) => {
+    if (err) {
+      return res.json({ Error: "get courses error in sql" });
+    } else {
+      return res.status(200).json(result);
+    }
+  });
+});
+
+app.get("/getcourse/:id", (req, res) => {
+  const id = req.params.id;
   const sqlGetCourse = "SELECT * FROM courses_settings WHERE id = ?";
  
-  connection.query(sqlGetCourse, [courseId], (err, result) => {
+  connection.query(sqlGetCourse, [id], (err, result) => {
     if (err) {
       console.error("Error retrieving course:", err);
       return res.status(500).json({ Error: "Error retrieving course" });
@@ -2747,17 +2612,16 @@ app.get("/getcourse/:courseId", (req, res) => {
 });
  
  
-app.put("/updatecourse/:courseId", (req, res) => {
-  const courseId = req.params.courseId;
-  const sqlUpdateCourse = "UPDATE courses_settings SET course_name=?, fee=?, createdby=?, max_discount=?, course_package=?, date=? WHERE id=?";
+app.put("/updatecourse/:id", (req, res) => {
+  const id = req.params.id;
+  const sqlUpdateCourse = "UPDATE courses_settings SET course_name=?, fee=?, createdby=?, max_discount=?, course_package=? WHERE id=?";
   const values = [
     req.body.course_name,
     req.body.fee,
     req.body.createdby,
     req.body.max_discount,
     req.body.course_package,
-    req.body.date,
-    courseId
+    id
   ];
  
   if (values.slice(0, -1).some((value) => value === undefined || value === null)) {
@@ -2802,130 +2666,12 @@ app.delete("/deletecourse/:id", (req, res) => {
 
 
 
-
-// app.post("/addcourses", (req, res) => {
-//   const courseName = req.body.course_name;
-//   const fee = req.body.fee;
-//   const createdBy = req.body.username;
-
-//   // Check if the "max_discount" column exists
-//   const checkColumnQuery = "SHOW COLUMNS FROM courses_settings LIKE 'max_discount'";
-
-//   connection.query(checkColumnQuery, (checkColumnErr, checkColumnResult) => {
-//     if (checkColumnErr) {
-//       console.error('Error checking if column exists:', checkColumnErr);
-//       return res.status(500).json({ Error: 'Internal Server Error' });
-//     }
-
-//     if (checkColumnResult.length === 0) {
-//       // If the column does not exist, add it using ALTER TABLE
-//       const addColumnQuery = "ALTER TABLE courses_settings ADD COLUMN max_discount INT DEFAULT 0";
-
-//       connection.query(addColumnQuery, (addColumnErr, addColumnResult) => {
-//         if (addColumnErr) {
-//           console.error('Error adding column:', addColumnErr);
-//           return res.status(500).json({ Error: 'Internal Server Error' });
-
-//         }
-//         console.log("res", res);
-//         // Now that the column is added, proceed with the course insertion
-//         insertCourse(courseName, fee, createdBy, res);
-//       });
-//     } else {
-//       // If the column already exists, proceed with the course insertion
-//       insertCourse(courseName, fee, createdBy, res);
-//     }
-//   });
-// });
-
-// function insertCourse(courseName, fee, createdBy, res) {
-//   const insertQuery = "INSERT INTO courses_settings (course_name, fee, createdby) VALUES (?, ?, ?)";
-//   const values = [courseName, fee, createdBy];
-
-//   if (!values.every((value) => value !== undefined)) {
-//     return res.status(422).json("Fill all the fields");
-//   }
-
-//   connection.query(insertQuery, values, (err, result) => {
-//     if (err) {
-//       console.error('Error adding course:', err);
-//       return res.json({ Error: "Error adding course" });
-//     } else {
-//       return res.status(201).json(req.body);
-//     }
-//   });
-// }
-
-
-
-// const interaktApiKey = 'Qkw5bElEanZwZVN3Q2VVUXVxdkp2eVNJN2FOdG9nQ0pQRU1xVkpCOVhXTTo=';
-
-// const interaktApiUrl = 'https://api.interakt.com/whatsapp/send';
-
-// app.post("/addcourses", async (req, res) => {
-//   const { course_name, fee, username } = req.body;
-
-//   // Check if any required field is missing
-//   if (!course_name || !fee || !username) {
-//     return res.status(422).json({ error: "Fill all the fields" });
-//   }
-
-//   const sql = "INSERT INTO courses_settings (course_name, fee, createdby) VALUES (?, ?, ?)";
-//   const values = [course_name, fee, username];
-
-//   try {
-//     const result = await connection.query(sql, values);
-//     const courseId = result.insertId;
-
-//     const messageData = {
-//       to: '9493991327', // Replace with the recipient's phone number
-//       message: `Course "${course_name}" added by ${username}`,
-//     };
-
-//     const headers = {
-//       'Content-Type': 'application/json',
-//       'Authorization': `Bearer ${interaktApiKey}`,
-//     };
-
-//     console.log('Sending WhatsApp message:', messageData);
-
-//     const response = await axios.post(interaktApiUrl, messageData, { headers, timeout: 10000 });
-//     // const response = await axios.post(interaktApiUrl, messageData, { headers });
-
-//     console.log('WhatsApp API response:', response.data);
-
-//     return res.status(201).json({
-//       success: true,
-//       message: "Course added successfully",
-//       course: { id: courseId, course_name, fee, createdby: username }
-//     });
-//   } catch (error) {
-//     console.error('Error adding course or sending WhatsApp message:', error.message);
-//     return res.status(500).json({ error: "Error adding course or sending WhatsApp message" });
-//   }
-// });
-
-
-
-
-
-app.get("/getcourses", (req, res) => {
-  const sql = "SELECT * FROM courses_settings";
-  connection.query(sql, (err, result) => {
-    if (err) {
-      return res.json({ Error: "get courses error in sql" });
-    } else {
-      return res.status(201).json(result);
-    }
-  });
-});
-
 // coursespackage
 
 app.post("/addcoursespackages", (req, res) => {
   const sql =
-    "INSERT INTO coursepackages_settings (coursepackages_name) VALUES (?)";
-  const values = [req.body.coursepackages_name];
+    "INSERT INTO coursepackages_settings (coursepackages_name, createdby) VALUES (?, ?)";
+  const values = [req.body.coursepackages_name, req.body.createdby];
 
   if (!values.every((value) => value !== undefined)) {
     return res.status(422).json("Please fill in all the data");
@@ -2939,11 +2685,11 @@ app.post("/addcoursespackages", (req, res) => {
 });
 
 
-app.get("/getcoursepackages/:courseId", (req, res) => {
-  const courseId = req.params.courseId;
+app.get("/getcoursepackages/:id", (req, res) => {
+  const id = req.params.id;
   const sqlGetCourse = "SELECT * FROM coursepackages_settings WHERE id = ?";
  
-  connection.query(sqlGetCourse, [courseId], (err, result) => {
+  connection.query(sqlGetCourse, [id], (err, result) => {
     if (err) {
       console.error("Error retrieving course:", err);
       return res.status(500).json({ Error: "Error retrieving course" });
@@ -2963,7 +2709,7 @@ app.get("/getcoursespackages", (req, res) => {
     if (err) {
       return res.json({ Error: "get courses error in sql" });
     } else {
-      return res.status(201).json(result);
+      return res.status(200).json(result);
     }
   });
 });
@@ -2983,20 +2729,19 @@ app.delete("/deletecoursepackage/:id", (req, res) => {
     }
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({ Error: "Course not found" });
+      return res.status(404).json({ Error: "coursepackages not found" });
     }
 
-    return res.status(200).json({ message: "Course deleted successfully" });
+    return res.status(200).json({ message: "coursepackages deleted successfully" });
   });
 });
 
-app.put("/updatecoursepackages/:courseId", (req, res) => {
-  const courseId = req.params.courseId;
+app.put("/updatecoursepackages/:id", (req, res) => {
+  const id = req.params.id;
   const sqlUpdateCourse = "UPDATE coursepackages_settings SET coursepackages_name=? WHERE id=?";
   const values = [
     req.body.coursepackages_name,
-    courseId
-    
+    id
   ];
  
   if (values.slice(0, -1).some((value) => value === undefined || value === null)) {
@@ -3015,6 +2760,307 @@ app.put("/updatecoursepackages/:courseId", (req, res) => {
     }
   });
 });
+
+// leadsource
+
+app.post("/addleadsource", (req, res) => {
+  const sql = "INSERT INTO leadsource_settings (leadsource) VALUES (?)";
+  const values = [req.body.leadsource];
+
+  if (!values.every((value) => value !== undefined)) {
+    res.status(422).json("fill the fields");
+  }
+
+  connection.query(sql, values, (err, result) => {
+    if (err) {
+      return res.json({ Error: "error adding loadsource" });
+    } else {
+      res.status(201).json(req.body);
+    }
+  });
+});
+
+app.get("/getleadsource", (req, res) => {
+  const sql = "SELECT * FROM leadsource_settings";
+
+  connection.query(sql, (err, result) => {
+    if (err) {
+      return res.json({ Error: "get leadsource error in sql" });
+    } else {
+      res.status(200).json(result);
+    }
+  });
+});
+
+
+
+app.get("/getleadsource/:id", (req, res) => {
+  const id = req.params.id;
+  const sql = "SELECT * FROM leadsource_settings WHERE id = ?";
+
+  connection.query(sql, [id], (err, result) => {
+    if (err) {
+      console.error("Error retrieving lead source", err)
+      return res.json({ Error: "get leadsource error in sql" });
+    } else {
+      if(result.length === 0){
+        return res.status(404).json({Error: "Lead Source not found"})
+      }
+      const course = result[0];
+      return res.status(200).json(course);
+    }
+  });
+});
+
+
+
+app.put("/updatedleadsource/:id", (req, res) => {
+  const id = req.params.id;
+  const sql = "UPDATE leadsource_settings SET leadsource = ? WHERE id=?";
+  const values = [req.body.leadsource, id];
+
+  if(values.slice(0, -1).some((value) => value === undefined || value === null)){
+    return res.status(422).json({error: "fill all the fields"});
+  }
+  
+  connection.query(sql, values, (err, result) => {
+    if(err){
+      console.error(("Error updating leadsource: ", err))
+      return res.json({ Error: "get leadsource error in sql" });
+    }else{
+      if(result.affectedRows === 0){
+        return res.status(404).json({ Error: "Lead Source not found"})
+      }
+      
+      return res.status(200).json({ message: "Lead Sourse updated successfully"})
+    }
+  })
+})
+
+
+
+app.delete("/deleteleadsource/:id", (req, res) => {
+  const id = req.params.id;
+
+  if(!id){
+    return res.status(422).json({ error: "id is required"})
+  }
+
+  const sql = "DELETE FROM leadsource_settings WHERE id = ?"
+
+  connection.query(sql, [id], (err, result) => {
+    if(err){
+      console.error(("Error deleting leadsource: ", err))
+      return res.status(500).json({ Error: "delete leadsource error in sql" });
+    }
+
+      if(result.affectedRows === 0){
+        return res.status(401).json({ Error: "Leadsource not found"});
+      }
+    
+      return res.status(200).json({ message: "leadsource delete successfully"})
+  })
+})
+
+// department
+
+app.post("/adddepartment", (req, res) => {
+  const sql = "INSERT INTO department_settings (department_name, description, createdby) VALUES (?, ?, ?)";
+  const values = [req.body.department_name, req.body.description, req.body.createdby];
+
+  if (!values.every((value) => value !== undefined)) {
+    return res.status(422).json("fill the field");
+  }
+
+  connection.query(sql, values, (err, result) => {
+    if (err) {
+      return res.json({ Error: "get department error in sql" });
+    } else {
+      res.status(201).json(req.body);
+    }
+  });
+});
+
+app.get("/getdepartment", (req, res) => {
+  const sql = "SELECT * FROM department_settings";
+  connection.query(sql, (err, result) => {
+    if (err) {
+      return res.json({ Error: "get department error in sql" });
+    } else {
+      res.status(200).json(result);
+    }
+  });
+});
+
+
+
+app.get("/getdepartment/:id", (req, res) => {
+  const id = req.params.id;
+  const sql = "SELECT * FROM department_settings WHERE id = ?";
+
+  connection.query(sql, [id], (err, result) => {
+    if (err) {
+      console.error("Error retrieving lead source", err)
+      return res.json({ Error: "get department error in sql" });
+    } else {
+      if(result.length === 0){
+        return res.status(404).json({Error: "department not found"})
+      }
+      const course = result[0];
+      return res.status(200).json(course);
+    }
+  });
+});
+
+
+
+app.put("/updatedepartment/:id", (req, res) => {
+  const id = req.params.id;
+  const sql = "UPDATE department_settings SET department_name = ?, description = ?, createdby = ? WHERE id=?";
+  const values = [req.body.department_name, req.body.description, req.body.createdby, id];
+
+  if(values.slice(0, -1).some((value) => value === undefined || value === null)){
+    return res.status(422).json({error: "fill all the fields"});
+  }
+  
+  connection.query(sql, values, (err, result) => {
+    if(err){
+      console.error(("Error updating leadsource: ", err))
+      return res.json({ Error: "get leadsource error in sql" });
+    }else{
+      if(result.affectedRows === 0){
+        return res.status(404).json({ Error: "Lead Source not found"})
+      }
+     
+      return res.status(200).json({ message: "Lead Sourse updated successfully"})
+    }
+  })
+})
+
+
+
+app.delete("/deletedepartment/:id", (req, res) => {
+  const id = req.params.id;
+
+  if(!id){
+    return res.status(422).json({ error: "id is required"})
+  }
+
+  const sql = "DELETE FROM department_settings WHERE id = ?"
+
+  connection.query(sql, [id], (err, result) => {
+    if(err){
+      console.error(("Error deleting department: ", err))
+      return res.status(500).json({ Error: "delete department error in sql" });
+    }
+
+      if(result.affectedRows === 0){
+        return res.status(401).json({ Error: "department not found"});
+      }
+    
+      return res.status(200).json({ message: "department delete successfully"})
+  })
+})
+
+
+
+// branch
+
+app.post("/addbranch", (req, res) => {
+  const sql = "INSERT INTO branch_settings (branch_name, description, createdby) VALUES (?, ?, ?)";
+  const values = [req.body.branch_name, req.body.description, req.body.createdby];
+
+  if (!values.every((value) => value !== undefined)) {
+    return res.status(422).json("Please fill in all the data");
+  }
+  connection.query(sql, values, (err, result) => {
+    if (err) {
+      console.log("err insert in addbranch: ", err);
+    }
+    return res.status(201).json(req.body);
+  });
+});
+
+app.get("/getbranch", (req, res) => {
+  const sql = "SELECT * FROM branch_settings";
+  connection.query(sql, (err, result) => {
+    if (err) {
+      return res.json({ Error: "get branch error in sql" });
+    } else {
+      res.status(200).json(result);
+    }
+  });
+});
+
+
+app.get("/getbranch/:id", (req, res) => {
+  const id = req.params.id;
+  const sql = "SELECT * FROM branch_settings WHERE id = ?";
+
+  connection.query(sql, [id], (err, result) => {
+    if (err) {
+      console.error("Error retrieving branch", err)
+      return res.json({ Error: "get branch error in sql" });
+    } else {
+      if(result.length === 0){
+        return res.status(404).json({Error: "branch not found"})
+      }
+      const course = result[0];
+      return res.status(200).json(course);
+    }
+  });
+});
+
+
+
+app.put("/updatebranch/:id", (req, res) => {
+  const id = req.params.id;
+  const sql = "UPDATE branch_settings SET branch_name = ?, description = ?, createdby = ? WHERE id=?";
+  const values = [req.body.branch_name, req.body.description, req.body.createdby, id];
+
+  if(values.slice(0, -1).some((value) => value === undefined || value === null)){
+    return res.status(422).json({error: "fill all the fields"});
+  }
+  
+  connection.query(sql, values, (err, result) => {
+    if(err){
+      console.error(("Error updating branch: ", err))
+      return res.json({ Error: "get branch error in sql" });
+    }else{
+      if(result.affectedRows === 0){
+        return res.status(404).json({ Error: "branch not found"})
+      }
+     
+      return res.status(200).json({ message: "branch updated successfully"})
+    }
+  })
+})
+
+
+
+app.delete("/deletebranch/:id", (req, res) => {
+  const id = req.params.id;
+
+  if(!id){
+    return res.status(422).json({ error: "id is required"})
+  }
+
+  const sql = "DELETE FROM branch_settings WHERE id = ?"
+
+  connection.query(sql, [id], (err, result) => {
+    if(err){
+      console.error(("Error deleting department: ", err))
+      return res.status(500).json({ Error: "delete branch error in sql" });
+    }
+
+      if(result.affectedRows === 0){
+        return res.status(401).json({ Error: "branch not found"});
+      }
+    
+      return res.status(200).json({ message: "branch delete successfully"})
+  })
+})
+
 
 // certificates
 
